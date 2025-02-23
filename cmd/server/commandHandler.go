@@ -5,6 +5,8 @@ import(
 	"fmt"
 )
 
+//Implementing responsibility chain pattern for commands handling
+
 type CommandHandler interface{
 	HandleCommand(command string) bool
 	SetNext(handler CommandHandler)
