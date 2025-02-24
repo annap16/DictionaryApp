@@ -13,8 +13,7 @@ import (
 
 // CreateTranslation is the resolver for the createTranslation field.
 func (r *mutationResolver) CreateTranslation(ctx context.Context, input model.CreateTranslationInput) (*model.Word, error) {
-	fmt.Println("Received GraphQL mutation input: %+v\n", input)
-
+	// Example return without DB integration
 	word := &model.Word{
 		ID:   "123",
 		Word: input.Word,
@@ -39,24 +38,22 @@ func (r *mutationResolver) CreateTranslation(ctx context.Context, input model.Cr
 	return word, nil
 }
 
-// GetWordID is the resolver for the getWordID field.
-func (r *queryResolver) GetWordID(ctx context.Context, word string) (int32, error) {
-	panic(fmt.Errorf("not implemented: GetWordID - getWordID"))
-}
-
-// GetTranslationID is the resolver for the getTranslationID field.
-func (r *queryResolver) GetTranslationID(ctx context.Context, translation string) (int32, error) {
-	panic(fmt.Errorf("not implemented: GetTranslationID - getTranslationID"))
-}
-
 // GetWordTranslation is the resolver for the getWordTranslation field.
-func (r *queryResolver) GetWordTranslation(ctx context.Context, word *string, id *string) ([]*model.Translation, error) {
-	panic(fmt.Errorf("not implemented: GetWordTranslation - getWordTranslation"))
-}
-
-// GetExamples is the resolver for the getExamples field.
-func (r *queryResolver) GetExamples(ctx context.Context, translation *string, id *string) ([]*model.ExampleSentence, error) {
-	panic(fmt.Errorf("not implemented: GetExamples - getExamples"))
+func (r *queryResolver) GetWordTranslation(ctx context.Context, word string) (*model.Word, error) {
+	// Example return without DB integration
+	return &model.Word{
+		ID:   "123",
+		Word: word,
+		Translations: []*model.Translation{
+			{
+				ID:          "1",
+				Translation: "house",
+				ExampleSentences: []*model.ExampleSentence{
+					{ID: "1", Sentence: "Dr House"},
+				},
+			},
+		},
+	}, nil
 }
 
 // Mutation returns MutationResolver implementation.

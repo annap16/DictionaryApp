@@ -13,7 +13,7 @@ func WaitForUserInput() {
 	exit := false
 
 	createHandler := &CreateCommandHandler{}
-	reciveHandler := &ReciveCommandHandler{}
+	reciveHandler := &ReceiveCommandHandler{}
 	modifyHandler := &ModifyCommandHandler{}
 	removeHandler := &RemoveCommandHandler{}
 

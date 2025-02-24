@@ -22,10 +22,7 @@ input CreateTranslationInput {
 }
 
 type Query {
-  getWordID(word: String!): Int!
-  getTranslationID(translation: String!): Int!
-  getWordTranslation(word: String, id: ID): [Translation!]!
-  getExamples(translation: String, id: ID): [ExampleSentence!]!
+  getWordTranslation(word: String!): Word
 }
 
 type Mutation {

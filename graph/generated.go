@@ -57,10 +57,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetExamples        func(childComplexity int, translation *string, id *string) int
-		GetTranslationID   func(childComplexity int, translation string) int
-		GetWordID          func(childComplexity int, word string) int
-		GetWordTranslation func(childComplexity int, word *string, id *string) int
+		GetWordTranslation func(childComplexity int, word string) int
 	}
 
 	Translation struct {
@@ -80,10 +77,7 @@ type MutationResolver interface {
 	CreateTranslation(ctx context.Context, input model.CreateTranslationInput) (*model.Word, error)
 }
 type QueryResolver interface {
-	GetWordID(ctx context.Context, word string) (int32, error)
-	GetTranslationID(ctx context.Context, translation string) (int32, error)
-	GetWordTranslation(ctx context.Context, word *string, id *string) ([]*model.Translation, error)
-	GetExamples(ctx context.Context, translation *string, id *string) ([]*model.ExampleSentence, error)
+	GetWordTranslation(ctx context.Context, word string) (*model.Word, error)
 }
 
 type executableSchema struct {
@@ -131,42 +125,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateTranslation(childComplexity, args["input"].(model.CreateTranslationInput)), true
 
-	case "Query.getExamples":
-		if e.complexity.Query.GetExamples == nil {
-			break
-		}
-
-		args, err := ec.field_Query_getExamples_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetExamples(childComplexity, args["translation"].(*string), args["id"].(*string)), true
-
-	case "Query.getTranslationID":
-		if e.complexity.Query.GetTranslationID == nil {
-			break
-		}
-
-		args, err := ec.field_Query_getTranslationID_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetTranslationID(childComplexity, args["translation"].(string)), true
-
-	case "Query.getWordID":
-		if e.complexity.Query.GetWordID == nil {
-			break
-		}
-
-		args, err := ec.field_Query_getWordID_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetWordID(childComplexity, args["word"].(string)), true
-
 	case "Query.getWordTranslation":
 		if e.complexity.Query.GetWordTranslation == nil {
 			break
@@ -177,7 +135,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetWordTranslation(childComplexity, args["word"].(*string), args["id"].(*string)), true
+		return e.complexity.Query.GetWordTranslation(childComplexity, args["word"].(string)), true
 
 	case "Translation.exampleSentences":
 		if e.complexity.Translation.ExampleSentences == nil {
@@ -392,93 +350,6 @@ func (ec *executionContext) field_Query___type_argsName(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Query_getExamples_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Query_getExamples_argsTranslation(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["translation"] = arg0
-	arg1, err := ec.field_Query_getExamples_argsID(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg1
-	return args, nil
-}
-func (ec *executionContext) field_Query_getExamples_argsTranslation(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*string, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("translation"))
-	if tmp, ok := rawArgs["translation"]; ok {
-		return ec.unmarshalOString2ᚖstring(ctx, tmp)
-	}
-
-	var zeroVal *string
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Query_getExamples_argsID(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*string, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-	if tmp, ok := rawArgs["id"]; ok {
-		return ec.unmarshalOID2ᚖstring(ctx, tmp)
-	}
-
-	var zeroVal *string
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Query_getTranslationID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Query_getTranslationID_argsTranslation(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["translation"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Query_getTranslationID_argsTranslation(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (string, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("translation"))
-	if tmp, ok := rawArgs["translation"]; ok {
-		return ec.unmarshalNString2string(ctx, tmp)
-	}
-
-	var zeroVal string
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Query_getWordID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Query_getWordID_argsWord(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["word"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Query_getWordID_argsWord(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (string, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("word"))
-	if tmp, ok := rawArgs["word"]; ok {
-		return ec.unmarshalNString2string(ctx, tmp)
-	}
-
-	var zeroVal string
-	return zeroVal, nil
-}
-
 func (ec *executionContext) field_Query_getWordTranslation_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -487,36 +358,18 @@ func (ec *executionContext) field_Query_getWordTranslation_args(ctx context.Cont
 		return nil, err
 	}
 	args["word"] = arg0
-	arg1, err := ec.field_Query_getWordTranslation_argsID(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg1
 	return args, nil
 }
 func (ec *executionContext) field_Query_getWordTranslation_argsWord(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (*string, error) {
+) (string, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("word"))
 	if tmp, ok := rawArgs["word"]; ok {
-		return ec.unmarshalOString2ᚖstring(ctx, tmp)
+		return ec.unmarshalNString2string(ctx, tmp)
 	}
 
-	var zeroVal *string
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Query_getWordTranslation_argsID(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (*string, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-	if tmp, ok := rawArgs["id"]; ok {
-		return ec.unmarshalOID2ᚖstring(ctx, tmp)
-	}
-
-	var zeroVal *string
+	var zeroVal string
 	return zeroVal, nil
 }
 
@@ -771,116 +624,6 @@ func (ec *executionContext) fieldContext_Mutation_createTranslation(ctx context.
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_getWordID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_getWordID(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetWordID(rctx, fc.Args["word"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int32)
-	fc.Result = res
-	return ec.marshalNInt2int32(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_getWordID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_getWordID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_getTranslationID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_getTranslationID(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetTranslationID(rctx, fc.Args["translation"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int32)
-	fc.Result = res
-	return ec.marshalNInt2int32(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_getTranslationID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_getTranslationID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query_getWordTranslation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_getWordTranslation(ctx, field)
 	if err != nil {
@@ -895,21 +638,18 @@ func (ec *executionContext) _Query_getWordTranslation(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetWordTranslation(rctx, fc.Args["word"].(*string), fc.Args["id"].(*string))
+		return ec.resolvers.Query().GetWordTranslation(rctx, fc.Args["word"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Translation)
+	res := resTmp.(*model.Word)
 	fc.Result = res
-	return ec.marshalNTranslation2ᚕᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐTranslationᚄ(ctx, field.Selections, res)
+	return ec.marshalOWord2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐWord(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getWordTranslation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -921,13 +661,13 @@ func (ec *executionContext) fieldContext_Query_getWordTranslation(ctx context.Co
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Translation_id(ctx, field)
-			case "translation":
-				return ec.fieldContext_Translation_translation(ctx, field)
-			case "exampleSentences":
-				return ec.fieldContext_Translation_exampleSentences(ctx, field)
+				return ec.fieldContext_Word_id(ctx, field)
+			case "word":
+				return ec.fieldContext_Word_word(ctx, field)
+			case "translations":
+				return ec.fieldContext_Word_translations(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Translation", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Word", field.Name)
 		},
 	}
 	defer func() {
@@ -938,67 +678,6 @@ func (ec *executionContext) fieldContext_Query_getWordTranslation(ctx context.Co
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getWordTranslation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_getExamples(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_getExamples(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetExamples(rctx, fc.Args["translation"].(*string), fc.Args["id"].(*string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ExampleSentence)
-	fc.Result = res
-	return ec.marshalNExampleSentence2ᚕᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐExampleSentenceᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_getExamples(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ExampleSentence_id(ctx, field)
-			case "sentence":
-				return ec.fieldContext_ExampleSentence_sentence(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ExampleSentence", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_getExamples_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3526,85 +3205,16 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "getWordID":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_getWordID(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "getTranslationID":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_getTranslationID(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getWordTranslation":
 			field := field
 
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
 				res = ec._Query_getWordTranslation(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "getExamples":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_getExamples(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
 				return res
 			}
 
@@ -4167,21 +3777,6 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) unmarshalNInt2int32(ctx context.Context, v any) (int32, error) {
-	res, err := graphql.UnmarshalInt32(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNInt2int32(ctx context.Context, sel ast.SelectionSet, v int32) graphql.Marshaler {
-	res := graphql.MarshalInt32(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
-}
-
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4544,22 +4139,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v any) (*string, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalID(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalID(*v)
-	return res
-}
-
 func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
 	if v == nil {
 		return nil, nil
@@ -4612,6 +4191,13 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOWord2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐWord(ctx context.Context, sel ast.SelectionSet, v *model.Word) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Word(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

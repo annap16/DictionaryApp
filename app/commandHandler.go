@@ -75,14 +75,29 @@ func (c *CreateCommandHandler) SetNext(handler CommandHandler) {
 	c.next = handler
 }
 
-type ReciveCommandHandler struct{
+type ReceiveCommandHandler struct{
 	next CommandHandler
 }
 
-func (r *ReciveCommandHandler) HandleCommand(command string) bool{
+func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
+	// TODO make NewClient request one time in other func
+	client := graphql.NewClient("http://localhost:8080/query")
+	handler := &QueriesHandler{client: client}
+
 	commandSplitted := strings.Split(command, " ")
-	if(commandSplitted[0]=="recive"){
-		fmt.Println("recive")
+	if(commandSplitted[0]=="receive"){
+		if(len(commandSplitted)!=2){
+			log.Fatal("Wrong command")
+		}
+		ctx := context.Background()
+		fmt.Println("Here I am")
+		received, err := handler.SendReciveMutation(ctx, commandSplitted[1])
+		if err != nil {
+			log.Fatal("Error:", err)
+		}
+
+		fmt.Println(received)
+
 		return true
 	}
 	if(r.next!=nil){
@@ -91,7 +106,7 @@ func (r *ReciveCommandHandler) HandleCommand(command string) bool{
 	return false
 }
 
-func (r *ReciveCommandHandler) SetNext(handler CommandHandler) {
+func (r *ReceiveCommandHandler) SetNext(handler CommandHandler) {
 	r.next = handler
 }
 
