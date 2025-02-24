@@ -90,8 +90,7 @@ func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
 			log.Fatal("Wrong command")
 		}
 		ctx := context.Background()
-		fmt.Println("Here I am")
-		received, err := handler.SendReciveMutation(ctx, commandSplitted[1])
+		received, err := handler.SendReceiveMutation(ctx, commandSplitted[1])
 		if err != nil {
 			log.Fatal("Error:", err)
 		}
@@ -117,7 +116,17 @@ type ModifyCommandHandler struct{
 func (m *ModifyCommandHandler) HandleCommand(command string) bool{
 	commandSplitted := strings.Split(command, " ")
 	if(commandSplitted[0]=="modify"){
-		fmt.Println("modify")
+		if(len(commandSplitted)<3){
+			log.Fatal("Wrong command")
+		}
+		modifyType := commandSplitted[1]
+		if modifyType=="delete"{
+			// TODO
+		} else if modifyType=="add"{
+			//TODO
+		} else{
+			log.Fatal("Wrong command")
+		}
 		return true
 	}
 	if(m.next!=nil){
@@ -136,9 +145,23 @@ type RemoveCommandHandler struct{
 }
 
 func (r *RemoveCommandHandler) HandleCommand(command string) bool{
+	// TODO make NewClient request one time in other func
+	client := graphql.NewClient("http://localhost:8080/query")
+	handler := &QueriesHandler{client: client}
+
 	commandSplitted := strings.Split(command, " ")
 	if(commandSplitted[0]=="remove"){
-		fmt.Println("remove")
+		if(len(commandSplitted)!=2){
+			log.Fatal("Wrong command")
+		}
+
+		ctx := context.Background()
+		err := handler.SendRemoveMutation(ctx, commandSplitted[1])
+		if err != nil {
+			log.Fatal("Error:", err)
+		} else{
+			fmt.Println("Successfully deleted translation with word:", commandSplitted[1])
+		}
 		return true
 	}
 	if(r.next!=nil){

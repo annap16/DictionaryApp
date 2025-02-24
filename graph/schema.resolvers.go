@@ -38,6 +38,12 @@ func (r *mutationResolver) CreateTranslation(ctx context.Context, input model.Cr
 	return word, nil
 }
 
+// DeleteWord is the resolver for the deleteWord field.
+func (r *mutationResolver) DeleteWord(ctx context.Context, word string) (bool, error) {
+	fmt.Println("Deleting the word:", word)
+	return true, nil
+}
+
 // GetWordTranslation is the resolver for the getWordTranslation field.
 func (r *queryResolver) GetWordTranslation(ctx context.Context, word string) (*model.Word, error) {
 	// Example return without DB integration

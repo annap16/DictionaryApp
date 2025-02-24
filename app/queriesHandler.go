@@ -40,24 +40,7 @@ func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.Cre
 	return nil
  }
 
- // TODO move to more accurate place
- type ReciveResponse struct {
-	GetWordTranslation struct { 
-		ID           string `json:"id"`
-		Word         string `json:"word"`
-		Translations []struct {
-			ID              string `json:"id"`
-			Translation     string `json:"translation"`
-			ExampleSentences []struct {
-				ID       string `json:"id"`
-				Sentence string `json:"sentence"`
-			} `json:"exampleSentences"`
-		} `json:"translations"`
-	} `json:"getWordTranslation"`
-}
-
-
- func (q *QueriesHandler) SendReciveMutation(ctx context.Context, input string) (string, error) {
+ func (q *QueriesHandler) SendReceiveMutation(ctx context.Context, input string) (string, error) {
 
 	request := graphql.NewRequest(`
 		query ($word: String!) {
@@ -75,7 +58,7 @@ func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.Cre
 
 	request.Var("word", input)
 
-	var response ReciveResponse
+	var response ReceiveResponse
 	if err := q.client.Run(context.Background(), request, &response); err != nil {
 		log.Fatal(err)
 	}
@@ -83,7 +66,7 @@ func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.Cre
 	return q.ParseReceiveResponse(response), nil
 }
 
-func (q *QueriesHandler) ParseReceiveResponse(response ReciveResponse) string{
+func (q *QueriesHandler) ParseReceiveResponse(response ReceiveResponse) string{
 	var result string
 	result += "Word: " + response.GetWordTranslation.Word + "\n"
 
@@ -96,5 +79,28 @@ func (q *QueriesHandler) ParseReceiveResponse(response ReciveResponse) string{
 	result = strings.TrimSuffix(result, "\n")
 	return result
 }
+
+
+func (q *QueriesHandler) SendRemoveMutation(ctx context.Context, input string) error {
+	request := graphql.NewRequest(`
+		mutation ($word: String!) {
+			deleteWord(word: $word)
+		}
+	`)
+
+	request.Var("word", input)
+
+	var response RemoveResponse
+
+	if err := q.client.Run(context.Background(), request, &response); err != nil {
+		log.Fatal("Error:", err)
+		return err
+	}
+
+	return nil
+
+
+}
+
 
 

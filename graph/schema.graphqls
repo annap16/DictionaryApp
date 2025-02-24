@@ -27,4 +27,5 @@ type Query {
 
 type Mutation {
   createTranslation(input: CreateTranslationInput!): Word!
+  deleteWord(word: String!): Boolean!
 }
