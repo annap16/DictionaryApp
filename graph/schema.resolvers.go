@@ -11,14 +11,52 @@ import (
 	"github.com/annap16/DictionaryApp/graph/model"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// CreateTranslation is the resolver for the createTranslation field.
+func (r *mutationResolver) CreateTranslation(ctx context.Context, input model.CreateTranslationInput) (*model.Word, error) {
+	fmt.Println("Received GraphQL mutation input: %+v\n", input)
+
+	word := &model.Word{
+		ID:   "123",
+		Word: input.Word,
+		Translations: []*model.Translation{
+			{
+				ID:          "1",
+				Translation: input.Translation,
+				ExampleSentences: func() []*model.ExampleSentence {
+					var exampleSentences []*model.ExampleSentence
+					for i, sentence := range input.Examples {
+						exampleSentences = append(exampleSentences, &model.ExampleSentence{
+							ID:       fmt.Sprintf("%d", i+1),
+							Sentence: sentence,
+						})
+					}
+					return exampleSentences
+				}(),
+			},
+		},
+	}
+
+	return word, nil
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// GetWordID is the resolver for the getWordID field.
+func (r *queryResolver) GetWordID(ctx context.Context, word string) (int32, error) {
+	panic(fmt.Errorf("not implemented: GetWordID - getWordID"))
+}
+
+// GetTranslationID is the resolver for the getTranslationID field.
+func (r *queryResolver) GetTranslationID(ctx context.Context, translation string) (int32, error) {
+	panic(fmt.Errorf("not implemented: GetTranslationID - getTranslationID"))
+}
+
+// GetWordTranslation is the resolver for the getWordTranslation field.
+func (r *queryResolver) GetWordTranslation(ctx context.Context, word *string, id *string) ([]*model.Translation, error) {
+	panic(fmt.Errorf("not implemented: GetWordTranslation - getWordTranslation"))
+}
+
+// GetExamples is the resolver for the getExamples field.
+func (r *queryResolver) GetExamples(ctx context.Context, translation *string, id *string) ([]*model.ExampleSentence, error) {
+	panic(fmt.Errorf("not implemented: GetExamples - getExamples"))
 }
 
 // Mutation returns MutationResolver implementation.

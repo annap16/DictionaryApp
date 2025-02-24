@@ -3,6 +3,12 @@ package main
 import(
 	"strings"
 	"fmt"
+	"context"
+	"log"
+	"regexp"
+	"github.com/annap16/DictionaryApp/graph/model"
+	"github.com/machinebox/graphql"
+
 )
 
 //Implementing responsibility chain pattern for commands handling
@@ -17,15 +23,52 @@ type CreateCommandHandler struct{
 }
 
 func (c *CreateCommandHandler) HandleCommand(command string) bool{
+
+	// TODO make NewClient request one time in other func
+	client := graphql.NewClient("http://localhost:8080/query")
+	handler := &QueriesHandler{client: client}
+
 	commandSplitted := strings.Split(command, " ")
 	if(commandSplitted[0]=="create"){
-		fmt.Println("create")
+		if len(commandSplitted)<3 {
+			log.Fatal("Incorrect command")
+			return false
+		}
+		word := commandSplitted[1]
+		translation := commandSplitted[2] 
+		sentences := ParseQuery(command)
+
+		input := model.CreateTranslationInput{
+			Word:        word,
+			Translation: translation,
+			Examples:    sentences,
+		}
+
+		ctx := context.Background()
+		err := handler.SendCreateMutation(ctx, input)
+		if err != nil {
+			log.Fatal("Error:", err)
+		}
+
 		return true
 	}
 	if(c.next!=nil){
 		return c.next.HandleCommand(command)
 	}
 	return false
+}
+
+func ParseQuery(query string) ([]string) {
+	re := regexp.MustCompile(`\[(.*?)\]`)
+
+	matches := re.FindAllStringSubmatch(query, -1)
+
+	var sentences []string
+	for _, match := range matches {
+		sentences = append(sentences, match[1]) 
+	}
+
+	return sentences
 }
 
 func (c *CreateCommandHandler) SetNext(handler CommandHandler) {
