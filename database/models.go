@@ -1,24 +1,23 @@
 package database
 
 import (
-	"gorm.io/gorm"
 )
 
 type ExampleSentence struct {
-	gorm.Model
+	ID           uint           `gorm:"primaryKey"`
 	Sentence      string `gorm:"not null"`
 	TranslationID uint   `gorm:"not null"`
 }
 
 type Translation struct {
-	gorm.Model
+	ID           uint           `gorm:"primaryKey"`
 	Translation      string            `gorm:"not null"`
 	WordID           uint              `gorm:"not null"` 
-	ExampleSentences []ExampleSentence `gorm:"foreignKey:TranslationID"`
+	ExampleSentences []ExampleSentence  `gorm:"foreignKey:TranslationID;constraint:OnDelete:CASCADE;"`
 }
 
 type Word struct {
-	gorm.Model
+	ID           uint           `gorm:"primaryKey"`
 	Word         string        `gorm:"unique;not null"`
-	Translations []Translation `gorm:"foreignKey:WordID"`
-}
+	Translations []Translation `gorm:"foreignKey:WordID;constraint:OnDelete:CASCADE;"`
+	}

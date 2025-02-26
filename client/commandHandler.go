@@ -167,7 +167,7 @@ func (r *RemoveCommandHandler) HandleCommand(command string) bool{
 		if err != nil {
 			log.Fatal("Error:", err)
 		} else{
-			fmt.Println("Successfully deleted translation with word:", commandSplitted[1])
+			fmt.Println("Word and related data deleted successfully")
 		}
 		return true
 	}

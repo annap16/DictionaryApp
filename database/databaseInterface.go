@@ -16,6 +16,7 @@ func NewDBInterface(db *gorm.DB) *DBInterface {
 	return &DBInterface{DB: db}
 }
 
+
 func (dbI *DBInterface) AddWord(input model.CreateTranslationInput) error {
 	exampleSentences := createExampleSentences(input.Examples)
 
@@ -94,5 +95,15 @@ func convertExampleSentences(sentences []ExampleSentence) []*model.ExampleSenten
 	}
 	return modelSentences
 }
+
+func (dbI *DBInterface) DeleteWord(input string) (bool, error) {
+	if err := dbI.DB.Where("word = ?", input).Delete(&Word{}).Error; err != nil {
+		log.Fatal("Error deleting word:", err)
+		return false, err
+	}
+
+	return true, nil
+}
+
 
 

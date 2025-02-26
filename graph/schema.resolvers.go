@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/annap16/DictionaryApp/graph/model"
@@ -24,27 +23,12 @@ func (r *mutationResolver) CreateTranslation(ctx context.Context, input model.Cr
 
 // DeleteWord is the resolver for the deleteWord field.
 func (r *mutationResolver) DeleteWord(ctx context.Context, word string) (bool, error) {
-	fmt.Println("Deleting the word:", word)
-	return true, nil
+	return r.DBInterface.DeleteWord(word)
 }
 
 // GetWordTranslation is the resolver for the getWordTranslation field.
 func (r *queryResolver) GetWordTranslation(ctx context.Context, word string) (*model.Word, error) {
-	// Example return without DB integration
 	return r.DBInterface.ReceiveWordTranslation(word)
-	// return &model.Word{
-	// 	ID:   "123",
-	// 	Word: word,
-	// 	Translations: []*model.Translation{
-	// 		{
-	// 			ID:          "1",
-	// 			Translation: "house",
-	// 			ExampleSentences: []*model.ExampleSentence{
-	// 				{ID: "1", Sentence: "Dr House"},
-	// 			},
-	// 		},
-	// 	},
-	// }, nil
 }
 
 // Mutation returns MutationResolver implementation.
