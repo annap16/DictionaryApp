@@ -23,12 +23,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("Database connection error: %v", err)
 	}
+	dbInterface := database.NewDBInterface(db.Connection)
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: db}}))
+	
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{
+		Resolvers: &graph.Resolver{DBInterface: dbInterface},
+	}))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})

@@ -75,7 +75,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateTranslation(ctx context.Context, input model.CreateTranslationInput) (*model.Word, error)
+	CreateTranslation(ctx context.Context, input model.CreateTranslationInput) (bool, error)
 	DeleteWord(ctx context.Context, word string) (bool, error)
 }
 type QueryResolver interface {
@@ -624,9 +624,9 @@ func (ec *executionContext) _Mutation_createTranslation(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Word)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNWord2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐWord(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createTranslation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -636,15 +636,7 @@ func (ec *executionContext) fieldContext_Mutation_createTranslation(ctx context.
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Word_id(ctx, field)
-			case "word":
-				return ec.fieldContext_Word_word(ctx, field)
-			case "translations":
-				return ec.fieldContext_Word_translations(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Word", field.Name)
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	defer func() {
@@ -3943,20 +3935,6 @@ func (ec *executionContext) marshalNTranslation2ᚖgithubᚗcomᚋannap16ᚋDict
 		return graphql.Null
 	}
 	return ec._Translation(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNWord2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐWord(ctx context.Context, sel ast.SelectionSet, v model.Word) graphql.Marshaler {
-	return ec._Word(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNWord2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐWord(ctx context.Context, sel ast.SelectionSet, v *model.Word) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Word(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

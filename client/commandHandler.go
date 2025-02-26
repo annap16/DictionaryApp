@@ -47,8 +47,10 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 		ctx := context.Background()
 		err := handler.SendCreateMutation(ctx, input)
 		if err != nil {
-			log.Fatal("Error:", err)
+			log.Fatal("Error after send create mutation:", err)
 		}
+
+		fmt.Println("Word successfully added to dictionary")
 
 		return true
 	}

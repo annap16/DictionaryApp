@@ -6,5 +6,5 @@ package graph
 import "github.com/annap16/DictionaryApp/database"
 
 type Resolver struct{
-	DB *database.Database
+	DBInterface *database.DBInterface 
 }

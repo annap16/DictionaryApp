@@ -16,20 +16,10 @@ type QueriesHandler struct{
 func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.CreateTranslationInput) error {
 	request := graphql.NewRequest(`
 	mutation ($input: CreateTranslationInput!) {
-		createTranslation(input: $input) {
-			id
-			word
-			translations {
-				id
-				translation
-				exampleSentences {
-					id
-					sentence
-				}
-			}
-		}
+		createTranslation(input: $input)
 	}
-`)	
+	`)
+
 	request.Var("input", input)
 
 	err := q.client.Run(context.Background(), request, nil)

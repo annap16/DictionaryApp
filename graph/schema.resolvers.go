@@ -7,35 +7,19 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/annap16/DictionaryApp/graph/model"
 )
 
 // CreateTranslation is the resolver for the createTranslation field.
-func (r *mutationResolver) CreateTranslation(ctx context.Context, input model.CreateTranslationInput) (*model.Word, error) {
-	// Example return without DB integration
-	word := &model.Word{
-		ID:   "123",
-		Word: input.Word,
-		Translations: []*model.Translation{
-			{
-				ID:          "1",
-				Translation: input.Translation,
-				ExampleSentences: func() []*model.ExampleSentence {
-					var exampleSentences []*model.ExampleSentence
-					for i, sentence := range input.Examples {
-						exampleSentences = append(exampleSentences, &model.ExampleSentence{
-							ID:       fmt.Sprintf("%d", i+1),
-							Sentence: sentence,
-						})
-					}
-					return exampleSentences
-				}(),
-			},
-		},
+func (r *mutationResolver) CreateTranslation(ctx context.Context, input model.CreateTranslationInput) (bool, error) {
+	err := r.DBInterface.AddWord(input)
+	if err != nil {
+		log.Fatal("Create Word error")
+		return false, err
 	}
-
-	return word, nil
+	return true, nil
 }
 
 // DeleteWord is the resolver for the deleteWord field.
