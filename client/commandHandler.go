@@ -94,10 +94,15 @@ func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
 		ctx := context.Background()
 		received, err := handler.SendReceiveMutation(ctx, commandSplitted[1])
 		if err != nil {
+			if strings.Contains(err.Error(), "record not found") {
+				fmt.Println("The word is not in the dictionary")
+				return true
+			}
 			log.Fatal("Error:", err)
+		}else{
+			fmt.Println(received)
 		}
 
-		fmt.Println(received)
 
 		return true
 	}

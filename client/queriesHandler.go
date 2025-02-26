@@ -4,6 +4,7 @@ import(
 	"context"
 	"log"
 	"strings"
+
 	"github.com/machinebox/graphql"
 	"github.com/annap16/DictionaryApp/graph/model"
 )
@@ -47,12 +48,19 @@ func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.Cre
 	`)
 
 	request.Var("word", input)
+	
 
 	var response ReceiveResponse
-	if err := q.client.Run(context.Background(), request, &response); err != nil {
-		log.Fatal(err)
+	err := q.client.Run(context.Background(), request, &response)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			return "", err
+		}
+		log.Fatal("Error:", err)
+		return "", err
 	}
-	
+
 	return q.ParseReceiveResponse(response), nil
 }
 

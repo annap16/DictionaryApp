@@ -22,7 +22,7 @@ input CreateTranslationInput {
 }
 
 type Query {
-  getWordTranslation(word: String!): Word
+  getWordTranslation(word: String!): Word!
 }
 
 type Mutation {
