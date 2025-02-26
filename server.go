@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/annap16/DictionaryApp/database"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
@@ -17,12 +19,16 @@ import (
 const defaultPort = "8080"
 
 func main() {
+	db, err := database.NewDatabase()
+	if err != nil {
+		log.Fatalf("Database connection error: %v", err)
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
-
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: db}}))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
