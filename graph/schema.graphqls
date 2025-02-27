@@ -22,10 +22,12 @@ input CreateTranslationInput {
 }
 
 type Query {
-  getWordTranslation(word: String!): Word!
+  getWordTranslation(word: String!): Word
 }
 
 type Mutation {
   createTranslation(input: CreateTranslationInput!): Boolean!
   deleteWord(word: String!): Boolean!
+  deleteTranslation(translation: String!): Boolean!
+  deleteExample(example: String!): Boolean!
 }

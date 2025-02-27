@@ -85,26 +85,56 @@ func (q *QueriesHandler) SendRemoveMutation(ctx context.Context, input string) (
 			deleteWord(word: $word)
 		}
 	`)
-
 	request.Var("word", input)
 
-	var response RemoveResponse
-
+	var response RemoveWordResponse
+	
 	if err := q.client.Run(context.Background(), request, &response); err != nil {
 		
 		log.Fatal("Error:", err)
 		return false, err
 	}
 
-	if response.DeleteWord{
-		return true, nil
-	}
-
-
-	return false, nil
-
+	return response.DeleteWord, nil
 
 }
+
+func(q *QueriesHandler) SendRemoveTranslationMutation(ctx context.Context, input string) (bool, error){
+	request := graphql.NewRequest(`
+		mutation ($translation: String!) {
+    		deleteTranslation(translation: $translation)
+		}
+		`)
+	request.Var("translation", input)
+
+	var response RemoveTranslationResponse
+
+    if err := q.client.Run(context.Background(), request, &response); err != nil {
+        log.Fatal("Error:", err)
+        return false, err
+    }
+
+	return response.DeleteTranslation, nil
+}
+
+func(q *QueriesHandler) SendRemoveExampleMutation(ctx context.Context, input string) (bool, error){
+	request := graphql.NewRequest(`
+	mutation($example: String!) {
+		deleteExample(example: $example)
+	}
+	`)
+	request.Var("example", input)
+
+	var response RemoveExampleResponse
+
+	if err := q.client.Run(context.Background(), request, &response); err != nil {
+		log.Fatal("Error:", err)
+	return false, err
+	}	
+	
+	return response.DeleteExample, nil
+}
+
 
 
 

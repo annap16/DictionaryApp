@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 	"log"
-	"strings"
+	"errors"
 	"github.com/annap16/DictionaryApp/graph/model"
 	"gorm.io/gorm"
 )
@@ -54,13 +54,14 @@ func (dbI *DBInterface) ReceiveWordTranslation(input string) (*model.Word, error
 	err := dbI.DB.
 		Preload("Translations.ExampleSentences"). 
 		Where("word = ?", input).                
-		First(&result).Error    
+		Find(&result).Error    
 
 	if err != nil {
-		if strings.Contains(err.Error(), "record not found") {
-			return nil, err
-		}
 		log.Fatal("Error:", err)
+		return nil, err
+	}
+	if result.ID == 0 {
+		err = errors.New("record not found")
 		return nil, err
 	}
 						
@@ -98,15 +99,58 @@ func convertExampleSentences(sentences []ExampleSentence) []*model.ExampleSenten
 
 func (dbI *DBInterface) DeleteWord(input string) (bool, error) {
 	var word Word
-	if err := dbI.DB.Where("word = ?", input).First(&word).Error; err != nil {
-		if strings.Contains(err.Error(), "record not found") {
-			return false, nil
-		}
+	if err := dbI.DB.Where("word = ?", input).Find(&word).Error; err != nil {
 		log.Fatal("Error:", err)
 		return false, err
 	}
+	if word.ID == 0 {
+		return false, nil
+	}
 	if err := dbI.DB.Where("word = ?", input).Delete(&Word{}).Error; err != nil {
 		log.Fatal("Error deleting word:", err)
+		return false, err
+	}
+
+	return true, nil
+}
+
+
+func (dbI *DBInterface) DeleteTranslation(input string) (bool, error) {
+	var translation Translation
+	// fmt.Println("Here 1")
+	if err := dbI.DB.Where("translation = ?", input).Find(&translation).Error; err != nil {
+		log.Fatal("Error:", err)
+		return false, err
+	}
+	//fmt.Println("Here 2")
+
+	if translation.ID == 0 {
+		return false, nil
+	}
+	//fmt.Println("Here 3")
+
+	if err := dbI.DB.Where("translation = ?", input).Delete(&Translation{}).Error; err != nil {
+		log.Fatal("Error deleting translation:", err)
+		return false, err
+	}
+	//fmt.Println("Here 4")
+
+
+	return true, nil
+
+}
+
+func (dbI* DBInterface) DeleteExample(input string)(bool, error){
+	var example ExampleSentence
+	if err := dbI.DB.Where("sentence = ?", input).Find(&example).Error; err != nil {
+		log.Fatal("Error:", err)
+		return false, err
+	}
+	if example.ID == 0 {
+		return false, nil
+	}
+	if err := dbI.DB.Where("sentence = ?", input).Delete(&ExampleSentence{}).Error; err != nil {
+		log.Fatal("Error deleting example:", err)
 		return false, err
 	}
 

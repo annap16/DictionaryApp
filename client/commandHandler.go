@@ -6,6 +6,8 @@ import(
 	"context"
 	"log"
 	"regexp"
+
+
 	"github.com/annap16/DictionaryApp/graph/model"
 	"github.com/machinebox/graphql"
 
@@ -96,14 +98,11 @@ func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
 		if err != nil {
 			if strings.Contains(err.Error(), "record not found") {
 				fmt.Println("The word dosen't exist in the dictionary")
-				return true
-			}
+				return true			}
 			log.Fatal("Error:", err)
-		}else{
+		}else if received!=""{
 			fmt.Println(received)
 		}
-
-
 		return true
 	}
 	if(r.next!=nil){
@@ -121,26 +120,60 @@ type ModifyCommandHandler struct{
 }
 
 func (m *ModifyCommandHandler) HandleCommand(command string) bool{
+	// TODO make NewClient request one time in other func
+	client := graphql.NewClient("http://localhost:8080/query")
+	handler := &QueriesHandler{client: client}
+	
 	commandSplitted := strings.Split(command, " ")
 	if(commandSplitted[0]=="modify"){
-		if(len(commandSplitted)<3){
-			log.Fatal("Wrong command")
+		if(len(commandSplitted)<4){
+			fmt.Println("Wrong command")
 		}
 		modifyType := commandSplitted[1]
 		if modifyType=="delete"{
-			// TODO
+			m.handleUpdateDeleteCommand(command, commandSplitted, handler)
 		} else if modifyType=="add"{
 			//TODO
 		} else{
-			log.Fatal("Wrong command")
+			fmt.Println("Wrong command")
 		}
 		return true
 	}
+
 	if(m.next!=nil){
 		return m.next.HandleCommand(command)
 	}
 	return false
 }
+
+func (m *ModifyCommandHandler) handleUpdateDeleteCommand(command string, commandSplitted []string, handler *QueriesHandler){
+	var success bool
+	var err error
+	if(commandSplitted[2]=="translation"){
+		success, err = handler.SendRemoveTranslationMutation(context.Background(), commandSplitted[3])
+	}else if (commandSplitted[2]=="example"){
+		sentence := ParseQuery(command)
+		if len(sentence) !=1{
+			fmt.Println("Wrong command. You should specify only one example and use brackets")
+			return
+		}
+		success, err = handler.SendRemoveExampleMutation(context.Background(), sentence[0])
+
+	}else{
+		fmt.Println("Wrong command. You can on delete example or translation while modyfing word")
+		return
+	}
+
+	if err != nil {
+		log.Fatal("Error:", err)
+	} else if success{
+		fmt.Println("Word modified successfully")
+	}else{
+		fmt.Println("Example/Translation dosen't exist in the dictionary")
+	}
+
+}
+
 
 func (m *ModifyCommandHandler) SetNext(handler CommandHandler) {
 	m.next = handler

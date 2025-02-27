@@ -20,6 +20,14 @@ type ReceiveResponse struct {
 }
 
 
-type RemoveResponse struct {
+type RemoveWordResponse struct {
 	DeleteWord bool `json:"deleteWord"`
+}
+
+type RemoveTranslationResponse struct {
+	DeleteTranslation bool `json:"deleteTranslation"`
+}
+
+type RemoveExampleResponse struct {
+	DeleteExample bool `json:"deleteExample"`
 }
