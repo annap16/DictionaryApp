@@ -133,7 +133,7 @@ func (m *ModifyCommandHandler) HandleCommand(command string) bool{
 		if modifyType=="delete"{
 			m.handleUpdateDeleteCommand(command, commandSplitted, handler)
 		} else if modifyType=="add"{
-			//TODO
+			m.handleUpdateAddCommand(command, commandSplitted, handler)
 		} else{
 			fmt.Println("Wrong command")
 		}
@@ -172,6 +172,42 @@ func (m *ModifyCommandHandler) handleUpdateDeleteCommand(command string, command
 		fmt.Println("Example/Translation dosen't exist in the dictionary")
 	}
 
+}
+
+func (m *ModifyCommandHandler) handleUpdateAddCommand(command string, commandSplitted []string, handler *QueriesHandler){
+	var success bool
+	var err error
+	if commandSplitted[2]=="translation"{
+		if len(commandSplitted)<5 {
+			fmt.Println("Wrong command. Not enugh input arguments for adding new translation")
+			return
+		}
+		sentences := ParseQuery(command)
+		input := model.CreateTranslationInput{
+			Word:        commandSplitted[3],
+			Translation: commandSplitted[4],
+			Examples:    sentences,
+		}
+		success, err = handler.SendAddTranslationMutation(context.Background(), input)
+	} else if commandSplitted[2]=="example"{
+		if len(commandSplitted)<4{
+			fmt.Println("Wrong command. Not enugh input arguments for adding new examples")
+			return
+		}
+		sentences := ParseQuery(command)
+		success, err = handler.SendAddExampleMutation(context.Background(), commandSplitted[3], sentences)
+	}else {
+		fmt.Println("Wrong command. You can on delete example or translation while modyfing word")
+		return
+	}
+
+	if err != nil {
+		log.Fatal("Error:", err)
+	} else if success{
+		fmt.Println("Word modified successfully")
+	}else{
+		fmt.Println("Example/Translation dosen't exist in the dictionary")
+	}
 }
 
 

@@ -135,6 +135,42 @@ func(q *QueriesHandler) SendRemoveExampleMutation(ctx context.Context, input str
 	return response.DeleteExample, nil
 }
 
+func (q *QueriesHandler) SendAddTranslationMutation(ctx context.Context, input model.CreateTranslationInput) (bool, error) {
+    request := graphql.NewRequest(`
+        mutation ($input: CreateTranslationInput!) {
+            addTranslation(input: $input)
+        }
+    `)
+
+    request.Var("input", input)
+
+    if err := q.client.Run(context.Background(), request, nil); err != nil {
+        log.Fatal("Error while adding translation:", err)
+        return false, err
+    }
+
+    return true, nil
+}
+
+func (q *QueriesHandler) SendAddExampleMutation(ctx context.Context, translation string, sentences []string) (bool, error) {
+    request := graphql.NewRequest(`
+        mutation ($translation: String!, $examples: [String!]!) {
+            addExample(translation: $translation, examples: $examples)
+        }
+    `)
+
+    request.Var("translation", translation)
+    request.Var("examples", sentences)
+
+    if err := q.client.Run(context.Background(), request, nil); err != nil {
+        log.Fatal("Error while adding example sentences:", err)
+        return false, err
+    }
+
+    return true, nil
+}
+
+
 
 
 

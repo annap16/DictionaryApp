@@ -117,30 +117,24 @@ func (dbI *DBInterface) DeleteWord(input string) (bool, error) {
 
 func (dbI *DBInterface) DeleteTranslation(input string) (bool, error) {
 	var translation Translation
-	// fmt.Println("Here 1")
 	if err := dbI.DB.Where("translation = ?", input).Find(&translation).Error; err != nil {
 		log.Fatal("Error:", err)
 		return false, err
 	}
-	//fmt.Println("Here 2")
-
 	if translation.ID == 0 {
 		return false, nil
 	}
-	//fmt.Println("Here 3")
-
 	if err := dbI.DB.Where("translation = ?", input).Delete(&Translation{}).Error; err != nil {
 		log.Fatal("Error deleting translation:", err)
 		return false, err
 	}
-	//fmt.Println("Here 4")
 
 
 	return true, nil
 
 }
 
-func (dbI* DBInterface) DeleteExample(input string)(bool, error){
+func (dbI *DBInterface) DeleteExample(input string)(bool, error){
 	var example ExampleSentence
 	if err := dbI.DB.Where("sentence = ?", input).Find(&example).Error; err != nil {
 		log.Fatal("Error:", err)
@@ -153,6 +147,62 @@ func (dbI* DBInterface) DeleteExample(input string)(bool, error){
 		log.Fatal("Error deleting example:", err)
 		return false, err
 	}
+
+	return true, nil
+}
+
+func (dbI *DBInterface) AddTranslation(input model.CreateTranslationInput) (bool, error) {
+	var existingWord Word
+
+	err := dbI.DB.Preload("Translations.ExampleSentences"). Where("word = ?", input.Word).Find(&existingWord).Error    
+	if err != nil{
+		fmt.Println("Error while finding the word:", err)
+		return false, err
+	}
+	if existingWord.ID==0{
+		return false, err
+	}
+
+	exampleSentences := createExampleSentences(input.Examples)
+
+	newTranslation := Translation{
+		Translation:      input.Translation,
+		WordID:           existingWord.ID,
+		ExampleSentences: exampleSentences,
+	}
+
+	if err := dbI.DB.Create(&newTranslation).Error; err != nil {
+		fmt.Println("Error while saving translation:", err)
+		return false, err
+	}
+
+	return true, nil
+}
+
+
+func (dbI *DBInterface) AddExample( translation string, examples []string) (bool, error) {
+	var existingTranslation Translation
+
+	err := dbI.DB.Preload("ExampleSentences"). Where("translation = ?", translation).Find(&existingTranslation).Error    
+	if err != nil{
+		fmt.Println("Error while finding the translation:", err)
+		return false, err
+	}
+	if existingTranslation.ID==0{
+		return false, err
+	}
+
+	exampleSentences := createExampleSentences(examples)
+	
+	
+	for _, example := range exampleSentences {
+		example.TranslationID = existingTranslation.ID 
+		if err := dbI.DB.Create(&example).Error; err != nil {
+			fmt.Println("Error while saving example sentence:", err)
+			return false, err
+		}
+	}
+
 
 	return true, nil
 }

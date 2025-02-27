@@ -21,6 +21,16 @@ func (r *mutationResolver) CreateTranslation(ctx context.Context, input model.Cr
 	return true, nil
 }
 
+// AddTranslation is the resolver for the addTranslation field.
+func (r *mutationResolver) AddTranslation(ctx context.Context, input model.CreateTranslationInput) (bool, error) {
+	return r.DBInterface.AddTranslation(input)
+}
+
+// AddExample is the resolver for the addExample field.
+func (r *mutationResolver) AddExample(ctx context.Context, translation string, examples []string) (bool, error) {
+	return r.DBInterface.AddExample(translation, examples)
+}
+
 // DeleteWord is the resolver for the deleteWord field.
 func (r *mutationResolver) DeleteWord(ctx context.Context, word string) (bool, error) {
 	return r.DBInterface.DeleteWord(word)
