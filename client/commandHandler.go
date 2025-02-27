@@ -95,7 +95,7 @@ func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
 		received, err := handler.SendReceiveMutation(ctx, commandSplitted[1])
 		if err != nil {
 			if strings.Contains(err.Error(), "record not found") {
-				fmt.Println("The word is not in the dictionary")
+				fmt.Println("The word dosen't exist in the dictionary")
 				return true
 			}
 			log.Fatal("Error:", err)
@@ -163,11 +163,13 @@ func (r *RemoveCommandHandler) HandleCommand(command string) bool{
 		}
 
 		ctx := context.Background()
-		err := handler.SendRemoveMutation(ctx, commandSplitted[1])
+		success, err := handler.SendRemoveMutation(ctx, commandSplitted[1])
 		if err != nil {
 			log.Fatal("Error:", err)
-		} else{
+		} else if success{
 			fmt.Println("Word and related data deleted successfully")
+		}else{
+			fmt.Println("The word dosen't exist in the dictionary")
 		}
 		return true
 	}

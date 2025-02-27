@@ -97,6 +97,14 @@ func convertExampleSentences(sentences []ExampleSentence) []*model.ExampleSenten
 }
 
 func (dbI *DBInterface) DeleteWord(input string) (bool, error) {
+	var word Word
+	if err := dbI.DB.Where("word = ?", input).First(&word).Error; err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			return false, nil
+		}
+		log.Fatal("Error:", err)
+		return false, err
+	}
 	if err := dbI.DB.Where("word = ?", input).Delete(&Word{}).Error; err != nil {
 		log.Fatal("Error deleting word:", err)
 		return false, err
@@ -104,6 +112,8 @@ func (dbI *DBInterface) DeleteWord(input string) (bool, error) {
 
 	return true, nil
 }
+
+
 
 
 
