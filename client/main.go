@@ -1,11 +1,14 @@
 package main
 
 import(
+	"github.com/machinebox/graphql"
+
 	)
 
 func main() {
-	WaitForUserInput()
-
+	client := graphql.NewClient("http://localhost:8080/query")
+	
+	WaitForUserInput(client)
 }
 
 

@@ -22,23 +22,18 @@ type CommandHandler interface{
 
 type CreateCommandHandler struct{
 	next CommandHandler
+	client *graphql.Client
 }
 
 func (c *CreateCommandHandler) HandleCommand(command string) bool{
-
-	// TODO make NewClient request one time in other func
-	client := graphql.NewClient("http://localhost:8080/query")
-	handler := &QueriesHandler{client: client}
-
 	commandSplitted := strings.Split(command, " ")
 	if(strings.ToLower(commandSplitted[0])=="create"){
-
-		
 		if !CheckCreateSyntax(command){
 			fmt.Println("Incorrect command")
 			return true
 		}
 
+		handler := &QueriesHandler{client: c.client}
 		word := commandSplitted[1]
 		translation := commandSplitted[2] 
 		sentences := ParseQuery(command)
@@ -92,20 +87,17 @@ func (c *CreateCommandHandler) SetNext(handler CommandHandler) {
 
 type ReceiveCommandHandler struct{
 	next CommandHandler
+	client *graphql.Client
 }
 
 func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
-	// TODO make NewClient request one time in other func
-	client := graphql.NewClient("http://localhost:8080/query")
-	handler := &QueriesHandler{client: client}
-
 	commandSplitted := strings.Split(command, " ")
 	if(strings.ToLower(commandSplitted[0])=="receive"){
 		if(len(commandSplitted)!=2){
 			fmt.Println("Wrong command")
 			return true
 		}
-
+		handler := &QueriesHandler{client: r.client}
 		ctx := context.Background()
 		received, err := handler.SendReceiveMutation(ctx, commandSplitted[1])
 		if err!=nil{
@@ -129,18 +121,16 @@ func (r *ReceiveCommandHandler) SetNext(handler CommandHandler) {
 
 type ModifyCommandHandler struct{
 	next CommandHandler
+	client *graphql.Client
 }
 
-func (m *ModifyCommandHandler) HandleCommand(command string) bool{
-	// TODO make NewClient request one time in other func
-	client := graphql.NewClient("http://localhost:8080/query")
-	handler := &QueriesHandler{client: client}
-	
+func (m *ModifyCommandHandler) HandleCommand(command string) bool{	
 	commandSplitted := strings.Split(command, " ")
 	if(strings.ToLower(commandSplitted[0])=="modify"){
 		if(len(commandSplitted)<3){
 			fmt.Println("Wrong command")
 		}
+		handler := &QueriesHandler{client: m.client}
 		modifyType := strings.ToLower(commandSplitted[1])
 		if modifyType=="delete"{
 			m.handleUpdateDeleteCommand(command, commandSplitted, handler)
@@ -246,20 +236,17 @@ func (m *ModifyCommandHandler) SetNext(handler CommandHandler) {
 
 type RemoveCommandHandler struct{
 	next CommandHandler
+	client *graphql.Client
 }
 
 func (r *RemoveCommandHandler) HandleCommand(command string) bool{
-	// TODO make NewClient request one time in other func
-	client := graphql.NewClient("http://localhost:8080/query")
-	handler := &QueriesHandler{client: client}
-
 	commandSplitted := strings.Split(command, " ")
 	if(strings.ToLower(commandSplitted[0])=="remove"){
 		if(len(commandSplitted)!=2){
 			fmt.Println("Wrong command")
 			return true
 		}
-
+		handler := &QueriesHandler{client: r.client}
 		ctx := context.Background()
 		success, err := handler.SendRemoveMutation(ctx, commandSplitted[1])
 		if err!=nil{
