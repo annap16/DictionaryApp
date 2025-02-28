@@ -19,6 +19,9 @@ type ReceiveResponse struct {
 	} `json:"getWordTranslation"`
 }
 
+type AddWordResponse struct {
+	CreateTranslation bool `json:"createTranslation"`
+}
 
 type RemoveWordResponse struct {
 	DeleteWord bool `json:"deleteWord"`

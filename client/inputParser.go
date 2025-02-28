@@ -33,10 +33,9 @@ func WaitForUserInput() {
 
 		// Formatting input string
 		input = input[:len(input)-1]
-		input = strings.ToLower(input)
 
 		// Checking for exit condition
-		if(input=="exit"){
+		if(strings.ToLower(input)=="exit"){
 			exit = true
 			break
 		}

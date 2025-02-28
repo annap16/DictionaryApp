@@ -6,19 +6,13 @@ package graph
 
 import (
 	"context"
-	"log"
 
 	"github.com/annap16/DictionaryApp/graph/model"
 )
 
 // CreateTranslation is the resolver for the createTranslation field.
 func (r *mutationResolver) CreateTranslation(ctx context.Context, input model.CreateTranslationInput) (bool, error) {
-	err := r.DBInterface.AddWord(input)
-	if err != nil {
-		log.Fatal("Create Word error")
-		return false, err
-	}
-	return true, nil
+	return r.DBInterface.AddWord(input)
 }
 
 // AddTranslation is the resolver for the addTranslation field.

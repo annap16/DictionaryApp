@@ -17,7 +17,16 @@ func NewDBInterface(db *gorm.DB) *DBInterface {
 }
 
 
-func (dbI *DBInterface) AddWord(input model.CreateTranslationInput) error {
+func (dbI *DBInterface) AddWord(input model.CreateTranslationInput) (bool, error) {
+	var existingWord Word
+	if err := dbI.DB.Where("word = ?", input.Word).Find(&existingWord).Error; err != nil {
+		log.Println("Error while checking word existance in a DB:", err)
+		return false, err
+	}
+	if existingWord.ID!=0{
+		return false, nil
+	}
+	
 	exampleSentences := createExampleSentences(input.Examples)
 
 	translation := Translation{ 
@@ -31,11 +40,11 @@ func (dbI *DBInterface) AddWord(input model.CreateTranslationInput) error {
 	}
 
 	if err := dbI.DB.Create(&word).Error; err != nil {
-		fmt.Println("Error while adding new word to a database", err)
-		return err
+		fmt.Println("Error while adding a word to a DB", err)
+		return false, err
 	}
 
-	return nil
+	return true, nil
 }
 
 func createExampleSentences(examples []string) []ExampleSentence {
@@ -154,7 +163,7 @@ func (dbI *DBInterface) DeleteExample(input string)(bool, error){
 func (dbI *DBInterface) AddTranslation(input model.CreateTranslationInput) (bool, error) {
 	var existingWord Word
 
-	err := dbI.DB.Preload("Translations.ExampleSentences"). Where("word = ?", input.Word).Find(&existingWord).Error    
+	err := dbI.DB.Where("word = ?", input.Word).Find(&existingWord).Error    
 	if err != nil{
 		fmt.Println("Error while finding the word:", err)
 		return false, err
@@ -183,7 +192,7 @@ func (dbI *DBInterface) AddTranslation(input model.CreateTranslationInput) (bool
 func (dbI *DBInterface) AddExample( translation string, examples []string) (bool, error) {
 	var existingTranslation Translation
 
-	err := dbI.DB.Preload("ExampleSentences"). Where("translation = ?", translation).Find(&existingTranslation).Error    
+	err := dbI.DB.Where("translation = ?", translation).Find(&existingTranslation).Error    
 	if err != nil{
 		fmt.Println("Error while finding the translation:", err)
 		return false, err

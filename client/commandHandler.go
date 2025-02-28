@@ -31,11 +31,14 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 	handler := &QueriesHandler{client: client}
 
 	commandSplitted := strings.Split(command, " ")
-	if(commandSplitted[0]=="create"){
-		if len(commandSplitted)<3 {
-			log.Fatal("Incorrect command")
-			return false
+	if(strings.ToLower(commandSplitted[0])=="create"){
+
+		
+		if !CheckCreateSyntax(command){
+			fmt.Println("Incorrect command")
+			return true
 		}
+
 		word := commandSplitted[1]
 		translation := commandSplitted[2] 
 		sentences := ParseQuery(command)
@@ -47,9 +50,11 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 		}
 
 		ctx := context.Background()
-		err := handler.SendCreateMutation(ctx, input)
-		if err != nil {
-			log.Fatal("Error after send create mutation:", err)
+		success := handler.SendCreateMutation(ctx, input)
+		
+		if !success{
+			fmt.Println("Given word already exists in the dictionary")
+			return true
 		}
 
 		fmt.Println("Word successfully added to dictionary")
@@ -60,6 +65,13 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 		return c.next.HandleCommand(command)
 	}
 	return false
+}
+
+func CheckCreateSyntax(command string) bool{
+	pattern := `(?i)^create\s+(\S+)\s+(\S+)(\s+\[.*?\])*?$`
+	re := regexp.MustCompile(pattern)
+
+	return re.MatchString(command)
 }
 
 func ParseQuery(query string) ([]string) {
@@ -89,7 +101,7 @@ func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
 	handler := &QueriesHandler{client: client}
 
 	commandSplitted := strings.Split(command, " ")
-	if(commandSplitted[0]=="receive"){
+	if(strings.ToLower(commandSplitted[0])=="receive"){
 		if(len(commandSplitted)!=2){
 			log.Fatal("Wrong command")
 		}
@@ -125,11 +137,11 @@ func (m *ModifyCommandHandler) HandleCommand(command string) bool{
 	handler := &QueriesHandler{client: client}
 	
 	commandSplitted := strings.Split(command, " ")
-	if(commandSplitted[0]=="modify"){
+	if(strings.ToLower(commandSplitted[0])=="modify"){
 		if(len(commandSplitted)<4){
 			fmt.Println("Wrong command")
 		}
-		modifyType := commandSplitted[1]
+		modifyType := strings.ToLower(commandSplitted[1])
 		if modifyType=="delete"{
 			m.handleUpdateDeleteCommand(command, commandSplitted, handler)
 		} else if modifyType=="add"{
@@ -149,9 +161,9 @@ func (m *ModifyCommandHandler) HandleCommand(command string) bool{
 func (m *ModifyCommandHandler) handleUpdateDeleteCommand(command string, commandSplitted []string, handler *QueriesHandler){
 	var success bool
 	var err error
-	if(commandSplitted[2]=="translation"){
+	if(strings.ToLower(commandSplitted[2])=="translation"){
 		success, err = handler.SendRemoveTranslationMutation(context.Background(), commandSplitted[3])
-	}else if (commandSplitted[2]=="example"){
+	}else if (strings.ToLower(commandSplitted[2])=="example"){
 		sentence := ParseQuery(command)
 		if len(sentence) !=1{
 			fmt.Println("Wrong command. You should specify only one example and use brackets")
@@ -177,7 +189,7 @@ func (m *ModifyCommandHandler) handleUpdateDeleteCommand(command string, command
 func (m *ModifyCommandHandler) handleUpdateAddCommand(command string, commandSplitted []string, handler *QueriesHandler){
 	var success bool
 	var err error
-	if commandSplitted[2]=="translation"{
+	if strings.ToLower(commandSplitted[2])=="translation"{
 		if len(commandSplitted)<5 {
 			fmt.Println("Wrong command. Not enugh input arguments for adding new translation")
 			return
@@ -189,7 +201,7 @@ func (m *ModifyCommandHandler) handleUpdateAddCommand(command string, commandSpl
 			Examples:    sentences,
 		}
 		success, err = handler.SendAddTranslationMutation(context.Background(), input)
-	} else if commandSplitted[2]=="example"{
+	} else if strings.ToLower(commandSplitted[2])=="example"{
 		if len(commandSplitted)<4{
 			fmt.Println("Wrong command. Not enugh input arguments for adding new examples")
 			return
@@ -226,7 +238,7 @@ func (r *RemoveCommandHandler) HandleCommand(command string) bool{
 	handler := &QueriesHandler{client: client}
 
 	commandSplitted := strings.Split(command, " ")
-	if(commandSplitted[0]=="remove"){
+	if(strings.ToLower(commandSplitted[0])=="remove"){
 		if(len(commandSplitted)!=2){
 			log.Fatal("Wrong command")
 		}

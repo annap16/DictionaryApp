@@ -14,7 +14,7 @@ type QueriesHandler struct{
 }
 
 
-func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.CreateTranslationInput) error {
+func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.CreateTranslationInput) bool {
 	request := graphql.NewRequest(`
 	mutation ($input: CreateTranslationInput!) {
 		createTranslation(input: $input)
@@ -23,12 +23,15 @@ func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.Cre
 
 	request.Var("input", input)
 
-	err := q.client.Run(context.Background(), request, nil)
+	var response AddWordResponse
+
+	err := q.client.Run(context.Background(), request, &response)
 	if err!=nil{
-		log.Fatal("Error:", err)
+		log.Println("Error while adding a word:", err)
 	}
 
-	return nil
+
+	return response.CreateTranslation
  }
 
  func (q *QueriesHandler) SendReceiveMutation(ctx context.Context, input string) (string, error) {
