@@ -51,7 +51,7 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 
 		ctx := context.Background()
 		success := handler.SendCreateMutation(ctx, input)
-		
+
 		if !success{
 			fmt.Println("Given word already exists in the dictionary")
 			return true
@@ -240,14 +240,13 @@ func (r *RemoveCommandHandler) HandleCommand(command string) bool{
 	commandSplitted := strings.Split(command, " ")
 	if(strings.ToLower(commandSplitted[0])=="remove"){
 		if(len(commandSplitted)!=2){
-			log.Fatal("Wrong command")
+			fmt.Println("Wrong command")
+			return true
 		}
 
 		ctx := context.Background()
-		success, err := handler.SendRemoveMutation(ctx, commandSplitted[1])
-		if err != nil {
-			log.Fatal("Error:", err)
-		} else if success{
+		success := handler.SendRemoveMutation(ctx, commandSplitted[1])
+		if success{
 			fmt.Println("Word and related data deleted successfully")
 		}else{
 			fmt.Println("The word dosen't exist in the dictionary")

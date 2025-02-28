@@ -82,7 +82,7 @@ func (q *QueriesHandler) ParseReceiveResponse(response ReceiveResponse) string{
 }
 
 
-func (q *QueriesHandler) SendRemoveMutation(ctx context.Context, input string) (bool, error) {
+func (q *QueriesHandler) SendRemoveMutation(ctx context.Context, input string) bool {
 	request := graphql.NewRequest(`
 		mutation ($word: String!) {
 			deleteWord(word: $word)
@@ -94,11 +94,11 @@ func (q *QueriesHandler) SendRemoveMutation(ctx context.Context, input string) (
 	
 	if err := q.client.Run(context.Background(), request, &response); err != nil {
 		
-		log.Fatal("Error:", err)
-		return false, err
+		log.Println("Error while removing word from a dictionary:", err)
+		return false
 	}
 
-	return response.DeleteWord, nil
+	return response.DeleteWord
 
 }
 

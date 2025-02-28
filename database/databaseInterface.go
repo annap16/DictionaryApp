@@ -109,14 +109,14 @@ func convertExampleSentences(sentences []ExampleSentence) []*model.ExampleSenten
 func (dbI *DBInterface) DeleteWord(input string) (bool, error) {
 	var word Word
 	if err := dbI.DB.Where("word = ?", input).Find(&word).Error; err != nil {
-		log.Fatal("Error:", err)
+		log.Println("Error while checking word existance in a DB:", err)
 		return false, err
 	}
 	if word.ID == 0 {
 		return false, nil
 	}
 	if err := dbI.DB.Where("word = ?", input).Delete(&Word{}).Error; err != nil {
-		log.Fatal("Error deleting word:", err)
+		log.Println("Error while deleting word from a DB:", err)
 		return false, err
 	}
 
