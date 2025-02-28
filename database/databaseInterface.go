@@ -19,7 +19,7 @@ func NewDBInterface(db *gorm.DB) *DBInterface {
 
 func (dbI *DBInterface) AddWord(input model.CreateTranslationInput) (bool, error) {
 	var existingWord Word
-	if err := dbI.DB.Where("word = ?", input.Word).Find(&existingWord).Error; err != nil {
+	if err := dbI.DB.Where("LOWER(word) = LOWER(?)", input.Word).Find(&existingWord).Error; err != nil {
 		log.Println("Error while checking word existance in a DB:", err)
 		return false, err
 	}
@@ -62,7 +62,7 @@ func (dbI *DBInterface) ReceiveWordTranslation(input string) (*model.Word, error
 
 	err := dbI.DB.
 		Preload("Translations.ExampleSentences"). 
-		Where("word = ?", input).                
+		Where("LOWER(word) = LOWER(?)", input).                
 		Find(&result).Error    
 
 	if err != nil {
@@ -108,14 +108,14 @@ func convertExampleSentences(sentences []ExampleSentence) []*model.ExampleSenten
 
 func (dbI *DBInterface) DeleteWord(input string) (bool, error) {
 	var word Word
-	if err := dbI.DB.Where("word = ?", input).Find(&word).Error; err != nil {
+	if err := dbI.DB.Where("LOWER(word) = LOWER(?)", input).Find(&word).Error; err != nil {
 		log.Println("Error while checking word existance in a DB:", err)
 		return false, err
 	}
 	if word.ID == 0 {
 		return false, nil
 	}
-	if err := dbI.DB.Where("word = ?", input).Delete(&Word{}).Error; err != nil {
+	if err := dbI.DB.Where("LOWER(word) = LOWER(?)", input).Delete(&Word{}).Error; err != nil {
 		log.Println("Error while deleting word from a DB:", err)
 		return false, err
 	}
@@ -126,14 +126,14 @@ func (dbI *DBInterface) DeleteWord(input string) (bool, error) {
 
 func (dbI *DBInterface) DeleteTranslation(input string) (bool, error) {
 	var translation Translation
-	if err := dbI.DB.Where("translation = ?", input).Find(&translation).Error; err != nil {
+	if err := dbI.DB.Where("LOWER(translation) = LOWER(?)", input).Find(&translation).Error; err != nil {
 		log.Println("Error while searching for translation existance in a DB:", err)
 		return false, err
 	}
 	if translation.ID == 0 {
 		return false, nil
 	}
-	if err := dbI.DB.Where("translation = ?", input).Delete(&Translation{}).Error; err != nil {
+	if err := dbI.DB.Where("LOWER(translation) = LOWER(?)", input).Delete(&Translation{}).Error; err != nil {
 		log.Println("Error while deleting translation:", err)
 		return false, err
 	}
@@ -143,14 +143,14 @@ func (dbI *DBInterface) DeleteTranslation(input string) (bool, error) {
 
 func (dbI *DBInterface) DeleteExample(input string)(bool, error){
 	var example ExampleSentence
-	if err := dbI.DB.Where("sentence = ?", input).Find(&example).Error; err != nil {
+	if err := dbI.DB.Where("LOWER(sentence) = LOWER(?)", input).Find(&example).Error; err != nil {
 		log.Println("Error while searching for example existance in a DB:", err)
 		return false, err
 	}
 	if example.ID == 0 {
 		return false, nil
 	}
-	if err := dbI.DB.Where("sentence = ?", input).Delete(&ExampleSentence{}).Error; err != nil {
+	if err := dbI.DB.Where("LOWER(sentence) = LOWER(?)", input).Delete(&ExampleSentence{}).Error; err != nil {
 		log.Println("Error while deleting example:", err)
 		return false, err
 	}
@@ -161,7 +161,7 @@ func (dbI *DBInterface) DeleteExample(input string)(bool, error){
 func (dbI *DBInterface) AddTranslation(input model.CreateTranslationInput) (bool, error) {
 	var existingWord Word
 
-	err := dbI.DB.Where("word = ?", input.Word).Find(&existingWord).Error    
+	err := dbI.DB.Where("LOWER(word) = LOWER(?)", input.Word).Find(&existingWord).Error    
 	if err != nil{
 		log.Println("Error while searching for word existance in a DB:", err)
 		return false, err
@@ -171,7 +171,7 @@ func (dbI *DBInterface) AddTranslation(input model.CreateTranslationInput) (bool
 	}
 
 	var existingTranslation Translation
-	err = dbI.DB.Where("translation = ?", input.Translation).Find(&existingTranslation).Error    
+	err = dbI.DB.Where("LOWER(translation) = LOWER(?)", input.Translation).Find(&existingTranslation).Error    
 	if err != nil{
 		log.Println("Error while searching for translation existance in a DB:", err)
 		return false, err
@@ -201,7 +201,7 @@ func (dbI *DBInterface) AddTranslation(input model.CreateTranslationInput) (bool
 func (dbI *DBInterface) AddExample( translation string, examples []string) (bool, error) {
 	var existingTranslation Translation
 
-	err := dbI.DB.Where("translation = ?", translation).Find(&existingTranslation).Error    
+	err := dbI.DB.Where("LOWER(translation) = LOWER(?)", translation).Find(&existingTranslation).Error    
 	if err != nil{
 		log.Println("Error while searching for translation existance in a DB:", err)
 		return false, err
@@ -212,7 +212,7 @@ func (dbI *DBInterface) AddExample( translation string, examples []string) (bool
 
 	for _, example := range examples {
 		var existingExample ExampleSentence
-		err := dbI.DB.Where("sentence = ?", example).Find(&existingExample).Error
+		err := dbI.DB.Where("LOWER(sentence) = LOWER(?)", example).Find(&existingExample).Error
 		if err != nil {
 			log.Println("Error while searching for example existence in DB:", err)
 			return false, err
