@@ -32,7 +32,7 @@ func WaitForUserInput() {
 		}
 
 		// Formatting input string
-		input = input[:len(input)-1]
+		input = strings.TrimRight(input, " \t\r\n")
 
 		// Checking for exit condition
 		if(strings.ToLower(input)=="exit"){

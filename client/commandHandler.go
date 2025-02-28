@@ -50,14 +50,14 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 		}
 
 		ctx := context.Background()
-		success := handler.SendCreateMutation(ctx, input)
-
-		if !success{
+		success, err := handler.SendCreateMutation(ctx, input)
+		if err != nil {
+			fmt.Println("Error occured while adding word to the dictionary")
+		}else if !success{
 			fmt.Println("Given word already exists in the dictionary")
-			return true
+		}else{
+			fmt.Println("Word successfully added to dictionary")
 		}
-
-		fmt.Println("Word successfully added to dictionary")
 
 		return true
 	}
@@ -76,7 +76,6 @@ func CheckCreateSyntax(command string) bool{
 
 func ParseQuery(query string) ([]string) {
 	re := regexp.MustCompile(`\[(.*?)\]`)
-
 	matches := re.FindAllStringSubmatch(query, -1)
 
 	var sentences []string
@@ -103,17 +102,18 @@ func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
 	commandSplitted := strings.Split(command, " ")
 	if(strings.ToLower(commandSplitted[0])=="receive"){
 		if(len(commandSplitted)!=2){
-			log.Fatal("Wrong command")
+			fmt.Println("Wrong command")
+			return true
 		}
+
 		ctx := context.Background()
 		received, err := handler.SendReceiveMutation(ctx, commandSplitted[1])
-		if err != nil {
-			if strings.Contains(err.Error(), "record not found") {
-				fmt.Println("The word dosen't exist in the dictionary")
-				return true			}
-			log.Fatal("Error:", err)
+		if err!=nil{
+			fmt.Println("Error while receving a word")
 		}else if received!=""{
 			fmt.Println(received)
+		}else{
+			fmt.Println("The word doesn't exist in the dictionary")
 		}
 		return true
 	}
@@ -138,7 +138,7 @@ func (m *ModifyCommandHandler) HandleCommand(command string) bool{
 	
 	commandSplitted := strings.Split(command, " ")
 	if(strings.ToLower(commandSplitted[0])=="modify"){
-		if(len(commandSplitted)<4){
+		if(len(commandSplitted)<3){
 			fmt.Println("Wrong command")
 		}
 		modifyType := strings.ToLower(commandSplitted[1])
@@ -161,23 +161,25 @@ func (m *ModifyCommandHandler) HandleCommand(command string) bool{
 func (m *ModifyCommandHandler) handleUpdateDeleteCommand(command string, commandSplitted []string, handler *QueriesHandler){
 	var success bool
 	var err error
+
 	if(strings.ToLower(commandSplitted[2])=="translation"){
+		if len(commandSplitted)!=4{
+			fmt.Println("Wrong command")
+		}
 		success, err = handler.SendRemoveTranslationMutation(context.Background(), commandSplitted[3])
 	}else if (strings.ToLower(commandSplitted[2])=="example"){
 		sentence := ParseQuery(command)
-		if len(sentence) !=1{
+		if len(sentence) !=1 {
 			fmt.Println("Wrong command. You should specify only one example and use brackets")
 			return
 		}
 		success, err = handler.SendRemoveExampleMutation(context.Background(), sentence[0])
-
 	}else{
-		fmt.Println("Wrong command. You can on delete example or translation while modyfing word")
-		return
+		fmt.Println("Wrong command")
 	}
 
 	if err != nil {
-		log.Fatal("Error:", err)
+		log.Println("Error while modyfing word:", err)
 	} else if success{
 		fmt.Println("Word modified successfully")
 	}else{
@@ -190,8 +192,8 @@ func (m *ModifyCommandHandler) handleUpdateAddCommand(command string, commandSpl
 	var success bool
 	var err error
 	if strings.ToLower(commandSplitted[2])=="translation"{
-		if len(commandSplitted)<5 {
-			fmt.Println("Wrong command. Not enugh input arguments for adding new translation")
+		if !CheckAddTranslationSyntax(command){
+			fmt.Println("Wrong command")
 			return
 		}
 		sentences := ParseQuery(command)
@@ -202,14 +204,14 @@ func (m *ModifyCommandHandler) handleUpdateAddCommand(command string, commandSpl
 		}
 		success, err = handler.SendAddTranslationMutation(context.Background(), input)
 	} else if strings.ToLower(commandSplitted[2])=="example"{
-		if len(commandSplitted)<4{
-			fmt.Println("Wrong command. Not enugh input arguments for adding new examples")
-			return
+		if !CheckAddExampleSyntax(command){
+			fmt.Println("Wrong command syntax")
+			return 
 		}
 		sentences := ParseQuery(command)
 		success, err = handler.SendAddExampleMutation(context.Background(), commandSplitted[3], sentences)
 	}else {
-		fmt.Println("Wrong command. You can on delete example or translation while modyfing word")
+		fmt.Println("Wrong command. You can only delete example or translation while modyfing word")
 		return
 	}
 
@@ -218,8 +220,22 @@ func (m *ModifyCommandHandler) handleUpdateAddCommand(command string, commandSpl
 	} else if success{
 		fmt.Println("Word modified successfully")
 	}else{
-		fmt.Println("Example/Translation dosen't exist in the dictionary")
+		fmt.Println("Couldn't add examples/translation because it already exists or couldnt be found")
 	}
+}
+
+func CheckAddExampleSyntax(command string) bool{
+	pattern := `(?i)^modify\s+add\s+example\s+(\S+)(\s+\[.*?\])+$`
+	re := regexp.MustCompile(pattern)
+
+	return re.MatchString(command)
+}
+
+func CheckAddTranslationSyntax(command string) bool{
+	pattern := `(?i)^modify\s+add\s+translation\s+(\S+)\s+(\S+)(\s+\[.*?\])*$`
+	re := regexp.MustCompile(pattern)
+
+	return re.MatchString(command)
 }
 
 
@@ -245,8 +261,10 @@ func (r *RemoveCommandHandler) HandleCommand(command string) bool{
 		}
 
 		ctx := context.Background()
-		success := handler.SendRemoveMutation(ctx, commandSplitted[1])
-		if success{
+		success, err := handler.SendRemoveMutation(ctx, commandSplitted[1])
+		if err!=nil{
+			fmt.Println("An error occured while removing word from the dictionary")
+		}else if success{
 			fmt.Println("Word and related data deleted successfully")
 		}else{
 			fmt.Println("The word dosen't exist in the dictionary")

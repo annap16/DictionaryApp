@@ -14,7 +14,7 @@ type QueriesHandler struct{
 }
 
 
-func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.CreateTranslationInput) bool {
+func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.CreateTranslationInput) (bool, error) {
 	request := graphql.NewRequest(`
 	mutation ($input: CreateTranslationInput!) {
 		createTranslation(input: $input)
@@ -28,10 +28,10 @@ func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.Cre
 	err := q.client.Run(context.Background(), request, &response)
 	if err!=nil{
 		log.Println("Error while adding a word:", err)
+		return false, err
 	}
 
-
-	return response.CreateTranslation
+	return response.CreateTranslation, nil
  }
 
  func (q *QueriesHandler) SendReceiveMutation(ctx context.Context, input string) (string, error) {
@@ -51,16 +51,15 @@ func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.Cre
 	`)
 
 	request.Var("word", input)
-	
 
 	var response ReceiveResponse
 	err := q.client.Run(context.Background(), request, &response)
 
 	if err != nil {
-		if strings.Contains(err.Error(), "record not found") {
-			return "", err
+		if strings.Contains(err.Error(), "Record not found") {
+			return "", nil
 		}
-		log.Fatal("Error:", err)
+		log.Println("Error while searching for a word:", err)
 		return "", err
 	}
 
@@ -82,7 +81,7 @@ func (q *QueriesHandler) ParseReceiveResponse(response ReceiveResponse) string{
 }
 
 
-func (q *QueriesHandler) SendRemoveMutation(ctx context.Context, input string) bool {
+func (q *QueriesHandler) SendRemoveMutation(ctx context.Context, input string) (bool, error) {
 	request := graphql.NewRequest(`
 		mutation ($word: String!) {
 			deleteWord(word: $word)
@@ -95,10 +94,10 @@ func (q *QueriesHandler) SendRemoveMutation(ctx context.Context, input string) b
 	if err := q.client.Run(context.Background(), request, &response); err != nil {
 		
 		log.Println("Error while removing word from a dictionary:", err)
-		return false
+		return false, err
 	}
 
-	return response.DeleteWord
+	return response.DeleteWord, nil
 
 }
 
@@ -113,7 +112,7 @@ func(q *QueriesHandler) SendRemoveTranslationMutation(ctx context.Context, input
 	var response RemoveTranslationResponse
 
     if err := q.client.Run(context.Background(), request, &response); err != nil {
-        log.Fatal("Error:", err)
+        log.Println("Error while deleting translation:", err)
         return false, err
     }
 
@@ -131,7 +130,7 @@ func(q *QueriesHandler) SendRemoveExampleMutation(ctx context.Context, input str
 	var response RemoveExampleResponse
 
 	if err := q.client.Run(context.Background(), request, &response); err != nil {
-		log.Fatal("Error:", err)
+		log.Println("Error while deleting example:", err)
 	return false, err
 	}	
 	
@@ -147,12 +146,20 @@ func (q *QueriesHandler) SendAddTranslationMutation(ctx context.Context, input m
 
     request.Var("input", input)
 
-    if err := q.client.Run(context.Background(), request, nil); err != nil {
-        log.Fatal("Error while adding translation:", err)
+	var response AddTranslationResponse
+	//var response map[string]interface{}
+
+
+    err := q.client.Run(context.Background(), request, &response)
+	if err != nil {
+        log.Println("Error while adding translation:", err)
         return false, err
     }
 
-    return true, nil
+	//fmt.Println(response)
+
+
+    return response.AddTranslation, nil
 }
 
 func (q *QueriesHandler) SendAddExampleMutation(ctx context.Context, translation string, sentences []string) (bool, error) {
@@ -165,12 +172,18 @@ func (q *QueriesHandler) SendAddExampleMutation(ctx context.Context, translation
     request.Var("translation", translation)
     request.Var("examples", sentences)
 
-    if err := q.client.Run(context.Background(), request, nil); err != nil {
-        log.Fatal("Error while adding example sentences:", err)
+	var response AddExampleResponse
+	//var response map[string]interface{}
+
+    err := q.client.Run(context.Background(), request, &response)
+	if err != nil {
+        log.Println("Error while adding example sentences:", err)
         return false, err
     }
 
-    return true, nil
+	//fmt.Println(response)
+
+    return response.AddExample, nil
 }
 
 

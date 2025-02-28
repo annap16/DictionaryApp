@@ -23,6 +23,14 @@ type AddWordResponse struct {
 	CreateTranslation bool `json:"createTranslation"`
 }
 
+type AddTranslationResponse struct {
+	AddTranslation bool `json:"addTranslation"`
+}
+
+type AddExampleResponse struct {
+	AddExample bool `json:"addExample"`
+}
+
 type RemoveWordResponse struct {
 	DeleteWord bool `json:"deleteWord"`
 }

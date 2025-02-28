@@ -66,11 +66,11 @@ func (dbI *DBInterface) ReceiveWordTranslation(input string) (*model.Word, error
 		Find(&result).Error    
 
 	if err != nil {
-		log.Fatal("Error:", err)
+		log.Println("Error while loading word from a DB:", err)
 		return nil, err
 	}
 	if result.ID == 0 {
-		err = errors.New("record not found")
+		err = errors.New("Record not found")
 		return nil, err
 	}
 						
@@ -127,33 +127,31 @@ func (dbI *DBInterface) DeleteWord(input string) (bool, error) {
 func (dbI *DBInterface) DeleteTranslation(input string) (bool, error) {
 	var translation Translation
 	if err := dbI.DB.Where("translation = ?", input).Find(&translation).Error; err != nil {
-		log.Fatal("Error:", err)
+		log.Println("Error while searching for translation existance in a DB:", err)
 		return false, err
 	}
 	if translation.ID == 0 {
 		return false, nil
 	}
 	if err := dbI.DB.Where("translation = ?", input).Delete(&Translation{}).Error; err != nil {
-		log.Fatal("Error deleting translation:", err)
+		log.Println("Error while deleting translation:", err)
 		return false, err
 	}
 
-
 	return true, nil
-
 }
 
 func (dbI *DBInterface) DeleteExample(input string)(bool, error){
 	var example ExampleSentence
 	if err := dbI.DB.Where("sentence = ?", input).Find(&example).Error; err != nil {
-		log.Fatal("Error:", err)
+		log.Println("Error while searching for example existance in a DB:", err)
 		return false, err
 	}
 	if example.ID == 0 {
 		return false, nil
 	}
 	if err := dbI.DB.Where("sentence = ?", input).Delete(&ExampleSentence{}).Error; err != nil {
-		log.Fatal("Error deleting example:", err)
+		log.Println("Error while deleting example:", err)
 		return false, err
 	}
 
@@ -165,12 +163,23 @@ func (dbI *DBInterface) AddTranslation(input model.CreateTranslationInput) (bool
 
 	err := dbI.DB.Where("word = ?", input.Word).Find(&existingWord).Error    
 	if err != nil{
-		fmt.Println("Error while finding the word:", err)
+		log.Println("Error while searching for word existance in a DB:", err)
 		return false, err
 	}
 	if existingWord.ID==0{
 		return false, err
 	}
+
+	var existingTranslation Translation
+	err = dbI.DB.Where("translation = ?", input.Translation).Find(&existingTranslation).Error    
+	if err != nil{
+		log.Println("Error while searching for translation existance in a DB:", err)
+		return false, err
+	}
+	if existingTranslation.ID!=0{
+		return false, err
+	}
+
 
 	exampleSentences := createExampleSentences(input.Examples)
 
@@ -181,7 +190,7 @@ func (dbI *DBInterface) AddTranslation(input model.CreateTranslationInput) (bool
 	}
 
 	if err := dbI.DB.Create(&newTranslation).Error; err != nil {
-		fmt.Println("Error while saving translation:", err)
+		log.Println("Error while adding translation:", err)
 		return false, err
 	}
 
@@ -194,24 +203,36 @@ func (dbI *DBInterface) AddExample( translation string, examples []string) (bool
 
 	err := dbI.DB.Where("translation = ?", translation).Find(&existingTranslation).Error    
 	if err != nil{
-		fmt.Println("Error while finding the translation:", err)
+		log.Println("Error while searching for translation existance in a DB:", err)
 		return false, err
 	}
 	if existingTranslation.ID==0{
 		return false, err
 	}
 
-	exampleSentences := createExampleSentences(examples)
+	for _, example := range examples {
+		var existingExample ExampleSentence
+		err := dbI.DB.Where("sentence = ?", example).Find(&existingExample).Error
+		if err != nil {
+			log.Println("Error while searching for example existence in DB:", err)
+			return false, err
+		}
+		
+		if existingExample.ID != 0 && existingTranslation.ID == existingExample.TranslationID {
+			return false, nil 
+		}
+	}
 	
+
+	exampleSentences := createExampleSentences(examples)
 	
 	for _, example := range exampleSentences {
 		example.TranslationID = existingTranslation.ID 
 		if err := dbI.DB.Create(&example).Error; err != nil {
-			fmt.Println("Error while saving example sentence:", err)
+			log.Println("Error while adding example sentence:", err)
 			return false, err
 		}
 	}
-
 
 	return true, nil
 }
