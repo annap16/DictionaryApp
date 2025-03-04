@@ -43,3 +43,4 @@ func (d *Database) migrate() {
 	}
 	fmt.Println("Database migration completed.")
 }
+

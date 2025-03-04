@@ -119,12 +119,14 @@ func(q *QueriesHandler) SendRemoveTranslationMutation(ctx context.Context, input
 	return response.DeleteTranslation, nil
 }
 
-func(q *QueriesHandler) SendRemoveExampleMutation(ctx context.Context, input string) (bool, error){
+func(q *QueriesHandler) SendRemoveExampleMutation(ctx context.Context, translation string, input string) (bool, error){
 	request := graphql.NewRequest(`
-	mutation($example: String!) {
-		deleteExample(example: $example)
+	mutation($translation: String!, $example: String!) {
+		deleteExample(translation: $translation, example: $example)
 	}
 	`)
+
+	request.Var("translation", translation)
 	request.Var("example", input)
 
 	var response RemoveExampleResponse

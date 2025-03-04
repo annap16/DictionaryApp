@@ -31,5 +31,5 @@ type Mutation {
   addExample(translation: String!, examples: [String!]): Boolean!
   deleteWord(word: String!): Boolean!
   deleteTranslation(translation: String!): Boolean!
-  deleteExample(example: String!): Boolean!
+  deleteExample(translation: String!, example: String!): Boolean!
 }

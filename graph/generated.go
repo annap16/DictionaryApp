@@ -56,7 +56,7 @@ type ComplexityRoot struct {
 		AddExample        func(childComplexity int, translation string, examples []string) int
 		AddTranslation    func(childComplexity int, input model.CreateTranslationInput) int
 		CreateTranslation func(childComplexity int, input model.CreateTranslationInput) int
-		DeleteExample     func(childComplexity int, example string) int
+		DeleteExample     func(childComplexity int, translation string, example string) int
 		DeleteTranslation func(childComplexity int, translation string) int
 		DeleteWord        func(childComplexity int, word string) int
 	}
@@ -84,7 +84,7 @@ type MutationResolver interface {
 	AddExample(ctx context.Context, translation string, examples []string) (bool, error)
 	DeleteWord(ctx context.Context, word string) (bool, error)
 	DeleteTranslation(ctx context.Context, translation string) (bool, error)
-	DeleteExample(ctx context.Context, example string) (bool, error)
+	DeleteExample(ctx context.Context, translation string, example string) (bool, error)
 }
 type QueryResolver interface {
 	GetWordTranslation(ctx context.Context, word string) (*model.Word, error)
@@ -169,7 +169,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteExample(childComplexity, args["example"].(string)), true
+		return e.complexity.Mutation.DeleteExample(childComplexity, args["translation"].(string), args["example"].(string)), true
 
 	case "Mutation.deleteTranslation":
 		if e.complexity.Mutation.DeleteTranslation == nil {
@@ -464,13 +464,31 @@ func (ec *executionContext) field_Mutation_createTranslation_argsInput(
 func (ec *executionContext) field_Mutation_deleteExample_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Mutation_deleteExample_argsExample(ctx, rawArgs)
+	arg0, err := ec.field_Mutation_deleteExample_argsTranslation(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["example"] = arg0
+	args["translation"] = arg0
+	arg1, err := ec.field_Mutation_deleteExample_argsExample(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["example"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_deleteExample_argsTranslation(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("translation"))
+	if tmp, ok := rawArgs["translation"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteExample_argsExample(
 	ctx context.Context,
 	rawArgs map[string]any,
@@ -1053,7 +1071,7 @@ func (ec *executionContext) _Mutation_deleteExample(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteExample(rctx, fc.Args["example"].(string))
+		return ec.resolvers.Mutation().DeleteExample(rctx, fc.Args["translation"].(string), fc.Args["example"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

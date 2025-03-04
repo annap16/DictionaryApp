@@ -34,8 +34,8 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 		}
 
 		handler := &QueriesHandler{client: c.client}
-		word := commandSplitted[1]
-		translation := commandSplitted[2] 
+		word := strings.ToLower(commandSplitted[1])
+		translation := strings.ToLower(commandSplitted[2]) 
 		sentences := ParseQuery(command)
 
 		input := model.CreateTranslationInput{
@@ -99,7 +99,7 @@ func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
 		}
 		handler := &QueriesHandler{client: r.client}
 		ctx := context.Background()
-		received, err := handler.SendReceiveMutation(ctx, commandSplitted[1])
+		received, err := handler.SendReceiveMutation(ctx, strings.ToLower(commandSplitted[1]))
 		if err!=nil{
 			fmt.Println("Error while receving a word")
 		}else if received!=""{
@@ -163,7 +163,7 @@ func (m *ModifyCommandHandler) handleUpdateDeleteCommand(command string, command
 			fmt.Println("Wrong command. You should specify only one example and use brackets")
 			return
 		}
-		success, err = handler.SendRemoveExampleMutation(context.Background(), sentence[0])
+		success, err = handler.SendRemoveExampleMutation(context.Background(), strings.ToLower(commandSplitted[3]), sentence[0])
 	}else{
 		fmt.Println("Wrong command")
 	}
@@ -188,8 +188,8 @@ func (m *ModifyCommandHandler) handleUpdateAddCommand(command string, commandSpl
 		}
 		sentences := ParseQuery(command)
 		input := model.CreateTranslationInput{
-			Word:        commandSplitted[3],
-			Translation: commandSplitted[4],
+			Word:        strings.ToLower(commandSplitted[3]),
+			Translation: strings.ToLower(commandSplitted[4]),
 			Examples:    sentences,
 		}
 		success, err = handler.SendAddTranslationMutation(context.Background(), input)
