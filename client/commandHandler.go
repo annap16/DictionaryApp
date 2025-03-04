@@ -6,12 +6,10 @@ import(
 	"context"
 	"log"
 	"regexp"
-
-
 	"github.com/annap16/DictionaryApp/graph/model"
-	"github.com/machinebox/graphql"
-
 )
+
+
 
 //Implementing responsibility chain pattern for commands handling
 
@@ -22,7 +20,7 @@ type CommandHandler interface{
 
 type CreateCommandHandler struct{
 	next CommandHandler
-	client *graphql.Client
+	handler QueriesHandler
 }
 
 func (c *CreateCommandHandler) HandleCommand(command string) bool{
@@ -33,7 +31,6 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 			return true
 		}
 
-		handler := &QueriesHandler{client: c.client}
 		word := strings.ToLower(commandSplitted[1])
 		translation := strings.ToLower(commandSplitted[2]) 
 		sentences := ParseQuery(command)
@@ -45,7 +42,7 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 		}
 
 		ctx := context.Background()
-		success, err := handler.SendCreateMutation(ctx, input)
+		success, err := c.handler.SendCreateMutation(ctx, input)
 		if err != nil {
 			fmt.Println("Error occured while adding word to the dictionary")
 		}else if !success{
@@ -63,7 +60,7 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 }
 
 func CheckCreateSyntax(command string) bool{
-	pattern := `(?i)^create\s+(\S+)\s+(\S+)(\s+\[.*?\])*?$`
+	pattern := `(?i)^create\s+([^\[\]\s]+)\s+([^\[\]\s]+)(\s+\[[^\[\]]+\])*?$`
 	re := regexp.MustCompile(pattern)
 
 	return re.MatchString(command)
@@ -87,7 +84,7 @@ func (c *CreateCommandHandler) SetNext(handler CommandHandler) {
 
 type ReceiveCommandHandler struct{
 	next CommandHandler
-	client *graphql.Client
+	handler QueriesHandler
 }
 
 func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
@@ -97,11 +94,10 @@ func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
 			fmt.Println("Wrong command")
 			return true
 		}
-		handler := &QueriesHandler{client: r.client}
 		ctx := context.Background()
-		received, err := handler.SendReceiveMutation(ctx, strings.ToLower(commandSplitted[1]))
+		received, err := r.handler.SendReceiveMutation(ctx, strings.ToLower(commandSplitted[1]))
 		if err!=nil{
-			fmt.Println("Error while receving a word")
+			fmt.Println("Error while receiving a word")
 		}else if received!=""{
 			fmt.Println(received)
 		}else{
@@ -121,7 +117,7 @@ func (r *ReceiveCommandHandler) SetNext(handler CommandHandler) {
 
 type ModifyCommandHandler struct{
 	next CommandHandler
-	client *graphql.Client
+	handler QueriesHandler
 }
 
 func (m *ModifyCommandHandler) HandleCommand(command string) bool{	
@@ -130,12 +126,11 @@ func (m *ModifyCommandHandler) HandleCommand(command string) bool{
 		if(len(commandSplitted)<3){
 			fmt.Println("Wrong command")
 		}
-		handler := &QueriesHandler{client: m.client}
 		modifyType := strings.ToLower(commandSplitted[1])
 		if modifyType=="delete"{
-			m.handleUpdateDeleteCommand(command, commandSplitted, handler)
+			m.handleUpdateDeleteCommand(command, commandSplitted)
 		} else if modifyType=="add"{
-			m.handleUpdateAddCommand(command, commandSplitted, handler)
+			m.handleUpdateAddCommand(command, commandSplitted)
 		} else{
 			fmt.Println("Wrong command")
 		}
@@ -148,7 +143,7 @@ func (m *ModifyCommandHandler) HandleCommand(command string) bool{
 	return false
 }
 
-func (m *ModifyCommandHandler) handleUpdateDeleteCommand(command string, commandSplitted []string, handler *QueriesHandler){
+func (m *ModifyCommandHandler) handleUpdateDeleteCommand(command string, commandSplitted []string){
 	var success bool
 	var err error
 
@@ -156,14 +151,14 @@ func (m *ModifyCommandHandler) handleUpdateDeleteCommand(command string, command
 		if len(commandSplitted)!=4{
 			fmt.Println("Wrong command")
 		}
-		success, err = handler.SendRemoveTranslationMutation(context.Background(), commandSplitted[3])
+		success, err = m.handler.SendRemoveTranslationMutation(context.Background(), commandSplitted[3])
 	}else if (strings.ToLower(commandSplitted[2])=="example"){
 		sentence := ParseQuery(command)
 		if len(sentence) !=1 {
 			fmt.Println("Wrong command. You should specify only one example and use brackets")
 			return
 		}
-		success, err = handler.SendRemoveExampleMutation(context.Background(), strings.ToLower(commandSplitted[3]), sentence[0])
+		success, err = m.handler.SendRemoveExampleMutation(context.Background(), strings.ToLower(commandSplitted[3]), sentence[0])
 	}else{
 		fmt.Println("Wrong command")
 	}
@@ -178,7 +173,7 @@ func (m *ModifyCommandHandler) handleUpdateDeleteCommand(command string, command
 
 }
 
-func (m *ModifyCommandHandler) handleUpdateAddCommand(command string, commandSplitted []string, handler *QueriesHandler){
+func (m *ModifyCommandHandler) handleUpdateAddCommand(command string, commandSplitted []string){
 	var success bool
 	var err error
 	if strings.ToLower(commandSplitted[2])=="translation"{
@@ -192,14 +187,14 @@ func (m *ModifyCommandHandler) handleUpdateAddCommand(command string, commandSpl
 			Translation: strings.ToLower(commandSplitted[4]),
 			Examples:    sentences,
 		}
-		success, err = handler.SendAddTranslationMutation(context.Background(), input)
+		success, err = m.handler.SendAddTranslationMutation(context.Background(), input)
 	} else if strings.ToLower(commandSplitted[2])=="example"{
 		if !CheckAddExampleSyntax(command){
 			fmt.Println("Wrong command syntax")
 			return 
 		}
 		sentences := ParseQuery(command)
-		success, err = handler.SendAddExampleMutation(context.Background(), commandSplitted[3], sentences)
+		success, err = m.handler.SendAddExampleMutation(context.Background(), commandSplitted[3], sentences)
 	}else {
 		fmt.Println("Wrong command. You can only delete example or translation while modyfing word")
 		return
@@ -236,7 +231,7 @@ func (m *ModifyCommandHandler) SetNext(handler CommandHandler) {
 
 type RemoveCommandHandler struct{
 	next CommandHandler
-	client *graphql.Client
+	handler QueriesHandler
 }
 
 func (r *RemoveCommandHandler) HandleCommand(command string) bool{
@@ -246,9 +241,8 @@ func (r *RemoveCommandHandler) HandleCommand(command string) bool{
 			fmt.Println("Wrong command")
 			return true
 		}
-		handler := &QueriesHandler{client: r.client}
 		ctx := context.Background()
-		success, err := handler.SendRemoveMutation(ctx, commandSplitted[1])
+		success, err := r.handler.SendRemoveMutation(ctx, commandSplitted[1])
 		if err!=nil{
 			fmt.Println("An error occured while removing word from the dictionary")
 		}else if success{

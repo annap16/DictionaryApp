@@ -47,7 +47,6 @@ func (dbI *DBInterface) AddWord(input model.CreateTranslationInput) (bool, error
 		Translations: []Translation{translation}, 
 	}
 
-
 	err := tx.Create(&word).Error
 	if err != nil {
 		tx.Rollback() 
@@ -55,7 +54,6 @@ func (dbI *DBInterface) AddWord(input model.CreateTranslationInput) (bool, error
 		return false, err
 	}
 	
-
 	tx.Commit()
 
 	return true, nil

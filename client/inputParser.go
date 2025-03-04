@@ -5,19 +5,17 @@ import(
 	"os"
 	"bufio"
 	"strings"
-	"github.com/machinebox/graphql"
-
 )
 
-func WaitForUserInput(client *graphql.Client) {
+func WaitForUserInput(handler QueriesHandler) {
 	// Initializing variables and responsibility chain
 	reader := bufio.NewReader(os.Stdin)
 	exit := false
 
-	createHandler := &CreateCommandHandler{client: client}
-	reciveHandler := &ReceiveCommandHandler{client: client}
-	modifyHandler := &ModifyCommandHandler{client: client}
-	removeHandler := &RemoveCommandHandler{client: client}
+	createHandler := &CreateCommandHandler{handler: handler}
+	reciveHandler := &ReceiveCommandHandler{handler: handler}
+	modifyHandler := &ModifyCommandHandler{handler: handler}
+	removeHandler := &RemoveCommandHandler{handler: handler}
 
 	createHandler.SetNext(reciveHandler)
 	reciveHandler.SetNext(modifyHandler)

@@ -4,17 +4,16 @@ import(
 	"context"
 	"log"
 	"strings"
-
 	"github.com/machinebox/graphql"
 	"github.com/annap16/DictionaryApp/graph/model"
 )
 
-type QueriesHandler struct{
-	client *graphql.Client
+type QueriesHandlerQL struct{
+	client GraphQLClient
 }
 
 
-func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.CreateTranslationInput) (bool, error) {
+func (q *QueriesHandlerQL) SendCreateMutation(ctx context.Context, input model.CreateTranslationInput) (bool, error) {
 	request := graphql.NewRequest(`
 	mutation ($input: CreateTranslationInput!) {
 		createTranslation(input: $input)
@@ -34,7 +33,7 @@ func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.Cre
 	return response.CreateTranslation, nil
  }
 
- func (q *QueriesHandler) SendReceiveMutation(ctx context.Context, input string) (string, error) {
+ func (q *QueriesHandlerQL) SendReceiveMutation(ctx context.Context, input string) (string, error) {
 
 	request := graphql.NewRequest(`
 		query ($word: String!) {
@@ -66,7 +65,7 @@ func (q *QueriesHandler) SendCreateMutation(ctx context.Context, input model.Cre
 	return q.ParseReceiveResponse(response), nil
 }
 
-func (q *QueriesHandler) ParseReceiveResponse(response ReceiveResponse) string{
+func (q *QueriesHandlerQL) ParseReceiveResponse(response ReceiveResponse) string{
 	var result string
 	result += "Word: " + response.GetWordTranslation.Word + "\n"
 
@@ -81,7 +80,7 @@ func (q *QueriesHandler) ParseReceiveResponse(response ReceiveResponse) string{
 }
 
 
-func (q *QueriesHandler) SendRemoveMutation(ctx context.Context, input string) (bool, error) {
+func (q *QueriesHandlerQL) SendRemoveMutation(ctx context.Context, input string) (bool, error) {
 	request := graphql.NewRequest(`
 		mutation ($word: String!) {
 			deleteWord(word: $word)
@@ -101,7 +100,7 @@ func (q *QueriesHandler) SendRemoveMutation(ctx context.Context, input string) (
 
 }
 
-func(q *QueriesHandler) SendRemoveTranslationMutation(ctx context.Context, input string) (bool, error){
+func(q *QueriesHandlerQL) SendRemoveTranslationMutation(ctx context.Context, input string) (bool, error){
 	request := graphql.NewRequest(`
 		mutation ($translation: String!) {
     		deleteTranslation(translation: $translation)
@@ -119,7 +118,7 @@ func(q *QueriesHandler) SendRemoveTranslationMutation(ctx context.Context, input
 	return response.DeleteTranslation, nil
 }
 
-func(q *QueriesHandler) SendRemoveExampleMutation(ctx context.Context, translation string, input string) (bool, error){
+func(q *QueriesHandlerQL) SendRemoveExampleMutation(ctx context.Context, translation string, input string) (bool, error){
 	request := graphql.NewRequest(`
 	mutation($translation: String!, $example: String!) {
 		deleteExample(translation: $translation, example: $example)
@@ -139,7 +138,7 @@ func(q *QueriesHandler) SendRemoveExampleMutation(ctx context.Context, translati
 	return response.DeleteExample, nil
 }
 
-func (q *QueriesHandler) SendAddTranslationMutation(ctx context.Context, input model.CreateTranslationInput) (bool, error) {
+func (q *QueriesHandlerQL) SendAddTranslationMutation(ctx context.Context, input model.CreateTranslationInput) (bool, error) {
     request := graphql.NewRequest(`
         mutation ($input: CreateTranslationInput!) {
             addTranslation(input: $input)
@@ -149,8 +148,6 @@ func (q *QueriesHandler) SendAddTranslationMutation(ctx context.Context, input m
     request.Var("input", input)
 
 	var response AddTranslationResponse
-	//var response map[string]interface{}
-
 
     err := q.client.Run(context.Background(), request, &response)
 	if err != nil {
@@ -158,13 +155,10 @@ func (q *QueriesHandler) SendAddTranslationMutation(ctx context.Context, input m
         return false, err
     }
 
-	//fmt.Println(response)
-
-
     return response.AddTranslation, nil
 }
 
-func (q *QueriesHandler) SendAddExampleMutation(ctx context.Context, translation string, sentences []string) (bool, error) {
+func (q *QueriesHandlerQL) SendAddExampleMutation(ctx context.Context, translation string, sentences []string) (bool, error) {
     request := graphql.NewRequest(`
         mutation ($translation: String!, $examples: [String!]!) {
             addExample(translation: $translation, examples: $examples)
@@ -175,15 +169,12 @@ func (q *QueriesHandler) SendAddExampleMutation(ctx context.Context, translation
     request.Var("examples", sentences)
 
 	var response AddExampleResponse
-	//var response map[string]interface{}
 
     err := q.client.Run(context.Background(), request, &response)
 	if err != nil {
         log.Println("Error while adding example sentences:", err)
         return false, err
     }
-
-	//fmt.Println(response)
 
     return response.AddExample, nil
 }
