@@ -2,25 +2,31 @@
 
 package model
 
-type Mutation struct {
+type CreateTranslationInput struct {
+	Word        string   `json:"word"`
+	Translation string   `json:"translation"`
+	Examples    []string `json:"examples,omitempty"`
 }
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type ExampleSentence struct {
+	ID       string `json:"id"`
+	Sentence string `json:"sentence"`
+}
+
+type Mutation struct {
 }
 
 type Query struct {
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type Translation struct {
+	ID               string             `json:"id"`
+	Translation      string             `json:"translation"`
+	ExampleSentences []*ExampleSentence `json:"exampleSentences"`
 }
 
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+type Word struct {
+	ID           string         `json:"id"`
+	Word         string         `json:"word"`
+	Translations []*Translation `json:"translations"`
 }

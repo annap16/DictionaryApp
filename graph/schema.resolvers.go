@@ -6,19 +6,43 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/annap16/DictionaryApp/graph/model"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// CreateTranslation is the resolver for the createTranslation field.
+func (r *mutationResolver) CreateTranslation(ctx context.Context, input model.CreateTranslationInput) (bool, error) {
+	return r.DBInterface.AddWord(input)
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// AddTranslation is the resolver for the addTranslation field.
+func (r *mutationResolver) AddTranslation(ctx context.Context, input model.CreateTranslationInput) (bool, error) {
+	return r.DBInterface.AddTranslation(input)
+}
+
+// AddExample is the resolver for the addExample field.
+func (r *mutationResolver) AddExample(ctx context.Context, translation string, examples []string) (bool, error) {
+	return r.DBInterface.AddExample(translation, examples)
+}
+
+// DeleteWord is the resolver for the deleteWord field.
+func (r *mutationResolver) DeleteWord(ctx context.Context, word string) (bool, error) {
+	return r.DBInterface.DeleteWord(word)
+}
+
+// DeleteTranslation is the resolver for the deleteTranslation field.
+func (r *mutationResolver) DeleteTranslation(ctx context.Context, translation string) (bool, error) {
+	return r.DBInterface.DeleteTranslation(translation)
+}
+
+// DeleteExample is the resolver for the deleteExample field.
+func (r *mutationResolver) DeleteExample(ctx context.Context, translation string, example string) (bool, error) {
+	return r.DBInterface.DeleteExample(translation, example)
+}
+
+// GetWordTranslation is the resolver for the getWordTranslation field.
+func (r *queryResolver) GetWordTranslation(ctx context.Context, word string) (*model.Word, error) {
+	return r.DBInterface.ReceiveWordTranslation(word)
 }
 
 // Mutation returns MutationResolver implementation.
