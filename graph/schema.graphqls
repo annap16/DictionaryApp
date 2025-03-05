@@ -15,7 +15,7 @@ type ExampleSentence {
   sentence: String!
 }
 
-input CreateTranslationInput {
+input FullRecordInput {
   word: String!
   translation: String!
   examples: [String!]
@@ -26,9 +26,9 @@ type Query {
 }
 
 type Mutation {
-  createTranslation(input: CreateTranslationInput!): Boolean!
-  addTranslation(input: CreateTranslationInput!): Boolean!
-  addExample(translation: String!, examples: [String!]): Boolean!
+  createTranslation(input: FullRecordInput!): Boolean!
+  addTranslation(input: FullRecordInput!): Boolean!
+  addExample(input: FullRecordInput!): Boolean!
   deleteWord(word: String!): Boolean!
   deleteTranslation(translation: String!): Boolean!
   deleteExample(translation: String!, example: String!): Boolean!
