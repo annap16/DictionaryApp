@@ -155,7 +155,7 @@ type MockQueriesHandler struct {
 	mock.Mock
 }
 
-func (m *MockQueriesHandler) SendCreateMutation(ctx context.Context, input model.CreateTranslationInput) (bool, error) {
+func (m *MockQueriesHandler) SendCreateMutation(ctx context.Context, input model.FullRecordInput) (bool, error) {
 	args := m.Called(ctx, input)
 	return args.Bool(0), args.Error(1)
 }
@@ -170,23 +170,23 @@ func (m *MockQueriesHandler) SendRemoveMutation(ctx context.Context, input strin
 	return args.Bool(0), args.Error(1)
 }
 
-func (m *MockQueriesHandler) SendRemoveTranslationMutation(ctx context.Context, input string) (bool, error) {
+func (m *MockQueriesHandler) SendRemoveTranslationMutation(ctx context.Context, word string, input string) (bool, error) {
+	args := m.Called(ctx, word, input)
+	return args.Bool(0), args.Error(1)
+}
+
+func (m *MockQueriesHandler) SendRemoveExampleMutation(ctx context.Context, word string, translation string, input string) (bool, error) {
+	args := m.Called(ctx, word, translation, input)
+	return args.Bool(0), args.Error(1)
+}
+
+func (m *MockQueriesHandler) SendAddTranslationMutation(ctx context.Context, input model.FullRecordInput) (bool, error) {
 	args := m.Called(ctx, input)
 	return args.Bool(0), args.Error(1)
 }
 
-func (m *MockQueriesHandler) SendRemoveExampleMutation(ctx context.Context, translation string, input string) (bool, error) {
-	args := m.Called(ctx, translation, input)
-	return args.Bool(0), args.Error(1)
-}
-
-func (m *MockQueriesHandler) SendAddTranslationMutation(ctx context.Context, input model.CreateTranslationInput) (bool, error) {
+func (m *MockQueriesHandler) SendAddExampleMutation(ctx context.Context, input model.FullRecordInput) (bool, error) {
 	args := m.Called(ctx, input)
-	return args.Bool(0), args.Error(1)
-}
-
-func (m *MockQueriesHandler) SendAddExampleMutation(ctx context.Context, translation string, sentences []string) (bool, error) {
-	args := m.Called(ctx, translation, sentences)
 	return args.Bool(0), args.Error(1)
 }
 
@@ -282,14 +282,14 @@ func TestHandleCommandCreate_CorrectInput(t *testing.T) {
 	tests := []struct {
 		name string
 		command string
-		expectedInput model.CreateTranslationInput
+		expectedInput model.FullRecordInput
 		expectedOutput string
 		expectedResult bool
 	}{
 		{
 			name: "Success - Input Check With One Example",
 			command: "create ksiazka book [I love my new book]",
-			expectedInput: model.CreateTranslationInput{
+			expectedInput: model.FullRecordInput{
 				Word: "ksiazka",
 				Translation: "book",
 				Examples: []string{"I love my new book"},
@@ -300,7 +300,7 @@ func TestHandleCommandCreate_CorrectInput(t *testing.T) {
 		{
 			name: "Success - Input Check With Two Examples",
 			command: "create samochod car [A fast car] [My car is blue]",
-			expectedInput: model.CreateTranslationInput{
+			expectedInput: model.FullRecordInput{
 				Word: "samochod",
 				Translation: "car",
 				Examples: []string{"A fast car", "My car is blue"},
@@ -311,7 +311,7 @@ func TestHandleCommandCreate_CorrectInput(t *testing.T) {
 		{
 			name: "Success - Input Check Without Any Examples",
 			command: "create kot cat",
-			expectedInput: model.CreateTranslationInput{
+			expectedInput: model.FullRecordInput{
 				Word: "kot",
 				Translation: "cat",
 				Examples: []string{},
@@ -326,7 +326,7 @@ func TestHandleCommandCreate_CorrectInput(t *testing.T) {
 			mockClient := new(MockGraphQLClient)
 			mockQueriesHandler := &MockQueriesHandler{client: mockClient}
 			
-			mockQueriesHandler.On("SendCreateMutation", mock.Anything, mock.MatchedBy(func(input model.CreateTranslationInput) bool {
+			mockQueriesHandler.On("SendCreateMutation", mock.Anything, mock.MatchedBy(func(input model.FullRecordInput) bool {
 				return input.Word == tt.expectedInput.Word &&
 					input.Translation == tt.expectedInput.Translation &&
 					len(input.Examples) == len(tt.expectedInput.Examples) &&
@@ -473,4 +473,3 @@ func TestHandleCommandReceive_CorrectInput(t *testing.T) {
 		})
 	}
 }
-
