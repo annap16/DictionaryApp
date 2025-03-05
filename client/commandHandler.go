@@ -4,22 +4,8 @@ import(
 	"strings"
 	"fmt"
 	"context"
-	"regexp"
 	"github.com/annap16/DictionaryApp/graph/model"
 )
-
-func ParseQuery(query string) ([]string) {
-	re := regexp.MustCompile(`\[(.*?)\]`)
-	matches := re.FindAllStringSubmatch(query, -1)
-
-	var sentences []string
-	for _, match := range matches {
-		sentences = append(sentences, match[1]) 
-	}
-
-	return sentences
-}
-
 
 //Implementing responsibility chain pattern for commands handling
 
@@ -110,6 +96,7 @@ func (r *ReceiveCommandHandler) SetNext(handler CommandHandler) {
 type ModifyCommandHandler struct{
 	next CommandHandler
 	handler QueriesHandler
+	modifyFactory CommandFactory
 }
 
 func (m *ModifyCommandHandler) HandleCommand(command string) bool{	
@@ -118,7 +105,7 @@ func (m *ModifyCommandHandler) HandleCommand(command string) bool{
 		if(len(commandSplitted)<3){
 			fmt.Println("Wrong command")
 		}
-		modifyAction := ModifyCommandFactory(m.handler, command)
+		modifyAction := m.modifyFactory.CreateAction(m.handler, command)
 		var success bool
 		if modifyAction!= nil{
 			success = modifyAction.Execute()

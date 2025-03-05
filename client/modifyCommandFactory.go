@@ -5,7 +5,14 @@ import (
 
 )
 
-func ModifyCommandFactory(handler QueriesHandler, command string) ModifyAction {
+type CommandFactory interface {
+    CreateAction(handler QueriesHandler, command string) ModifyAction
+}
+
+type ModifyCommandFactory struct{
+}
+
+func (m *ModifyCommandFactory) CreateAction(handler QueriesHandler, command string) ModifyAction {
     params, err := ParseModifyCommand(command)
     if err != nil {
         fmt.Println(err)
@@ -33,3 +40,4 @@ func ModifyCommandFactory(handler QueriesHandler, command string) ModifyAction {
 
     return nil
 }
+

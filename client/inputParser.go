@@ -14,7 +14,7 @@ func WaitForUserInput(handler QueriesHandler) {
 
 	createHandler := &CreateCommandHandler{handler: handler}
 	reciveHandler := &ReceiveCommandHandler{handler: handler}
-	modifyHandler := &ModifyCommandHandler{handler: handler}
+	modifyHandler := &ModifyCommandHandler{handler: handler, modifyFactory: &ModifyCommandFactory{}}
 	removeHandler := &RemoveCommandHandler{handler: handler}
 
 	createHandler.SetNext(reciveHandler)
