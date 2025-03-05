@@ -2,15 +2,15 @@
 
 package model
 
-type CreateTranslationInput struct {
-	Word        string   `json:"word"`
-	Translation string   `json:"translation"`
-	Examples    []string `json:"examples,omitempty"`
-}
-
 type ExampleSentence struct {
 	ID       string `json:"id"`
 	Sentence string `json:"sentence"`
+}
+
+type FullRecordInput struct {
+	Word        string   `json:"word"`
+	Translation string   `json:"translation"`
+	Examples    []string `json:"examples,omitempty"`
 }
 
 type Mutation struct {

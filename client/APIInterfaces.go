@@ -13,13 +13,14 @@ type GraphQLClient interface {
 }
 
 type QueriesHandler interface {
-	SendCreateMutation(ctx context.Context, input model.CreateTranslationInput) (bool, error)
+	SendCreateMutation(ctx context.Context, input model.FullRecordInput) (bool, error)
 	SendReceiveMutation(ctx context.Context, input string) (string, error)
 	SendRemoveMutation(ctx context.Context, input string) (bool, error)
-	SendRemoveTranslationMutation(ctx context.Context, input string) (bool, error)
-	SendRemoveExampleMutation(ctx context.Context, translation string, input string) (bool, error)
-	SendAddTranslationMutation(ctx context.Context, input model.CreateTranslationInput) (bool, error)
-	SendAddExampleMutation(ctx context.Context, translation string, sentences []string) (bool, error)
+	SendRemoveTranslationMutation(ctx context.Context, word string, input string) (bool, error)
+	SendRemoveExampleMutation(ctx context.Context, word string, translation string, input string) (bool, error)
+	SendAddTranslationMutation(ctx context.Context, input model.FullRecordInput) (bool, error)
+	SendAddExampleMutation(ctx context.Context, input model.FullRecordInput) (bool, error)
+
 }
 
 

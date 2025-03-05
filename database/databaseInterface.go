@@ -17,7 +17,7 @@ func NewDBInterface(db *gorm.DB) *DBInterface {
 }
 
 
-func (dbI *DBInterface) AddWord(input model.CreateTranslationInput) (bool, error) {
+func (dbI *DBInterface) AddWord(input model.FullRecordInput) (bool, error) {
 	tx := dbI.DB.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -221,7 +221,7 @@ func (dbI *DBInterface) DeleteExample(translation string, input string)(bool, er
 	return true, nil
 }
 
-func (dbI *DBInterface) AddTranslation(input model.CreateTranslationInput) (bool, error) {
+func (dbI *DBInterface) AddTranslation(input model.FullRecordInput) (bool, error) {
 	tx := dbI.DB.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -274,7 +274,7 @@ func (dbI *DBInterface) AddTranslation(input model.CreateTranslationInput) (bool
 }
 
 
-func (dbI *DBInterface) AddExample(translation string, examples []string) (bool, error) {
+func (dbI *DBInterface) AddExample(input model.FullRecordInput) (bool, error) {
 	tx := dbI.DB.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -284,7 +284,7 @@ func (dbI *DBInterface) AddExample(translation string, examples []string) (bool,
 
 	var existingTranslation Translation
 
-	err := tx.Where("translation = LOWER(?)", translation).Find(&existingTranslation).Error    
+	err := tx.Where("translation = LOWER(?)", input.Translation).Find(&existingTranslation).Error    
 	if err != nil{
 		tx.Rollback() 
 		log.Println("Error while searching for translation existance in a DB:", err)
@@ -295,7 +295,7 @@ func (dbI *DBInterface) AddExample(translation string, examples []string) (bool,
 		return false, err
 	}	
 
-	exampleSentences := createExampleSentences(examples)
+	exampleSentences := createExampleSentences(input.Examples)
 	
 	for _, example := range exampleSentences {
 		example.TranslationID = existingTranslation.ID 
@@ -310,7 +310,6 @@ func (dbI *DBInterface) AddExample(translation string, examples []string) (bool,
 
 	return true, nil
 }
-
 
 
 

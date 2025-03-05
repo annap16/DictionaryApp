@@ -53,9 +53,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddExample        func(childComplexity int, translation string, examples []string) int
-		AddTranslation    func(childComplexity int, input model.CreateTranslationInput) int
-		CreateTranslation func(childComplexity int, input model.CreateTranslationInput) int
+		AddExample        func(childComplexity int, input model.FullRecordInput) int
+		AddTranslation    func(childComplexity int, input model.FullRecordInput) int
+		CreateTranslation func(childComplexity int, input model.FullRecordInput) int
 		DeleteExample     func(childComplexity int, translation string, example string) int
 		DeleteTranslation func(childComplexity int, translation string) int
 		DeleteWord        func(childComplexity int, word string) int
@@ -79,9 +79,9 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateTranslation(ctx context.Context, input model.CreateTranslationInput) (bool, error)
-	AddTranslation(ctx context.Context, input model.CreateTranslationInput) (bool, error)
-	AddExample(ctx context.Context, translation string, examples []string) (bool, error)
+	CreateTranslation(ctx context.Context, input model.FullRecordInput) (bool, error)
+	AddTranslation(ctx context.Context, input model.FullRecordInput) (bool, error)
+	AddExample(ctx context.Context, input model.FullRecordInput) (bool, error)
 	DeleteWord(ctx context.Context, word string) (bool, error)
 	DeleteTranslation(ctx context.Context, translation string) (bool, error)
 	DeleteExample(ctx context.Context, translation string, example string) (bool, error)
@@ -133,7 +133,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddExample(childComplexity, args["translation"].(string), args["examples"].([]string)), true
+		return e.complexity.Mutation.AddExample(childComplexity, args["input"].(model.FullRecordInput)), true
 
 	case "Mutation.addTranslation":
 		if e.complexity.Mutation.AddTranslation == nil {
@@ -145,7 +145,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddTranslation(childComplexity, args["input"].(model.CreateTranslationInput)), true
+		return e.complexity.Mutation.AddTranslation(childComplexity, args["input"].(model.FullRecordInput)), true
 
 	case "Mutation.createTranslation":
 		if e.complexity.Mutation.CreateTranslation == nil {
@@ -157,7 +157,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateTranslation(childComplexity, args["input"].(model.CreateTranslationInput)), true
+		return e.complexity.Mutation.CreateTranslation(childComplexity, args["input"].(model.FullRecordInput)), true
 
 	case "Mutation.deleteExample":
 		if e.complexity.Mutation.DeleteExample == nil {
@@ -257,7 +257,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputCreateTranslationInput,
+		ec.unmarshalInputFullRecordInput,
 	)
 	first := true
 
@@ -377,41 +377,23 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 func (ec *executionContext) field_Mutation_addExample_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Mutation_addExample_argsTranslation(ctx, rawArgs)
+	arg0, err := ec.field_Mutation_addExample_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["translation"] = arg0
-	arg1, err := ec.field_Mutation_addExample_argsExamples(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["examples"] = arg1
+	args["input"] = arg0
 	return args, nil
 }
-func (ec *executionContext) field_Mutation_addExample_argsTranslation(
+func (ec *executionContext) field_Mutation_addExample_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (string, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("translation"))
-	if tmp, ok := rawArgs["translation"]; ok {
-		return ec.unmarshalNString2string(ctx, tmp)
+) (model.FullRecordInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐFullRecordInput(ctx, tmp)
 	}
 
-	var zeroVal string
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_addExample_argsExamples(
-	ctx context.Context,
-	rawArgs map[string]any,
-) ([]string, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("examples"))
-	if tmp, ok := rawArgs["examples"]; ok {
-		return ec.unmarshalOString2ᚕstringᚄ(ctx, tmp)
-	}
-
-	var zeroVal []string
+	var zeroVal model.FullRecordInput
 	return zeroVal, nil
 }
 
@@ -428,13 +410,13 @@ func (ec *executionContext) field_Mutation_addTranslation_args(ctx context.Conte
 func (ec *executionContext) field_Mutation_addTranslation_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (model.CreateTranslationInput, error) {
+) (model.FullRecordInput, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNCreateTranslationInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐCreateTranslationInput(ctx, tmp)
+		return ec.unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐFullRecordInput(ctx, tmp)
 	}
 
-	var zeroVal model.CreateTranslationInput
+	var zeroVal model.FullRecordInput
 	return zeroVal, nil
 }
 
@@ -451,13 +433,13 @@ func (ec *executionContext) field_Mutation_createTranslation_args(ctx context.Co
 func (ec *executionContext) field_Mutation_createTranslation_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (model.CreateTranslationInput, error) {
+) (model.FullRecordInput, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNCreateTranslationInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐCreateTranslationInput(ctx, tmp)
+		return ec.unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐFullRecordInput(ctx, tmp)
 	}
 
-	var zeroVal model.CreateTranslationInput
+	var zeroVal model.FullRecordInput
 	return zeroVal, nil
 }
 
@@ -796,7 +778,7 @@ func (ec *executionContext) _Mutation_createTranslation(ctx context.Context, fie
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateTranslation(rctx, fc.Args["input"].(model.CreateTranslationInput))
+		return ec.resolvers.Mutation().CreateTranslation(rctx, fc.Args["input"].(model.FullRecordInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -851,7 +833,7 @@ func (ec *executionContext) _Mutation_addTranslation(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddTranslation(rctx, fc.Args["input"].(model.CreateTranslationInput))
+		return ec.resolvers.Mutation().AddTranslation(rctx, fc.Args["input"].(model.FullRecordInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -906,7 +888,7 @@ func (ec *executionContext) _Mutation_addExample(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddExample(rctx, fc.Args["translation"].(string), fc.Args["examples"].([]string))
+		return ec.resolvers.Mutation().AddExample(rctx, fc.Args["input"].(model.FullRecordInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3532,8 +3514,8 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputCreateTranslationInput(ctx context.Context, obj any) (model.CreateTranslationInput, error) {
-	var it model.CreateTranslationInput
+func (ec *executionContext) unmarshalInputFullRecordInput(ctx context.Context, obj any) (model.FullRecordInput, error) {
+	var it model.FullRecordInput
 	asMap := map[string]any{}
 	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
@@ -4226,11 +4208,6 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNCreateTranslationInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐCreateTranslationInput(ctx context.Context, v any) (model.CreateTranslationInput, error) {
-	res, err := ec.unmarshalInputCreateTranslationInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) marshalNExampleSentence2ᚕᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐExampleSentenceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ExampleSentence) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -4283,6 +4260,11 @@ func (ec *executionContext) marshalNExampleSentence2ᚖgithubᚗcomᚋannap16ᚋ
 		return graphql.Null
 	}
 	return ec._ExampleSentence(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐFullRecordInput(ctx context.Context, v any) (model.FullRecordInput, error) {
+	res, err := ec.unmarshalInputFullRecordInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v any) (string, error) {
