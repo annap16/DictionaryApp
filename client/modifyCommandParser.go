@@ -41,7 +41,7 @@ func ParseModifyCommand(command string) (*ModifyCommandParams, error) {
         if params.TargetType == "translation" && len(parts) == 5 {
             params.Word = parts[3]
 			params.Translation = parts[4]
-        } else if params.TargetType == "example" && len(parts) > 5 && len(ParseQuery(command))==1 {
+        } else if params.TargetType == "example" && len(parts) > 5 {
             params.Word = parts[3]
 			params.Translation = parts[4]
             params.Examples = ParseQuery(command)

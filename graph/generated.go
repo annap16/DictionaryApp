@@ -56,8 +56,8 @@ type ComplexityRoot struct {
 		AddExample        func(childComplexity int, input model.FullRecordInput) int
 		AddTranslation    func(childComplexity int, input model.FullRecordInput) int
 		CreateTranslation func(childComplexity int, input model.FullRecordInput) int
-		DeleteExample     func(childComplexity int, translation string, example string) int
-		DeleteTranslation func(childComplexity int, translation string) int
+		DeleteExample     func(childComplexity int, input model.FullRecordInput) int
+		DeleteTranslation func(childComplexity int, word string, translation string) int
 		DeleteWord        func(childComplexity int, word string) int
 	}
 
@@ -83,8 +83,8 @@ type MutationResolver interface {
 	AddTranslation(ctx context.Context, input model.FullRecordInput) (bool, error)
 	AddExample(ctx context.Context, input model.FullRecordInput) (bool, error)
 	DeleteWord(ctx context.Context, word string) (bool, error)
-	DeleteTranslation(ctx context.Context, translation string) (bool, error)
-	DeleteExample(ctx context.Context, translation string, example string) (bool, error)
+	DeleteTranslation(ctx context.Context, word string, translation string) (bool, error)
+	DeleteExample(ctx context.Context, input model.FullRecordInput) (bool, error)
 }
 type QueryResolver interface {
 	GetWordTranslation(ctx context.Context, word string) (*model.Word, error)
@@ -169,7 +169,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteExample(childComplexity, args["translation"].(string), args["example"].(string)), true
+		return e.complexity.Mutation.DeleteExample(childComplexity, args["input"].(model.FullRecordInput)), true
 
 	case "Mutation.deleteTranslation":
 		if e.complexity.Mutation.DeleteTranslation == nil {
@@ -181,7 +181,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteTranslation(childComplexity, args["translation"].(string)), true
+		return e.complexity.Mutation.DeleteTranslation(childComplexity, args["word"].(string), args["translation"].(string)), true
 
 	case "Mutation.deleteWord":
 		if e.complexity.Mutation.DeleteWord == nil {
@@ -446,54 +446,54 @@ func (ec *executionContext) field_Mutation_createTranslation_argsInput(
 func (ec *executionContext) field_Mutation_deleteExample_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Mutation_deleteExample_argsTranslation(ctx, rawArgs)
+	arg0, err := ec.field_Mutation_deleteExample_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["translation"] = arg0
-	arg1, err := ec.field_Mutation_deleteExample_argsExample(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["example"] = arg1
+	args["input"] = arg0
 	return args, nil
 }
-func (ec *executionContext) field_Mutation_deleteExample_argsTranslation(
+func (ec *executionContext) field_Mutation_deleteExample_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (string, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("translation"))
-	if tmp, ok := rawArgs["translation"]; ok {
-		return ec.unmarshalNString2string(ctx, tmp)
+) (model.FullRecordInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐFullRecordInput(ctx, tmp)
 	}
 
-	var zeroVal string
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteExample_argsExample(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (string, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("example"))
-	if tmp, ok := rawArgs["example"]; ok {
-		return ec.unmarshalNString2string(ctx, tmp)
-	}
-
-	var zeroVal string
+	var zeroVal model.FullRecordInput
 	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Mutation_deleteTranslation_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Mutation_deleteTranslation_argsTranslation(ctx, rawArgs)
+	arg0, err := ec.field_Mutation_deleteTranslation_argsWord(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["translation"] = arg0
+	args["word"] = arg0
+	arg1, err := ec.field_Mutation_deleteTranslation_argsTranslation(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["translation"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_deleteTranslation_argsWord(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("word"))
+	if tmp, ok := rawArgs["word"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteTranslation_argsTranslation(
 	ctx context.Context,
 	rawArgs map[string]any,
@@ -998,7 +998,7 @@ func (ec *executionContext) _Mutation_deleteTranslation(ctx context.Context, fie
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteTranslation(rctx, fc.Args["translation"].(string))
+		return ec.resolvers.Mutation().DeleteTranslation(rctx, fc.Args["word"].(string), fc.Args["translation"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1053,7 +1053,7 @@ func (ec *executionContext) _Mutation_deleteExample(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteExample(rctx, fc.Args["translation"].(string), fc.Args["example"].(string))
+		return ec.resolvers.Mutation().DeleteExample(rctx, fc.Args["input"].(model.FullRecordInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

@@ -4,15 +4,15 @@ import (
 )
 
 type ExampleSentence struct {
-	ID           uint           `gorm:"primaryKey"`
-	Sentence      string `gorm:"not null"`
-	TranslationID uint   `gorm:"not null"`
+	ID           uint    `gorm:"primaryKey"`
+	Sentence      string `gorm:"uniqueIndex:exampleIdx;not null"`
+	TranslationID uint   `gorm:"uniqueIndex:exampleIdx;not null"`
 }
 
 type Translation struct {
 	ID           uint           `gorm:"primaryKey"`
-	Translation      string            `gorm:"uniqueIndex; not null"`
-	WordID           uint              `gorm:"not null"` 
+	Translation      string            `gorm:"uniqueIndex:translationIdx; not null"`
+	WordID           uint              `gorm:"uniqueIndex:translationIdx;not null"` 
 	ExampleSentences []ExampleSentence  `gorm:"foreignKey:TranslationID;constraint:OnDelete:CASCADE;"`
 }
 

@@ -34,7 +34,7 @@ func (m *ModifyCommandFactory) CreateAction(handler QueriesHandler, command stri
             targetType: params.TargetType,
             word: params.Word,
 			translation: params.Translation,
-            example: params.Examples, 
+            examples: params.Examples, 
         }
     }
 
