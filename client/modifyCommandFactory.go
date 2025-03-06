@@ -27,7 +27,7 @@ func ModifyCommandFactory(handler QueriesHandler, command string) ModifyAction {
             targetType: params.TargetType,
             word: params.Word,
 			translation: params.Translation,
-            example: params.Examples, 
+            examples: params.Examples, 
         }
     }
 

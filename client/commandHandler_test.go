@@ -175,8 +175,8 @@ func (m *MockQueriesHandler) SendRemoveTranslationMutation(ctx context.Context, 
 	return args.Bool(0), args.Error(1)
 }
 
-func (m *MockQueriesHandler) SendRemoveExampleMutation(ctx context.Context, word string, translation string, input string) (bool, error) {
-	args := m.Called(ctx, word, translation, input)
+func (m *MockQueriesHandler) SendRemoveExampleMutation(ctx context.Context, input model.FullRecordInput) (bool, error){
+	args := m.Called(ctx, input)
 	return args.Bool(0), args.Error(1)
 }
 

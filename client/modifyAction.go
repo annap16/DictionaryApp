@@ -55,7 +55,7 @@ type ModifyDeleteCommand struct {
     targetType string
     word string
 	translation string
-    example []string
+    examples []string
 }
 
 func (m *ModifyDeleteCommand) Execute() bool {
@@ -66,7 +66,12 @@ func (m *ModifyDeleteCommand) Execute() bool {
     case "translation":
         success, err = m.handler.SendRemoveTranslationMutation(context.Background(), m.word, m.translation)
     case "example":
-        success, err = m.handler.SendRemoveExampleMutation(context.Background(), m.word, m.translation, m.example[0])
+        input := model.FullRecordInput{
+            Word:        m.word,
+            Translation: m.translation,
+            Examples:    m.examples,
+        }
+        success, err = m.handler.SendRemoveExampleMutation(context.Background(), input)
     default:
         fmt.Println("Invalid modify delete command")
         return false

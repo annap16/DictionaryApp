@@ -101,13 +101,13 @@ func (q *QueriesHandlerQL) SendRemoveMutation(ctx context.Context, input string)
 }
 
 func(q *QueriesHandlerQL) SendRemoveTranslationMutation(ctx context.Context, word string, input string) (bool, error){
-	// TODO change DB structure and search based on word also
 	request := graphql.NewRequest(`
-		mutation ($translation: String!) {
-    		deleteTranslation(translation: $translation)
+		mutation ($word: String! $translation: String!) {
+    		deleteTranslation(word: $word translation: $translation)
 		}
 		`)
 	request.Var("translation", input)
+	request.Var("word", word)
 
 	var response RemoveTranslationResponse
 
@@ -119,16 +119,14 @@ func(q *QueriesHandlerQL) SendRemoveTranslationMutation(ctx context.Context, wor
 	return response.DeleteTranslation, nil
 }
 
-func(q *QueriesHandlerQL) SendRemoveExampleMutation(ctx context.Context, word string, translation string, input string) (bool, error){
-	// TODO change DB structure and search based on word also
+func(q *QueriesHandlerQL) SendRemoveExampleMutation(ctx context.Context, input model.FullRecordInput) (bool, error){
 	request := graphql.NewRequest(`
-	mutation($translation: String!, $example: String!) {
-		deleteExample(translation: $translation, example: $example)
+	mutation($input: FullRecordInput!) {
+		deleteExample(input: $input)
 	}
 	`)
 
-	request.Var("translation", translation)
-	request.Var("example", input)
+	request.Var("input", input)
 
 	var response RemoveExampleResponse
 

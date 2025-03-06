@@ -4,7 +4,6 @@ go 1.24.0
 
 require (
 	github.com/99designs/gqlgen v0.17.66
-	github.com/graphql-go/graphql v0.8.1
 	github.com/joho/godotenv v1.5.1
 	github.com/machinebox/graphql v0.2.2
 	github.com/stretchr/testify v1.10.0

@@ -31,13 +31,13 @@ func (r *mutationResolver) DeleteWord(ctx context.Context, word string) (bool, e
 }
 
 // DeleteTranslation is the resolver for the deleteTranslation field.
-func (r *mutationResolver) DeleteTranslation(ctx context.Context, translation string) (bool, error) {
-	return r.DBInterface.DeleteTranslation(translation)
+func (r *mutationResolver) DeleteTranslation(ctx context.Context, word string, translation string) (bool, error) {
+	return r.DBInterface.DeleteTranslation(word, translation)
 }
 
 // DeleteExample is the resolver for the deleteExample field.
-func (r *mutationResolver) DeleteExample(ctx context.Context, translation string, example string) (bool, error) {
-	return r.DBInterface.DeleteExample(translation, example)
+func (r *mutationResolver) DeleteExample(ctx context.Context, input model.FullRecordInput) (bool, error) {
+	return r.DBInterface.DeleteExample(input)
 }
 
 // GetWordTranslation is the resolver for the getWordTranslation field.

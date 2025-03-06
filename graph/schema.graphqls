@@ -30,6 +30,6 @@ type Mutation {
   addTranslation(input: FullRecordInput!): Boolean!
   addExample(input: FullRecordInput!): Boolean!
   deleteWord(word: String!): Boolean!
-  deleteTranslation(translation: String!): Boolean!
-  deleteExample(translation: String!, example: String!): Boolean!
+  deleteTranslation(word: String!, translation: String!): Boolean!
+  deleteExample(input: FullRecordInput!): Boolean!
 }

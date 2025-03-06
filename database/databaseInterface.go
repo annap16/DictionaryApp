@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"errors"
+	"strings"
 	"github.com/annap16/DictionaryApp/graph/model"
 	"gorm.io/gorm"
 )
@@ -16,25 +17,25 @@ func NewDBInterface(db *gorm.DB) *DBInterface {
 	return &DBInterface{DB: db}
 }
 
-
-func (dbI *DBInterface) AddWord(input model.FullRecordInput) (bool, error) {
+func (dbI *DBInterface) TransactionWrapper(fn func(tx *gorm.DB) (bool, error)) (bool, error) {
 	tx := dbI.DB.Begin()
 	defer func() {
 		if r := recover(); r != nil {
-			tx.Rollback() 
+			tx.Rollback()
 		}
 	}()
 
-	var existingWord Word
-	if err := tx.Where("word = ?", input.Word).Find(&existingWord).Error; err != nil {
-		tx.Rollback() 
-		log.Println("Error while checking word existance in a DB:", err)
+	success, err := fn(tx)
+	if err != nil {
+		tx.Rollback()
 		return false, err
 	}
-	if existingWord.ID!=0{
-		return false, nil
-	}
-	
+
+	tx.Commit()
+	return success, nil
+}
+
+func (dbI *DBInterface) AddWord(input model.FullRecordInput) (bool, error) {	
 	exampleSentences := createExampleSentences(input.Examples)
 
 	translation := Translation{ 
@@ -47,16 +48,18 @@ func (dbI *DBInterface) AddWord(input model.FullRecordInput) (bool, error) {
 		Translations: []Translation{translation}, 
 	}
 
-	err := tx.Create(&word).Error
-	if err != nil {
-		tx.Rollback() 
-		fmt.Println("Error while adding a word to a DB", err)
-		return false, err
+	return dbI.TransactionWrapper(func(tx *gorm.DB) (bool, error){
+		err := tx.Create(&word).Error
+		if err != nil {
+			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+				return false, nil
+			}
+			fmt.Println("Error while adding a word to a DB", err)
+			return false, err
 	}
-	
-	tx.Commit()
-
 	return true, nil
+	})
+
 }
 
 func createExampleSentences(examples []string) []ExampleSentence {
@@ -119,196 +122,168 @@ func convertExampleSentences(sentences []ExampleSentence) []*model.ExampleSenten
 }
 
 func (dbI *DBInterface) DeleteWord(input string) (bool, error) {
-	tx := dbI.DB.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback() 
+
+	return dbI.TransactionWrapper(func(tx *gorm.DB) (bool, error){
+		result := tx.Where("word = LOWER(?)", input).Delete(&Word{})
+		if result.Error != nil {
+			log.Println("Error while deleting word from a DB:", result.Error)
+			return false, result.Error
 		}
-	}()
+		if result.RowsAffected == 0 {
+			return false, nil
+		}
 
-	var word Word
-	if err := tx.Where("word = LOWER(?)", input).Find(&word).Error; err != nil {
-		tx.Rollback() 
-		log.Println("Error while checking word existance in a DB:", err)
-		return false, err
-	}
-	if word.ID == 0 {
-		tx.Rollback() 
-		return false, nil
-	}
-	if err := tx.Where("word = LOWER(?)", input).Delete(&Word{}).Error; err != nil {
-		tx.Rollback() 
-		log.Println("Error while deleting word from a DB:", err)
-		return false, err
-	}
-
-	tx.Commit()
-
-	return true, nil
+		return true, nil
+	})
 }
 
+func (dbI *DBInterface) GetWordID(tx *gorm.DB, word string) (uint, error) {
+	var existingWord Word
 
-func (dbI *DBInterface) DeleteTranslation(input string) (bool, error) {
-	tx := dbI.DB.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback() 
-		}
-	}()
-
-	var translation Translation
-	if err := tx.Where("translation = LOWER(?)", input).Find(&translation).Error; err != nil {
-		tx.Rollback() 
-		log.Println("Error while searching for translation existance in a DB:", err)
-		return false, err
-	}
-	if translation.ID == 0 {
-		tx.Rollback() 
-		return false, nil
+	err := tx.Where("word = ?", word).Find(&existingWord).Error    
+	if err != nil{
+		log.Println("Error while searching for word existance in a DB:", err)
+		return 0, err
 	}
 
-
-	if err := tx.Where("translation = LOWER(?)", input).Delete(&Translation{}).Error; err != nil {
-		tx.Rollback() 
-
-		log.Println("Error while deleting translation:", err)
-		return false, err
-	}
-
-	tx.Commit()
-
-	return true, nil
+	return uint(existingWord.ID), nil
 }
 
-func (dbI *DBInterface) DeleteExample(translation string, input string)(bool, error){
-	tx := dbI.DB.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback() 
-		}
-	}()
-	
+func (dbI *DBInterface) GetTranslationID(tx *gorm.DB, wordID uint, translation string) (uint, error) {
 	var existingTranslation Translation
-	if err := tx.Where("translation = ?", translation).Find(&existingTranslation).Error; err!=nil{
-		tx.Rollback() 
+
+	err := tx.Where("translation = LOWER(?) AND word_id=(?)", translation, wordID).Find(&existingTranslation).Error    
+	if err != nil{
 		log.Println("Error while searching for translation existance in a DB:", err)
-		return false, err
+		return 0, err
 	}
-	if existingTranslation.ID==0{
-		tx.Rollback() 
-		return false, nil
-	}
+	return uint(existingTranslation.ID), nil
+}
 
 
-	var example ExampleSentence
-	if err := tx.Where("LOWER(sentence) = LOWER(?) AND translation_id=?", input, existingTranslation.ID).Find(&example).Error; err != nil {
-		tx.Rollback() 
-		log.Println("Error while searching for example existance in a DB:", err)
-		return false, err
-	}
-	if example.ID == 0 {
-		tx.Rollback() 
-		return false, nil
-	}
-	if err := tx.Where("LOWER(sentence) = LOWER(?) AND translation_id=?", input, existingTranslation.ID).Delete(&ExampleSentence{}).Error; err != nil {
-		tx.Rollback() 
-		log.Println("Error while deleting example:", err)
-		return false, err
-	}
+func (dbI *DBInterface) DeleteTranslation(word string, translation string) (bool, error) {
+	return dbI.TransactionWrapper(func(tx *gorm.DB) (bool, error){
+		wordID, err := dbI.GetWordID(tx, word)
+		if err!=nil{
+			return false, err
+		} else if wordID==0{
+			return false, nil
+		}
 
-	tx.Commit()
+		result := tx.Where("word_id=(?) AND translation=(?)", wordID, translation).Delete(&Translation{}) 
+		if result.Error != nil {
+			log.Println("Error while deleting translation :", result.Error)
+			return false, err
+		}
+		if result.RowsAffected == 0 {
+			return false, nil
+		}
 
-	return true, nil
+		return true, nil
+	})
+}
+
+func (dbI *DBInterface) DeleteExample(input model.FullRecordInput)(bool, error){
+	return dbI.TransactionWrapper(func(tx *gorm.DB) (bool, error){
+		wordID, err := dbI.GetWordID(tx, input.Word)
+		if err!=nil{
+			return false, err
+		} else if wordID==0{
+			return false, nil
+		}
+
+		translationID, err := dbI.GetTranslationID(tx, wordID, input.Translation)
+		if err != nil{
+			return false, err
+		}else if translationID==0{
+			return false, nil
+		}
+		
+		for _, example := range input.Examples {
+			result := tx.Where("translation_id=(?) AND LOWER(sentence)=LOWER(?)", translationID, example).Delete(&ExampleSentence{}) 
+			if result.Error != nil {
+				log.Println("Error while deleting example sentence:", result.Error)
+				return false, err
+			}
+			if result.RowsAffected == 0 {
+				return false, nil
+			}
+		}
+
+		return true, nil
+	})
+
 }
 
 func (dbI *DBInterface) AddTranslation(input model.FullRecordInput) (bool, error) {
-	tx := dbI.DB.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback() 
+	return dbI.TransactionWrapper(func(tx *gorm.DB) (bool, error){
+		wordID, err := dbI.GetWordID(tx, input.Word)
+		if err!=nil{
+			return false, err
+		} else if wordID==0{
+			return false, nil
 		}
-	}()
-	
-	var existingWord Word
 
-	err := tx.Where("word = ?", input.Word).Find(&existingWord).Error    
-	if err != nil{
-		tx.Rollback() 
-		log.Println("Error while searching for word existance in a DB:", err)
-		return false, err
-	}
-	if existingWord.ID==0{
-		tx.Rollback() 
-		return false, err
-	}
+		exampleSentences := createExampleSentences(input.Examples)
 
-	var existingTranslation Translation
-	err = tx.Where("translation = ?", input.Translation).Find(&existingTranslation).Error    
-	if err != nil{
-		tx.Rollback() 
-		log.Println("Error while searching for translation existance in a DB:", err)
-		return false, err
-	}
-	if existingTranslation.ID!=0{
-		tx.Rollback() 
-		return false, err
-	}
+		newTranslation := Translation{
+			Translation:      input.Translation,
+			WordID:           wordID,
+			ExampleSentences: exampleSentences,
+		}
 
-	exampleSentences := createExampleSentences(input.Examples)
+		if err := tx.Create(&newTranslation).Error; err != nil {
+			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+				return false, nil
+			}
+			if strings.Contains(err.Error(), "violates foreign key constraint") {
+				log.Println("Error while searching for word existance in a DB:", err)
+				return false, errors.New("Word does not exist")
+			}
+			log.Println("Error while adding translation:", err)
+			return false, err
+		}
 
-	newTranslation := Translation{
-		Translation:      input.Translation,
-		WordID:           existingWord.ID,
-		ExampleSentences: exampleSentences,
-	}
-
-	if err := tx.Create(&newTranslation).Error; err != nil {
-		tx.Rollback() 
-		log.Println("Error while adding translation:", err)
-		return false, err
-	}
-
-	tx.Commit()
-
-	return true, nil
+		return true, nil
+	})
 }
 
 
 func (dbI *DBInterface) AddExample(input model.FullRecordInput) (bool, error) {
-	tx := dbI.DB.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback() 
-		}
-	}()
-
-	var existingTranslation Translation
-
-	err := tx.Where("translation = LOWER(?)", input.Translation).Find(&existingTranslation).Error    
-	if err != nil{
-		tx.Rollback() 
-		log.Println("Error while searching for translation existance in a DB:", err)
-		return false, err
-	}
-	if existingTranslation.ID==0{
-		tx.Rollback() 
-		return false, err
-	}	
-
-	exampleSentences := createExampleSentences(input.Examples)
-	
-	for _, example := range exampleSentences {
-		example.TranslationID = existingTranslation.ID 
-		if err := tx.Create(&example).Error; err != nil {
-			tx.Rollback() 
-			log.Println("Error while adding example sentence:", err)
+	return dbI.TransactionWrapper(func(tx *gorm.DB) (bool, error){
+		wordID, err := dbI.GetWordID(tx, input.Word)
+		if err!=nil{
 			return false, err
+		} else if wordID==0{
+			return false, nil
 		}
-	}
 
-	tx.Commit()
+		translationID, err := dbI.GetTranslationID(tx, wordID, input.Translation)
+		if err != nil{
+			return false, err
+		}else if translationID==0{
+			return false, nil
+		}
 
-	return true, nil
+		exampleSentences := createExampleSentences(input.Examples)
+		
+		for _, example := range exampleSentences {
+			example.TranslationID = translationID
+			if err := tx.Create(&example).Error; err != nil {
+				if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+					return false, nil
+				}
+				if strings.Contains(err.Error(), "violates foreign key constraint") {
+					log.Println("Error while searching for translation existance in a DB:", err)
+					return false, errors.New("Translation does not exist")
+				}
+				log.Println("Error while adding example sentence:", err)
+				return false, err
+			}
+		}
+
+		return true, nil
+	})
 }
 
 
