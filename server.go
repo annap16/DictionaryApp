@@ -19,11 +19,12 @@ import (
 const defaultPort = "8080"
 
 func main() {
-	db, err := database.NewDatabase()
+	db, err := database.NewGormDatabase()
 	if err != nil {
 		log.Fatalf("Database connection error: %v", err)
 	}
-	dbInterface := database.NewDBInterface(db.Connection)
+	repo := &database.GormRepository{}
+	dbInterface := database.NewDBInterface(db.Connection, repo)
 
 	port := os.Getenv("PORT")
 	if port == "" {

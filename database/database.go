@@ -7,13 +7,26 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"database/sql"
 )
+type Database interface {
+	Begin(opts ...*sql.TxOptions) *gorm.DB         
+    AutoMigrate(dst ...interface{}) error
+}
 
-type Database struct {
+type GormDatabase struct {
 	Connection *gorm.DB
 }
 
-func NewDatabase() (*Database, error) {
+func (g *GormDatabase) Begin(opts ...*sql.TxOptions) *gorm.DB {
+	return g.Connection.Begin() 
+}
+
+func (g *GormDatabase) AutoMigrate(dst ...interface{}) error {
+	return g.Connection.AutoMigrate(dst...)
+}
+
+func NewGormDatabase() (*GormDatabase, error) {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 		return nil, nil
@@ -24,23 +37,23 @@ func NewDatabase() (*Database, error) {
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("failed to connect to database: %w", err)
+		log.Fatalf("failed to connect to GormDatabase: %w", err)
 		return nil, nil
 	}
 
 	fmt.Println("Connected to PostgreSQL!")
 
-	database := &Database{Connection: db}
-	database.migrate()
-	return database, nil
+	GormDatabase := &GormDatabase{Connection: db}
+	GormDatabase.migrate()
+	return GormDatabase, nil
 }
 
-func (d *Database) migrate() {
+func (d *GormDatabase) migrate() {
 	err := d.Connection.AutoMigrate(&Word{}, &Translation{}, &ExampleSentence{})
 	if err != nil {
-		log.Fatal("Error migrating database: %v", err)
+		log.Fatal("Error migrating GormDatabase: %v", err)
 		return
 	}
-	fmt.Println("Database migration completed.")
+	fmt.Println("GormDatabase migration completed.")
 }
 
