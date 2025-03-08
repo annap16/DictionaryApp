@@ -45,16 +45,6 @@ func (dbI *DBInterface) AddWord(input model.FullRecordInput) (bool, error) {
 	})
 }
 
-func createExampleSentences(examples []string) []ExampleSentence {
-	var exampleSentences []ExampleSentence
-	for _, sentence := range examples {
-		exampleSentences = append(exampleSentences, ExampleSentence{
-			Sentence: sentence,
-		})
-	}
-	return exampleSentences
-}
-
 func (dbI *DBInterface) ReceiveWordTranslation(input string) (*model.Word, error) {
 	var result Word
 
@@ -84,28 +74,6 @@ func (dbI *DBInterface) ReceiveWordTranslation(input string) (*model.Word, error
 	return modelResult, nil
 }
 
-func convertTranslations(translations []Translation) []*model.Translation {
-	var modelTranslations []*model.Translation
-	for _, t := range translations {
-		modelTranslations = append(modelTranslations, &model.Translation{
-			ID:              fmt.Sprintf("%d", t.ID),
-			Translation:     t.Translation,
-			ExampleSentences: convertExampleSentences(t.ExampleSentences),
-		})
-	}
-	return modelTranslations
-}
-
-func convertExampleSentences(sentences []ExampleSentence) []*model.ExampleSentence {
-	var modelSentences []*model.ExampleSentence
-	for _, s := range sentences {
-		modelSentences = append(modelSentences, &model.ExampleSentence{
-			ID:       fmt.Sprintf("%d", s.ID),
-			Sentence: s.Sentence,
-		})
-	}
-	return modelSentences
-}
 
 func (dbI *DBInterface) DeleteWord(input string) (bool, error) {
 	return dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
@@ -225,7 +193,6 @@ func (dbI *DBInterface) AddTranslation(input model.FullRecordInput) (bool, error
 		})
 }
 
-
 func (dbI *DBInterface) AddExample(input model.FullRecordInput) (bool, error) {
 	return dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
 		wordID, err := dbI.GetWordID(tx, input.Word)
@@ -262,6 +229,39 @@ func (dbI *DBInterface) AddExample(input model.FullRecordInput) (bool, error) {
 
 		return true, nil
 	})
+}
+
+func createExampleSentences(examples []string) []ExampleSentence {
+	var exampleSentences []ExampleSentence
+	for _, sentence := range examples {
+		exampleSentences = append(exampleSentences, ExampleSentence{
+			Sentence: sentence,
+		})
+	}
+	return exampleSentences
+}
+
+func convertTranslations(translations []Translation) []*model.Translation {
+	var modelTranslations []*model.Translation
+	for _, t := range translations {
+		modelTranslations = append(modelTranslations, &model.Translation{
+			ID:              fmt.Sprintf("%d", t.ID),
+			Translation:     t.Translation,
+			ExampleSentences: convertExampleSentences(t.ExampleSentences),
+		})
+	}
+	return modelTranslations
+}
+
+func convertExampleSentences(sentences []ExampleSentence) []*model.ExampleSentence {
+	var modelSentences []*model.ExampleSentence
+	for _, s := range sentences {
+		modelSentences = append(modelSentences, &model.ExampleSentence{
+			ID:       fmt.Sprintf("%d", s.ID),
+			Sentence: s.Sentence,
+		})
+	}
+	return modelSentences
 }
 
 

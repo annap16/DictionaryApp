@@ -6,16 +6,6 @@ import (
 	"log"
 )
 
-// type TxContext interface {
-// 	Begin() TxContext
-// 	Commit() error
-// 	Rollback() error
-// 	Create(entity interface{}) error
-// 	Where(query interface{}, args ...interface{}) TxContext
-// 	Delete(entity interface{}) error
-// 	Save(entity interface{}) error
-// }
-
 type Repository interface {
 	TransactionWrapper(DB Database, fn func(tx *gorm.DB) (bool, error)) (bool, error)
     CreateWord(word *Word, tx *gorm.DB) error
@@ -27,7 +17,6 @@ type Repository interface {
 	GetWord(word string, result *Word, tx *gorm.DB) error
 	GetTranslation(wordID uint, translation string, result *Translation, tx *gorm.DB) error
 }
-
 
 
 type GormRepository struct {
