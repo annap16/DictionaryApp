@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"log"
 	"errors"
 	"strings"
 	"github.com/annap16/DictionaryApp/graph/model"
@@ -51,12 +50,12 @@ func (dbI *DBInterface) ReceiveWordTranslation(input string) (*model.Word, error
 	success, err := dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
 		err := dbI.repo.GetWord(input, &result, tx)
 		if err != nil {
-			log.Println("Error while loading word from a DB:", err)
+			fmt.Println("Error while loading word from a DB:", err)
 			return false, err
 		}
 		if result.ID == 0 {
 			err = errors.New("Record not found")
-			return false, nil
+			return false, err
 		}
 		return true, nil
 	})
@@ -84,16 +83,10 @@ func (dbI *DBInterface) DeleteWord(input string) (bool, error) {
 func (dbI *DBInterface) GetWordID(tx *gorm.DB, word string) (uint, error) {
 	var existingWord Word
 
-	_, err := dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
-		err := dbI.repo.GetWord(word, &existingWord, tx)
-		if err!=nil{
-			return false, err
-		}
-		return true, nil
-	})
+	err := dbI.repo.GetWord(word, &existingWord, tx)
 
 	if err != nil{
-		log.Println("Error while searching for word existance in a DB:", err)
+		fmt.Println("Error while searching for word existance in a DB:", err)
 		return 0, err
 	}
 
@@ -103,16 +96,9 @@ func (dbI *DBInterface) GetWordID(tx *gorm.DB, word string) (uint, error) {
 func (dbI *DBInterface) GetTranslationID(tx *gorm.DB, wordID uint, translation string) (uint, error) {
 	var existingTranslation Translation
 
-	_, err := dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
-		err := dbI.repo.GetTranslation(wordID, translation, &existingTranslation, tx)
-		if err!=nil{
-			return false, err
-		}
-		return true, nil
-	})
-
+	err := dbI.repo.GetTranslation(wordID, translation, &existingTranslation, tx)
 	if err != nil{
-		log.Println("Error while searching for translation existance in a DB:", err)
+		fmt.Println("Error while searching for translation existance in a DB:", err)
 		return 0, err
 	}
 	return uint(existingTranslation.ID), nil
@@ -129,7 +115,7 @@ func (dbI *DBInterface) DeleteTranslation(word string, translation string) (bool
 		}
 
 		return  dbI.repo.DeleteTranslation(wordID, translation, tx)
-		})
+	})
 }
 
 func (dbI *DBInterface) DeleteExample(input model.FullRecordInput)(bool, error){
@@ -183,10 +169,10 @@ func (dbI *DBInterface) AddTranslation(input model.FullRecordInput) (bool, error
 				return false, nil
 			}
 			if strings.Contains(err.Error(), "violates foreign key constraint") {
-				log.Println("Error while searching for word existance in a DB:", err)
+				fmt.Println("Error while searching for word existance in a DB:", err)
 				return false, errors.New("Word does not exist")
 			}
-			log.Println("Error while adding translation:", err)
+			fmt.Println("Error while adding translation:", err)
 			return false, err
 		}
 		return true, nil
@@ -219,10 +205,10 @@ func (dbI *DBInterface) AddExample(input model.FullRecordInput) (bool, error) {
 					return false, nil
 				}
 				if strings.Contains(err.Error(), "violates foreign key constraint") {
-					log.Println("Error while searching for translation existance in a DB:", err)
+					fmt.Println("Error while searching for translation existance in a DB:", err)
 					return false, errors.New("Translation does not exist")
 				}
-				log.Println("Error while adding example sentence:", err)
+				fmt.Println("Error while adding example sentence:", err)
 				return false, err
 			}
 		}

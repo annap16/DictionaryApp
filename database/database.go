@@ -37,7 +37,7 @@ func NewGormDatabase() (*GormDatabase, error) {
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("failed to connect to GormDatabase: %w", err)
+		log.Fatalf("failed to connect to GormDatabase: %v", err)
 		return nil, nil
 	}
 
@@ -51,7 +51,7 @@ func NewGormDatabase() (*GormDatabase, error) {
 func (d *GormDatabase) migrate() {
 	err := d.Connection.AutoMigrate(&Word{}, &Translation{}, &ExampleSentence{})
 	if err != nil {
-		log.Fatal("Error migrating GormDatabase: %v", err)
+		log.Fatalf("Error migrating GormDatabase: %v", err)
 		return
 	}
 	fmt.Println("GormDatabase migration completed.")
