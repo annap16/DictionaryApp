@@ -5,7 +5,7 @@ import(
 	"fmt"
 	"context"
 	"regexp"
-	"github.com/annap16/DictionaryApp/server/graph/model"
+	"dictionary-app/server/graph/model"
 )
 
 func ParseQuery(query string) ([]string) {

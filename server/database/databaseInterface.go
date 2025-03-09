@@ -137,7 +137,7 @@ func (dbI *DBInterface) DeleteExample(input model.FullRecordInput)(bool, error){
 		for _, example := range input.Examples {
 			success, err := dbI.repo.DeleteExample(translationID, example, tx)
 			if !success || err!=nil{
-				return success, err
+				return success, errors.New("Example error")
 			}
 		}
 

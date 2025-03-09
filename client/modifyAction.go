@@ -4,7 +4,7 @@ import(
 	"fmt"
 	"context"
 	"log"
-	"github.com/annap16/DictionaryApp/server/graph/model"
+	"dictionary-app/server/graph/model"
 )
 
 type ModifyAction interface {

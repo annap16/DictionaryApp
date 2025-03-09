@@ -530,7 +530,7 @@ func TestDeleteExample(t *testing.T){
 					Return(nil)
 			},			
 			expectedResult: false,
-			expectedError: nil,
+			expectedError: errors.New("Example error"),
 			expectedOutput: "",
 		},
 		{

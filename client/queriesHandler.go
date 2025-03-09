@@ -5,7 +5,7 @@ import(
 	"log"
 	"strings"
 	"github.com/machinebox/graphql"
-	"github.com/annap16/DictionaryApp/server/graph/model"
+	"dictionary-app/server/graph/model"
 )
 
 type QueriesHandlerQL struct{
