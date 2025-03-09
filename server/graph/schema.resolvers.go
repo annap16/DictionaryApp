@@ -7,21 +7,21 @@ package graph
 import (
 	"context"
 
-	"github.com/annap16/DictionaryApp/graph/model"
+	model1 "dictionary-app/server/graph/model"
 )
 
 // CreateTranslation is the resolver for the createTranslation field.
-func (r *mutationResolver) CreateTranslation(ctx context.Context, input model.FullRecordInput) (bool, error) {
+func (r *mutationResolver) CreateTranslation(ctx context.Context, input model1.FullRecordInput) (bool, error) {
 	return r.DBInterface.AddWord(input)
 }
 
 // AddTranslation is the resolver for the addTranslation field.
-func (r *mutationResolver) AddTranslation(ctx context.Context, input model.FullRecordInput) (bool, error) {
+func (r *mutationResolver) AddTranslation(ctx context.Context, input model1.FullRecordInput) (bool, error) {
 	return r.DBInterface.AddTranslation(input)
 }
 
 // AddExample is the resolver for the addExample field.
-func (r *mutationResolver) AddExample(ctx context.Context, input model.FullRecordInput) (bool, error) {
+func (r *mutationResolver) AddExample(ctx context.Context, input model1.FullRecordInput) (bool, error) {
 	return r.DBInterface.AddExample(input)
 }
 
@@ -36,12 +36,12 @@ func (r *mutationResolver) DeleteTranslation(ctx context.Context, word string, t
 }
 
 // DeleteExample is the resolver for the deleteExample field.
-func (r *mutationResolver) DeleteExample(ctx context.Context, input model.FullRecordInput) (bool, error) {
+func (r *mutationResolver) DeleteExample(ctx context.Context, input model1.FullRecordInput) (bool, error) {
 	return r.DBInterface.DeleteExample(input)
 }
 
 // GetWordTranslation is the resolver for the getWordTranslation field.
-func (r *queryResolver) GetWordTranslation(ctx context.Context, word string) (*model.Word, error) {
+func (r *queryResolver) GetWordTranslation(ctx context.Context, word string) (*model1.Word, error) {
 	return r.DBInterface.ReceiveWordTranslation(word)
 }
 

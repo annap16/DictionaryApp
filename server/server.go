@@ -5,25 +5,26 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/annap16/DictionaryApp/database"
+	"dictionary-app/server/database"
+	"dictionary-app/server/graph"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/annap16/DictionaryApp/graph"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
 const defaultPort = "8080"
 
 func main() {
-	db, err := database.NewDatabase()
+	db, err := database.NewGormDatabase()
 	if err != nil {
 		log.Fatalf("Database connection error: %v", err)
 	}
-	dbInterface := database.NewDBInterface(db.Connection)
+	repo := &database.GormRepository{}
+	dbInterface := database.NewDBInterface(db.Connection, repo)
 
 	port := os.Getenv("PORT")
 	if port == "" {

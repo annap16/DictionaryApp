@@ -4,7 +4,8 @@ import(
 	"strings"
 	"fmt"
 	"context"
-	"github.com/annap16/DictionaryApp/graph/model"
+	"regexp"
+	"dictionary-app/server/graph/model"
 )
 
 //Implementing responsibility chain pattern for commands handling

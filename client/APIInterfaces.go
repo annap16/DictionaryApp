@@ -2,7 +2,7 @@ package main
 
 import(
 	"context"
-	"github.com/annap16/DictionaryApp/graph/model"
+	"dictionary-app/server/graph/model"
 	"github.com/machinebox/graphql"
 
 )

@@ -5,7 +5,7 @@ import(
 	)
 
 func main() {
-	client := graphql.NewClient("http://localhost:8080/query")
+	client := graphql.NewClient("http://server:8080/query")
 	queriesHandlerQL := &QueriesHandlerQL {client: client} 
 	WaitForUserInput(queriesHandlerQL)
 }
