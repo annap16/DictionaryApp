@@ -12,9 +12,10 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"dictionary-app/server/graph/model"
+
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/annap16/DictionaryApp/graph/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -390,7 +391,7 @@ func (ec *executionContext) field_Mutation_addExample_argsInput(
 ) (model.FullRecordInput, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐFullRecordInput(ctx, tmp)
+		return ec.unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐFullRecordInput(ctx, tmp)
 	}
 
 	var zeroVal model.FullRecordInput
@@ -413,7 +414,7 @@ func (ec *executionContext) field_Mutation_addTranslation_argsInput(
 ) (model.FullRecordInput, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐFullRecordInput(ctx, tmp)
+		return ec.unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐFullRecordInput(ctx, tmp)
 	}
 
 	var zeroVal model.FullRecordInput
@@ -436,7 +437,7 @@ func (ec *executionContext) field_Mutation_createTranslation_argsInput(
 ) (model.FullRecordInput, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐFullRecordInput(ctx, tmp)
+		return ec.unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐFullRecordInput(ctx, tmp)
 	}
 
 	var zeroVal model.FullRecordInput
@@ -459,7 +460,7 @@ func (ec *executionContext) field_Mutation_deleteExample_argsInput(
 ) (model.FullRecordInput, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐFullRecordInput(ctx, tmp)
+		return ec.unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐFullRecordInput(ctx, tmp)
 	}
 
 	var zeroVal model.FullRecordInput
@@ -1119,7 +1120,7 @@ func (ec *executionContext) _Query_getWordTranslation(ctx context.Context, field
 	}
 	res := resTmp.(*model.Word)
 	fc.Result = res
-	return ec.marshalOWord2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐWord(ctx, field.Selections, res)
+	return ec.marshalOWord2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐWord(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getWordTranslation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1401,7 +1402,7 @@ func (ec *executionContext) _Translation_exampleSentences(ctx context.Context, f
 	}
 	res := resTmp.([]*model.ExampleSentence)
 	fc.Result = res
-	return ec.marshalNExampleSentence2ᚕᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐExampleSentenceᚄ(ctx, field.Selections, res)
+	return ec.marshalNExampleSentence2ᚕᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐExampleSentenceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Translation_exampleSentences(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1539,7 +1540,7 @@ func (ec *executionContext) _Word_translations(ctx context.Context, field graphq
 	}
 	res := resTmp.([]*model.Translation)
 	fc.Result = res
-	return ec.marshalNTranslation2ᚕᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐTranslationᚄ(ctx, field.Selections, res)
+	return ec.marshalNTranslation2ᚕᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐTranslationᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Word_translations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4208,7 +4209,7 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNExampleSentence2ᚕᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐExampleSentenceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ExampleSentence) graphql.Marshaler {
+func (ec *executionContext) marshalNExampleSentence2ᚕᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐExampleSentenceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ExampleSentence) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4232,7 +4233,7 @@ func (ec *executionContext) marshalNExampleSentence2ᚕᚖgithubᚗcomᚋannap16
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNExampleSentence2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐExampleSentence(ctx, sel, v[i])
+			ret[i] = ec.marshalNExampleSentence2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐExampleSentence(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4252,7 +4253,7 @@ func (ec *executionContext) marshalNExampleSentence2ᚕᚖgithubᚗcomᚋannap16
 	return ret
 }
 
-func (ec *executionContext) marshalNExampleSentence2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐExampleSentence(ctx context.Context, sel ast.SelectionSet, v *model.ExampleSentence) graphql.Marshaler {
+func (ec *executionContext) marshalNExampleSentence2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐExampleSentence(ctx context.Context, sel ast.SelectionSet, v *model.ExampleSentence) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -4262,7 +4263,7 @@ func (ec *executionContext) marshalNExampleSentence2ᚖgithubᚗcomᚋannap16ᚋ
 	return ec._ExampleSentence(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐFullRecordInput(ctx context.Context, v any) (model.FullRecordInput, error) {
+func (ec *executionContext) unmarshalNFullRecordInput2githubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐFullRecordInput(ctx context.Context, v any) (model.FullRecordInput, error) {
 	res, err := ec.unmarshalInputFullRecordInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -4297,7 +4298,7 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNTranslation2ᚕᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐTranslationᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Translation) graphql.Marshaler {
+func (ec *executionContext) marshalNTranslation2ᚕᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐTranslationᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Translation) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4321,7 +4322,7 @@ func (ec *executionContext) marshalNTranslation2ᚕᚖgithubᚗcomᚋannap16ᚋD
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNTranslation2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐTranslation(ctx, sel, v[i])
+			ret[i] = ec.marshalNTranslation2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐTranslation(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4341,7 +4342,7 @@ func (ec *executionContext) marshalNTranslation2ᚕᚖgithubᚗcomᚋannap16ᚋD
 	return ret
 }
 
-func (ec *executionContext) marshalNTranslation2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐTranslation(ctx context.Context, sel ast.SelectionSet, v *model.Translation) graphql.Marshaler {
+func (ec *executionContext) marshalNTranslation2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐTranslation(ctx context.Context, sel ast.SelectionSet, v *model.Translation) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -4684,7 +4685,7 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalOWord2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋgraphᚋmodelᚐWord(ctx context.Context, sel ast.SelectionSet, v *model.Word) graphql.Marshaler {
+func (ec *executionContext) marshalOWord2ᚖgithubᚗcomᚋannap16ᚋDictionaryAppᚋserverᚋgraphᚋmodelᚐWord(ctx context.Context, sel ast.SelectionSet, v *model.Word) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

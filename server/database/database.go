@@ -27,7 +27,10 @@ func (g *GormDatabase) AutoMigrate(dst ...interface{}) error {
 }
 
 func NewGormDatabase() (*GormDatabase, error) {
-	if err := godotenv.Load(); err != nil {
+	dir, err := os.Getwd()
+	fmt.Println("Current Working Directory:", dir)
+	if err := godotenv.Load("../.env"); err != nil {
+		log.Fatal(err)
 		log.Fatal("Error loading .env file")
 		return nil, nil
 	}

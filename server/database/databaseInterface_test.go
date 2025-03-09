@@ -4,7 +4,7 @@ import (
 	"testing"
 	"os"
 	"bytes"
-	"github.com/annap16/DictionaryApp/graph/model"
+	"dictionary-app/server/graph/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"errors"
 	"strings"
-	"github.com/annap16/DictionaryApp/graph/model"
+	"dictionary-app/server/graph/model"
 	"gorm.io/gorm"
 )
 
