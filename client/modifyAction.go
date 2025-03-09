@@ -1,13 +1,12 @@
 package main
 
 import(
-	"fmt"
 	"context"
 	"dictionary-app/server/graph/model"
 )
 
 type ModifyAction interface {
-    Execute() bool
+    Execute() (bool, error)
 }
 
 
@@ -21,7 +20,7 @@ type ModifyAddCommand struct {
 
 // TODO better error handling and returning err not only bool
 
-func (m *ModifyAddCommand) Execute() bool {
+func (m *ModifyAddCommand) Execute() (bool, error) {
     var success bool
     var err error
 
@@ -37,15 +36,13 @@ func (m *ModifyAddCommand) Execute() bool {
     case "example":
         success, err = m.handler.SendAddExampleMutation(context.Background(), input)
     default:
-        fmt.Println("Invalid modify add command")
-        return false
+        return false, nil
     }
     if err != nil {
-        fmt.Println("Error:", err)
-        return false
+        return false, err
     }
 
-    return success
+    return success, nil
 }
 
 type ModifyDeleteCommand struct {
@@ -56,7 +53,7 @@ type ModifyDeleteCommand struct {
     examples []string
 }
 
-func (m *ModifyDeleteCommand) Execute() bool {
+func (m *ModifyDeleteCommand) Execute() (bool, error) {
     var success bool
     var err error
 
@@ -71,14 +68,12 @@ func (m *ModifyDeleteCommand) Execute() bool {
         }
         success, err = m.handler.SendRemoveExampleMutation(context.Background(), input)
     default:
-        fmt.Println("Invalid modify delete command")
-        return false
+        return false, nil
     }
 
     if err != nil {
-        fmt.Println("Error:", err)
-        return false
+        return false, err
     }
 	
-    return success
+    return success, nil
 }

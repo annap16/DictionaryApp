@@ -38,7 +38,7 @@ func TestHandleCommandCreate(t *testing.T) {
 			command: "create word translation [example]",
 			mockResponse: true,
 			mockError: nil,
-			expectedOutput: "Word successfully added to dictionary\n",
+			expectedOutput: "Słowo zostało dodane do słownika\n",
 			expectedResult: true,
 		},
 		{
@@ -46,7 +46,7 @@ func TestHandleCommandCreate(t *testing.T) {
 			command: "create word translation [example]",
 			mockResponse: false,
 			mockError: nil,
-			expectedOutput: "Given word already exists in the dictionary\n",
+			expectedOutput: "Podane słowo istnieje już w słowniku\n",
 			expectedResult: true, 
 		},
 		{
@@ -54,7 +54,7 @@ func TestHandleCommandCreate(t *testing.T) {
 			command: "create word translation [example]",
 			mockResponse: false,
 			mockError: fmt.Errorf("mutation failed"),
-			expectedOutput: "Error occured while adding word to the dictionary\n",
+			expectedOutput: "Wystąpił błąd podczas dodawania do bazy danych: mutation failed\n",
 			expectedResult: true,
 		},
 	}
@@ -110,7 +110,7 @@ func TestHandleCommandCreate_CorrectInput(t *testing.T) {
 				Translation: "book",
 				Examples: []string{"I love my new book"},
 			},
-			expectedOutput: "Word successfully added to dictionary\n",
+			expectedOutput:"Słowo zostało dodane do słownika\n",
 			expectedResult: true,
 		},
 		{
@@ -121,7 +121,7 @@ func TestHandleCommandCreate_CorrectInput(t *testing.T) {
 				Translation: "car",
 				Examples: []string{"A fast car", "My car is blue"},
 			},
-			expectedOutput: "Word successfully added to dictionary\n",
+			expectedOutput: "Słowo zostało dodane do słownika\n",
 			expectedResult: true,
 		},
 		{
@@ -132,7 +132,7 @@ func TestHandleCommandCreate_CorrectInput(t *testing.T) {
 				Translation: "cat",
 				Examples: []string{},
 			},
-			expectedOutput: "Word successfully added to dictionary\n",
+			expectedOutput: "Słowo zostało dodane do słownika\n",
 			expectedResult: true,
 		},
 	}
@@ -188,7 +188,7 @@ func TestHandleCommandReceive(t *testing.T){
 			command: "receive word",
 			mockResponse: "",
 			mockError: nil,
-			expectedOutput: "The word doesn't exist in the dictionary\n",
+			expectedOutput: "Podane słowo nie istnieje w słowniku\n",
 			expectedResult: true,
 		},
 		{
@@ -196,7 +196,7 @@ func TestHandleCommandReceive(t *testing.T){
 			command: "receive ksiazka",
 			mockResponse: "",
 			mockError: fmt.Errorf("mutation failed"),
-			expectedOutput: "Error while receiving a word\n",
+			expectedOutput: "Wystąpił błąd podczas wyszukiwania w słowniku: mutation failed\n",
 			expectedResult: true,
 		},
 	}
@@ -296,21 +296,30 @@ type MockModifyFactory struct{
 	mock.Mock
 }
 
-func (m *MockModifyFactory) CreateAction(handler QueriesHandler, command string) ModifyAction{
+// func (m *MockModifyFactory) CreateAction(handler QueriesHandler, command string) (ModifyAction, error){
+// 	args := m.Called(handler, command)
+// 	if args.Get(0) != nil {
+// 		return args.Get(0).(ModifyAction),
+// 	}
+// 	return nil
+// }
+func (m *MockModifyFactory) CreateAction(handler QueriesHandler, command string) (ModifyAction, error) {
 	args := m.Called(handler, command)
-	if args.Get(0) != nil {
-		return args.Get(0).(ModifyAction)
-	}
-	return nil
+	return args.Get(0).(ModifyAction), args.Error(1)
 }
+
+
+
+
+
 
 type MockModifyAction struct{
 	mock.Mock
 }
 
-func (m *MockModifyAction) Execute() bool{
+func (m *MockModifyAction) Execute() (bool, error){
 	args := m.Called()
-	return args.Bool(0)
+	return args.Bool(0), args.Error(1)
 }
 
 func TestHandleCommandModify(t *testing.T) {
@@ -327,7 +336,7 @@ func TestHandleCommandModify(t *testing.T) {
 			command: "modify add example word translation [example]",
 			factoryResponse: new(MockModifyAction),
 			execResponse: true,
-			expectedOutput: "Word modified successfully\n",
+			expectedOutput: "Słowo zostało zmodyfikowane poprawnie\n",
 			expectedResult: true,
 		},
 		{
@@ -335,7 +344,7 @@ func TestHandleCommandModify(t *testing.T) {
 			command: "modify add translation word translation",
 			factoryResponse: new(MockModifyAction),
 			execResponse: true,
-			expectedOutput: "Word modified successfully\n",
+			expectedOutput: "Słowo zostało zmodyfikowane poprawnie\n",
 			expectedResult: true,
 		},
 		{
@@ -343,7 +352,7 @@ func TestHandleCommandModify(t *testing.T) {
 			command: "modify add example word translation [example]",
 			factoryResponse: new(MockModifyAction),
 			execResponse: false,
-			expectedOutput: "Something went wrong\n",
+			expectedOutput: "Wprowadzono niepoprawne polecenie\n",
 			expectedResult: true,
 		},
 		{
@@ -351,7 +360,7 @@ func TestHandleCommandModify(t *testing.T) {
 			command: "modify add translation word translation",
 			factoryResponse: new(MockModifyAction),
 			execResponse: false,
-			expectedOutput: "Something went wrong\n",
+			expectedOutput: "Wprowadzono niepoprawne polecenie\n",
 			expectedResult: true,
 		},
 		{
@@ -359,7 +368,7 @@ func TestHandleCommandModify(t *testing.T) {
 			command: "modify delete example word translation [example]",
 			factoryResponse: new(MockModifyAction),
 			execResponse: true,
-			expectedOutput: "Word modified successfully\n",
+			expectedOutput: "Słowo zostało zmodyfikowane poprawnie\n",
 			expectedResult: true,
 		},
 		{
@@ -367,7 +376,7 @@ func TestHandleCommandModify(t *testing.T) {
 			command: "modify delete translation word translation",
 			factoryResponse: new(MockModifyAction),
 			execResponse: true,
-			expectedOutput: "Word modified successfully\n",
+			expectedOutput: "Słowo zostało zmodyfikowane poprawnie\n",
 			expectedResult: true,
 		},
 		{
@@ -375,7 +384,7 @@ func TestHandleCommandModify(t *testing.T) {
 			command: "modify delete example word translation [example]",
 			factoryResponse: new(MockModifyAction),
 			execResponse: false,
-			expectedOutput: "Something went wrong\n",
+			expectedOutput: "Wprowadzono niepoprawne polecenie\n",
 			expectedResult: true,
 		},
 		{
@@ -383,7 +392,7 @@ func TestHandleCommandModify(t *testing.T) {
 			command: "modify delete translation word translation",
 			factoryResponse: new(MockModifyAction),
 			execResponse: false,
-			expectedOutput: "Something went wrong\n",
+			expectedOutput: "Wprowadzono niepoprawne polecenie\n",
 			expectedResult: true,
 		},
 
@@ -395,8 +404,8 @@ func TestHandleCommandModify(t *testing.T) {
 			mockFactory := new(MockModifyFactory)
 			mockModifyAction := tt.factoryResponse.(*MockModifyAction) 
 
-			mockFactory.On("CreateAction", mock.Anything, mock.Anything).Return(mockModifyAction)
-			mockModifyAction.On("Execute").Return(tt.execResponse)
+			mockFactory.On("CreateAction", mock.Anything, mock.Anything).Return(mockModifyAction, nil)
+			mockModifyAction.On("Execute").Return(tt.execResponse, nil)
 
 			handler := &ModifyCommandHandler{
 				modifyFactory: mockFactory, 
@@ -445,7 +454,7 @@ func TestHandleCommandRemove(t *testing.T){
 			command: "remove slowo",
 			mockResponse: true,
 			mockError: nil,
-			expectedOutput: "Word and related data deleted successfully\n",
+			expectedOutput: "Podane słowo i powiązane z nim dane zostały usunięte\n",
 			expectedResult: true,
 		},
 		{
@@ -453,7 +462,7 @@ func TestHandleCommandRemove(t *testing.T){
 			command: "remove slowo",
 			mockResponse: false,
 			mockError: nil,
-			expectedOutput: "The word dosen't exist in the dictionary\n",
+			expectedOutput: "Podane słowo nie istnieje w słowniku\n",
 			expectedResult: true, 
 		},
 		{
@@ -461,7 +470,7 @@ func TestHandleCommandRemove(t *testing.T){
 			command: "remove slowo",
 			mockResponse: false,
 			mockError: fmt.Errorf("Mutation Failed"),
-			expectedOutput: "An error occured while removing word from the dictionary\n",
+			expectedOutput: "Wystąpił błąd podczas usuwania słowa ze słownika: Mutation Failed\n",
 			expectedResult: true,
 		},
 	}

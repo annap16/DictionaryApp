@@ -13,7 +13,6 @@ func TestCreateAction(t *testing.T) {
         name string
         command string
         expectedAction ModifyAction
-		expectedOutput string
     }{
         {
             name: "Success - Create Add Command",
@@ -25,7 +24,6 @@ func TestCreateAction(t *testing.T) {
                 translation: "translation",
                 examples: nil,
             },
-			expectedOutput: "",
         },
         {
             name: "Success - Create Delete Command",
@@ -37,13 +35,11 @@ func TestCreateAction(t *testing.T) {
                 translation: "translation",
                 examples: nil,
             },
-			expectedOutput: "",
         },
 		{
             name: "Failure - Wrong Key word",
             command: "modify create translation word translation",
             expectedAction: nil,
-			expectedOutput: "Invalid modify action\n",
         },
 		
     }
@@ -53,13 +49,9 @@ func TestCreateAction(t *testing.T) {
             factory := &ModifyCommandFactory{}
 
 			var action ModifyAction
-			output := captureStdout(func() {
-				action = factory.CreateAction(mockHandler, tt.command)
-			})
-            
+			action, _ = factory.CreateAction(mockHandler, tt.command)            
 
             assert.Equal(t, tt.expectedAction, action)
-			assert.Equal(t, tt.expectedOutput, output)
         })
     }
 }

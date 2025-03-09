@@ -1,22 +1,20 @@
 package main
 
 import (
-	"fmt"
 
 )
 
 type CommandFactory interface {
-    CreateAction(handler QueriesHandler, command string) ModifyAction
+    CreateAction(handler QueriesHandler, command string) (ModifyAction, error)
 }
 
 type ModifyCommandFactory struct{
 }
 
-func (m *ModifyCommandFactory) CreateAction(handler QueriesHandler, command string) ModifyAction {
+func (m *ModifyCommandFactory) CreateAction(handler QueriesHandler, command string) (ModifyAction, error) {
     params, err := ParseModifyCommand(command)
     if err != nil {
-        fmt.Println(err)
-        return nil
+        return nil, err
     }
 
     switch params.Action {
@@ -27,7 +25,7 @@ func (m *ModifyCommandFactory) CreateAction(handler QueriesHandler, command stri
             word: params.Word,
             translation: params.Translation,
             examples: params.Examples,
-        }
+        }, nil
     case "delete":
         return &ModifyDeleteCommand{
             handler: handler,
@@ -35,9 +33,9 @@ func (m *ModifyCommandFactory) CreateAction(handler QueriesHandler, command stri
             word: params.Word,
 			translation: params.Translation,
             examples: params.Examples, 
-        }
+        }, nil
     }
 
-    return nil
+    return nil, nil
 }
 

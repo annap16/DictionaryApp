@@ -26,7 +26,6 @@ func (q *QueriesHandlerQL) SendCreateMutation(ctx context.Context, input model.F
 
 	err := q.client.Run(context.Background(), request, &response)
 	if err!=nil{
-		fmt.Println("Error while adding a word:", err)
 		return false, err
 	}
 
@@ -60,7 +59,6 @@ func (q *QueriesHandlerQL) SendCreateMutation(ctx context.Context, input model.F
 		if strings.Contains(err.Error(), "Record not found") {
 			return "", nil
 		}
-		fmt.Println("Error while searching for a word:", err)
 		return "", err
 	}
 
@@ -69,12 +67,12 @@ func (q *QueriesHandlerQL) SendCreateMutation(ctx context.Context, input model.F
 
 func (q *QueriesHandlerQL) ParseReceiveResponse(response ReceiveResponse) string{
 	var result string
-	result += "Word: " + response.GetWordTranslation.Word + "\n"
+	result += "Słowo: " + response.GetWordTranslation.Word + "\n"
 
 	for _, translation := range response.GetWordTranslation.Translations {
-		result += "Translation: " + translation.Translation + "\n"
+		result += "Tłumaczenie: " + translation.Translation + "\n"
 		for _, sentence := range translation.ExampleSentences {
-			result += "Examples: " + sentence.Sentence + "\n"
+			result += "Przykład: " + sentence.Sentence + "\n"
 		}
 	}
 	result = strings.TrimSuffix(result, "\n")
@@ -91,9 +89,7 @@ func (q *QueriesHandlerQL) SendRemoveMutation(ctx context.Context, input string)
 
 	var response RemoveWordResponse
 	
-	if err := q.client.Run(context.Background(), request, &response); err != nil {
-		
-		fmt.Println("Error while removing word from a dictionary:", err)
+	if err := q.client.Run(context.Background(), request, &response); err != nil {		
 		return false, err
 	}
 
@@ -152,7 +148,6 @@ func (q *QueriesHandlerQL) SendAddTranslationMutation(ctx context.Context, input
 
     err := q.client.Run(context.Background(), request, &response)
 	if err != nil {
-        fmt.Println("Error while adding translation:", err)
         return false, err
     }
 
@@ -172,7 +167,6 @@ func (q *QueriesHandlerQL) SendAddExampleMutation(ctx context.Context, input mod
 
     err := q.client.Run(context.Background(), request, &response)
 	if err != nil {
-        fmt.Println("Error while adding example sentences:", err)
         return false, err
     }
 

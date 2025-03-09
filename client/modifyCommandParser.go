@@ -16,7 +16,7 @@ type ModifyCommandParams struct {
 func ParseModifyCommand(command string) (*ModifyCommandParams, error) {
     parts := strings.Split(command, " ")
     if len(parts) < 3 {
-        return nil, errors.New("Invalid modify command")
+        return nil, errors.New("Wprowadzono niepoprawne polecenie")
     }
 
     params := &ModifyCommandParams{
@@ -35,7 +35,7 @@ func ParseModifyCommand(command string) (*ModifyCommandParams, error) {
 			params.Translation = parts[4]
             params.Examples = ParseQuery(command)
         } else {
-            return nil, errors.New("Invalid add command syntax")
+            return nil, errors.New("Niepoprawna składnia dla polecenia dodawania")
         }
     case "delete":
         if params.TargetType == "translation" && len(parts) == 5 {
@@ -46,10 +46,10 @@ func ParseModifyCommand(command string) (*ModifyCommandParams, error) {
 			params.Translation = parts[4]
             params.Examples = ParseQuery(command)
         } else {
-            return nil, errors.New("Invalid delete command syntax")
+            return nil, errors.New("Niepoprawna składnia dla polecenia usuwania")
         }
     default:
-        return nil, errors.New("Invalid modify action")
+        return nil, errors.New("Niepoprawna składnia dla polecenia modyfikacji słowa")
     }
 
     return params, nil

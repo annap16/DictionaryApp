@@ -23,7 +23,7 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 	commandSplitted := strings.Split(command, " ")
 	if(strings.ToLower(commandSplitted[0])=="create"){
 		if !CheckCreateSyntax(command){
-			fmt.Println("Incorrect command")
+			fmt.Println("Niepoprawne polecenie")
 			return true
 		}
 
@@ -40,11 +40,11 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 		ctx := context.Background()
 		success, err := c.handler.SendCreateMutation(ctx, input)
 		if err != nil {
-			fmt.Println("Error occured while adding word to the dictionary")
+			fmt.Println("Wystąpił błąd podczas dodawania do bazy danych:", err)
 		}else if !success{
-			fmt.Println("Given word already exists in the dictionary")
+			fmt.Println("Podane słowo istnieje już w słowniku")
 		}else{
-			fmt.Println("Word successfully added to dictionary")
+			fmt.Println("Słowo zostało dodane do słownika")
 		}
 
 		return true
@@ -54,7 +54,6 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 	}
 	return false
 }
-
 
 func (c *CreateCommandHandler) SetNext(handler CommandHandler) {
 	c.next = handler
@@ -69,17 +68,17 @@ func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
 	commandSplitted := strings.Split(command, " ")
 	if(strings.ToLower(commandSplitted[0])=="receive"){
 		if(len(commandSplitted)!=2){
-			fmt.Println("Wrong command")
+			fmt.Println("Niepoprawne polecenie")
 			return true
 		}
 		ctx := context.Background()
 		received, err := r.handler.SendReceiveMutation(ctx, strings.ToLower(commandSplitted[1]))
 		if err!=nil{
-			fmt.Println("Error while receiving a word")
+			fmt.Println("Wystąpił błąd podczas wyszukiwania w słowniku:", err)
 		}else if received!=""{
 			fmt.Println(received)
 		}else{
-			fmt.Println("The word doesn't exist in the dictionary")
+			fmt.Println("Podane słowo nie istnieje w słowniku")
 		}
 		return true
 	}
@@ -102,15 +101,22 @@ type ModifyCommandHandler struct{
 func (m *ModifyCommandHandler) HandleCommand(command string) bool{	
 	commandSplitted := strings.Split(command, " ")
 	if(strings.ToLower(commandSplitted[0])=="modify"){
-		modifyAction := m.modifyFactory.CreateAction(m.handler, command)
 		var success bool
+		modifyAction, err := m.modifyFactory.CreateAction(m.handler, command)
+
 		if modifyAction!= nil{
-			success = modifyAction.Execute()
-		}
-		if success{
-			fmt.Println("Word modified successfully")
+			success, err = modifyAction.Execute()
 		}else{
-			fmt.Println("Something went wrong")
+			fmt.Println(err)
+			return true
+		}
+
+		if success{
+			fmt.Println("Słowo zostało zmodyfikowane poprawnie")
+		}else if err==nil{
+			fmt.Println("Wprowadzono niepoprawne polecenie")
+		}else{
+			fmt.Println(err)
 		}
 		return true
 	}
@@ -136,17 +142,17 @@ func (r *RemoveCommandHandler) HandleCommand(command string) bool{
 	commandSplitted := strings.Split(command, " ")
 	if(strings.ToLower(commandSplitted[0])=="remove"){
 		if(len(commandSplitted)!=2){
-			fmt.Println("Wrong command")
+			fmt.Println("Niepoprawne polecenie")
 			return true
 		}
 		ctx := context.Background()
 		success, err := r.handler.SendRemoveMutation(ctx, commandSplitted[1])
 		if err!=nil{
-			fmt.Println("An error occured while removing word from the dictionary")
+			fmt.Println("Wystąpił błąd podczas usuwania słowa ze słownika:", err)
 		}else if success{
-			fmt.Println("Word and related data deleted successfully")
+			fmt.Println("Podane słowo i powiązane z nim dane zostały usunięte")
 		}else{
-			fmt.Println("The word dosen't exist in the dictionary")
+			fmt.Println("Podane słowo nie istnieje w słowniku")
 		}
 		return true
 	}

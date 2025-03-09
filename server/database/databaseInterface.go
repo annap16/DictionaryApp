@@ -166,13 +166,11 @@ func (dbI *DBInterface) AddTranslation(input model.FullRecordInput) (bool, error
 		err = dbI.repo.CreateTranslation(&newTranslation, tx)
 		if err != nil {
 			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-				return false, nil
+				return false, errors.New("Nie można dodać tłumaczenia – narusza ono unikalność rekordów")
 			}
 			if strings.Contains(err.Error(), "violates foreign key constraint") {
-				fmt.Println("Error while searching for word existance in a DB:", err)
-				return false, errors.New("Word does not exist")
+				return false, errors.New("Wystąpił błąd podczas dodawania tłumaczenia")
 			}
-			fmt.Println("Error while adding translation:", err)
 			return false, err
 		}
 		return true, nil
@@ -202,13 +200,11 @@ func (dbI *DBInterface) AddExample(input model.FullRecordInput) (bool, error) {
 			err:= dbI.repo.CreateExample(&example, tx)
 			if err != nil {
 				if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-					return false, nil
+					return false, errors.New("Nie można dodać przykładu - narusza ono unikalność rekordów")
 				}
 				if strings.Contains(err.Error(), "violates foreign key constraint") {
-					fmt.Println("Error while searching for translation existance in a DB:", err)
-					return false, errors.New("Translation does not exist")
+					return false, errors.New("Wystąpił błąd podczas dodawania przykładu")
 				}
-				fmt.Println("Error while adding example sentence:", err)
 				return false, err
 			}
 		}

@@ -65,19 +65,19 @@ func TestParseModifyCommand(t *testing.T) {
 		{
 			name:    "Failure - Wrong Key Word",
 			command: "modify create translation word translation",
-			expectedError: errors.New("Invalid modify action"),
+			expectedError: errors.New("Niepoprawna składnia dla polecenia modyfikacji słowa"),
 			expectedModel: nil,
 		},
 		{
 			name:    "Failure - Add - Wrong Command",
 			command: "modify add translation word translation [][Wrong]]",
-			expectedError: errors.New("Invalid add command syntax"),
+			expectedError: errors.New("Niepoprawna składnia dla polecenia dodawania"),
 			expectedModel: nil,
 		},
 		{
 			name:    "Failure - Delete - Wrong Command",
 			command: "modify delete translation word translation [][Wrong]]",
-			expectedError: errors.New("Invalid delete command syntax"),
+			expectedError: errors.New("Niepoprawna składnia dla polecenia usuwania"),
 			expectedModel: nil,
 		},
 	}

@@ -24,7 +24,6 @@ func TestSendCreateMutation(t *testing.T) {
 		mockBehavior func(mockClient *MockGraphQLClient)
 		expectedResult bool
 		expectedError error
-		expectedOutput string
 	}{
 		{
 			name: "Success - CreateTranslation Returns True",
@@ -36,7 +35,6 @@ func TestSendCreateMutation(t *testing.T) {
 			},
 			expectedResult: true,
 			expectedError: nil,
-			expectedOutput: "",
 		},
 		{
 			name: "Failure - Error From GraphQL Client",
@@ -45,7 +43,6 @@ func TestSendCreateMutation(t *testing.T) {
 			},
 			expectedResult: false,
 			expectedError:  errors.New("graphQL Error"),
-			expectedOutput: "Error while adding a word: graphQL Error\n",
 		},
 	}
 
@@ -58,16 +55,10 @@ func TestSendCreateMutation(t *testing.T) {
 				client: mockClient,
 			}
 
-			var result bool
-			var err error
-			output := captureStdout(func() {
-				result, err = queriesHandler.SendCreateMutation(context.Background(), input)
-
-			})
+			result, err := queriesHandler.SendCreateMutation(context.Background(), input)
 
 			assert.Equal(t, tt.expectedResult, result)
 			assert.Equal(t, tt.expectedError, err)
-			assert.Equal(t, tt.expectedOutput, output)
 
 			mockClient.AssertExpectations(t)
 		})
@@ -82,7 +73,6 @@ func TestSendReceiveMutation(t *testing.T) {
 		mockBehavior func(mockClient *MockGraphQLClient)
 		expectedResult string
 		expectedError error
-		expectedOutput string
 	}{
 		{
 			name: "Success - Word Found",
@@ -126,9 +116,8 @@ func TestSendReceiveMutation(t *testing.T) {
 					}
 				}).Return(nil)
 			},
-			expectedResult: "Word: word1\nTranslation: translation1\nExamples: example sentence 1\nExamples: example sentence 2",
+			expectedResult: "Słowo: word1\nTłumaczenie: translation1\nPrzykład: example sentence 1\nPrzykład: example sentence 2",
 			expectedError:  nil,
-			expectedOutput: "",
 		},
 		{
 			name: "Failure - Error from GraphQL Client",
@@ -137,7 +126,6 @@ func TestSendReceiveMutation(t *testing.T) {
 			},
 			expectedResult: "",
 			expectedError:  errors.New("graphQL Error"),
-			expectedOutput: "Error while searching for a word: graphQL Error\n",
 		},
 		{
 			name: "No Record Found",
@@ -146,7 +134,6 @@ func TestSendReceiveMutation(t *testing.T) {
 			},
 			expectedResult: "",
 			expectedError:  nil,
-			expectedOutput: "",
 		},
 	}
 
@@ -159,15 +146,10 @@ func TestSendReceiveMutation(t *testing.T) {
 				client: mockClient,
 			}
 
-			var result string
-			var err error
-			output := captureStdout(func() {
-				result, err = queriesHandler.SendReceiveMutation(context.Background(), input)
-			})
+			result, err := queriesHandler.SendReceiveMutation(context.Background(), input)
 
 			assert.Equal(t, tt.expectedResult, result)
 			assert.Equal(t, tt.expectedError, err)
-			assert.Equal(t, tt.expectedOutput, output)
 
 			mockClient.AssertExpectations(t)
 		})
@@ -181,7 +163,6 @@ func TestSendRemoveMutation(t *testing.T) {
 		mockBehavior func(mockClient *MockGraphQLClient)
 		expectedResult bool
 		expectedError  error
-		expectedOutput string
 	}{
 		{
 			name: "Success - DeleteWord Returns True",
@@ -193,7 +174,6 @@ func TestSendRemoveMutation(t *testing.T) {
 			},
 			expectedResult: true,
 			expectedError: nil,
-			expectedOutput: "",
 		},
 		{
 			name: "Failure - Error From GraphQL Client",
@@ -202,7 +182,6 @@ func TestSendRemoveMutation(t *testing.T) {
 			},
 			expectedResult: false,
 			expectedError: errors.New("graphQL Error"),
-			expectedOutput: "Error while removing word from a dictionary: graphQL Error\n",
 		},
 	}
 
@@ -215,15 +194,10 @@ func TestSendRemoveMutation(t *testing.T) {
 				client: mockClient,
 			}
 
-			var result bool
-			var err error
-			output := captureStdout(func() {
-				result, err = queriesHandler.SendRemoveMutation(context.Background(), input)
-			})
+			result, err := queriesHandler.SendRemoveMutation(context.Background(), input)
 
 			assert.Equal(t, tt.expectedResult, result)
 			assert.Equal(t, tt.expectedError, err)
-			assert.Equal(t, tt.expectedOutput, output)
 
 			mockClient.AssertExpectations(t)
 		})
@@ -360,7 +334,6 @@ func TestSendAddTranslationMutation(t *testing.T) {
 		mockBehavior func(mockClient *MockGraphQLClient)
 		expectedResult bool
 		expectedError error
-		expectedOutput string
 	}{
 		{
 			name: "Success - AddTranslation Returns True",
@@ -372,7 +345,6 @@ func TestSendAddTranslationMutation(t *testing.T) {
 			},
 			expectedResult: true,
 			expectedError: nil,
-			expectedOutput: "",
 		},
 		{
 			name: "Failure - Error From GraphQL Client",
@@ -381,7 +353,6 @@ func TestSendAddTranslationMutation(t *testing.T) {
 			},
 			expectedResult: false,
 			expectedError: errors.New("graphQL Error"),
-			expectedOutput: "Error while adding translation: graphQL Error\n",
 		},
 	}
 
@@ -394,15 +365,10 @@ func TestSendAddTranslationMutation(t *testing.T) {
 				client: mockClient,
 			}
 
-			var result bool
-			var err error
-			output := captureStdout(func() {
-				result, err = queriesHandler.SendAddTranslationMutation(context.Background(), input)
-			})
+			result, err := queriesHandler.SendAddTranslationMutation(context.Background(), input)
 
 			assert.Equal(t, tt.expectedResult, result)
 			assert.Equal(t, tt.expectedError, err)
-			assert.Equal(t, tt.expectedOutput, output)
 
 			mockClient.AssertExpectations(t)
 		})
@@ -421,7 +387,6 @@ func TestSendAddExampleMutation(t *testing.T) {
 		mockBehavior func(mockClient *MockGraphQLClient)
 		expectedResult bool
 		expectedError error
-		expectedOutput string
 	}{
 		{
 			name: "Success - AddExample Returns True",
@@ -433,7 +398,6 @@ func TestSendAddExampleMutation(t *testing.T) {
 			},
 			expectedResult: true,
 			expectedError: nil,
-			expectedOutput: "",
 		},
 		{
 			name: "Failure - Error From GraphQL Client",
@@ -442,7 +406,6 @@ func TestSendAddExampleMutation(t *testing.T) {
 			},
 			expectedResult: false,
 			expectedError: errors.New("graphQL Error"),
-			expectedOutput: "Error while adding example sentences: graphQL Error\n",
 		},
 	}
 
@@ -455,15 +418,10 @@ func TestSendAddExampleMutation(t *testing.T) {
 				client: mockClient,
 			}
 
-			var result bool
-			var err error
-			output := captureStdout(func() {
-				result, err = queriesHandler.SendAddExampleMutation(context.Background(), input)
-			})
+			result, err := queriesHandler.SendAddExampleMutation(context.Background(), input)
 
 			assert.Equal(t, tt.expectedResult, result)
 			assert.Equal(t, tt.expectedError, err)
-			assert.Equal(t, tt.expectedOutput, output)
 
 			mockClient.AssertExpectations(t)
 		})
@@ -508,7 +466,7 @@ func TestParseReceiveResponse(t *testing.T) {
 		},
 	}
 
-	expectedOutput := "Word: word1\nTranslation: translation1\nExamples: example sentence 1\nExamples: example sentence 2"
+	expectedOutput := "Słowo: word1\nTłumaczenie: translation1\nPrzykład: example sentence 1\nPrzykład: example sentence 2"
 
 	q := &QueriesHandlerQL{}
 
