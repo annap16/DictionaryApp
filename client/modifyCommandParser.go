@@ -2,7 +2,7 @@ package main
 
 import(
 	"strings"
-	"fmt"
+    "errors"
 )
 
 type ModifyCommandParams struct {
@@ -16,7 +16,7 @@ type ModifyCommandParams struct {
 func ParseModifyCommand(command string) (*ModifyCommandParams, error) {
     parts := strings.Split(command, " ")
     if len(parts) < 3 {
-        return nil, fmt.Errorf("Invalid modify command")
+        return nil, errors.New("Invalid modify command")
     }
 
     params := &ModifyCommandParams{
@@ -35,7 +35,7 @@ func ParseModifyCommand(command string) (*ModifyCommandParams, error) {
 			params.Translation = parts[4]
             params.Examples = ParseQuery(command)
         } else {
-            return nil, fmt.Errorf("Invalid add command syntax")
+            return nil, errors.New("Invalid add command syntax")
         }
     case "delete":
         if params.TargetType == "translation" && len(parts) == 5 {
@@ -46,10 +46,10 @@ func ParseModifyCommand(command string) (*ModifyCommandParams, error) {
 			params.Translation = parts[4]
             params.Examples = ParseQuery(command)
         } else {
-            return nil, fmt.Errorf("Invalid delete command syntax")
+            return nil, errors.New("Invalid delete command syntax")
         }
     default:
-        return nil, fmt.Errorf("Invalid modify action")
+        return nil, errors.New("Invalid modify action")
     }
 
     return params, nil
