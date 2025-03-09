@@ -81,7 +81,6 @@ func (q *QueriesHandlerQL) ParseReceiveResponse(response ReceiveResponse) string
 	return result
 }
 
-
 func (q *QueriesHandlerQL) SendRemoveMutation(ctx context.Context, input string) (bool, error) {
 	request := graphql.NewRequest(`
 		mutation ($word: String!) {
