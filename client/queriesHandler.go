@@ -2,8 +2,8 @@ package main
 
 import(
 	"context"
-	"log"
 	"strings"
+	"fmt"
 	"github.com/machinebox/graphql"
 	"dictionary-app/server/graph/model"
 )
@@ -26,12 +26,14 @@ func (q *QueriesHandlerQL) SendCreateMutation(ctx context.Context, input model.F
 
 	err := q.client.Run(context.Background(), request, &response)
 	if err!=nil{
-		log.Println("Error while adding a word:", err)
+		fmt.Println("Error while adding a word:", err)
 		return false, err
 	}
 
 	return response.CreateTranslation, nil
  }
+
+
 
  func (q *QueriesHandlerQL) SendReceiveMutation(ctx context.Context, input string) (string, error) {
 
@@ -58,7 +60,7 @@ func (q *QueriesHandlerQL) SendCreateMutation(ctx context.Context, input model.F
 		if strings.Contains(err.Error(), "Record not found") {
 			return "", nil
 		}
-		log.Println("Error while searching for a word:", err)
+		fmt.Println("Error while searching for a word:", err)
 		return "", err
 	}
 
@@ -92,7 +94,7 @@ func (q *QueriesHandlerQL) SendRemoveMutation(ctx context.Context, input string)
 	
 	if err := q.client.Run(context.Background(), request, &response); err != nil {
 		
-		log.Println("Error while removing word from a dictionary:", err)
+		fmt.Println("Error while removing word from a dictionary:", err)
 		return false, err
 	}
 
@@ -112,7 +114,7 @@ func(q *QueriesHandlerQL) SendRemoveTranslationMutation(ctx context.Context, wor
 	var response RemoveTranslationResponse
 
     if err := q.client.Run(context.Background(), request, &response); err != nil {
-        log.Println("Error while deleting translation:", err)
+        fmt.Println("Error while deleting translation:", err)
         return false, err
     }
 
@@ -131,7 +133,7 @@ func(q *QueriesHandlerQL) SendRemoveExampleMutation(ctx context.Context, input m
 	var response RemoveExampleResponse
 
 	if err := q.client.Run(context.Background(), request, &response); err != nil {
-		log.Println("Error while deleting example:", err)
+		fmt.Println("Error while deleting example:", err)
 	return false, err
 	}	
 	
@@ -151,7 +153,7 @@ func (q *QueriesHandlerQL) SendAddTranslationMutation(ctx context.Context, input
 
     err := q.client.Run(context.Background(), request, &response)
 	if err != nil {
-        log.Println("Error while adding translation:", err)
+        fmt.Println("Error while adding translation:", err)
         return false, err
     }
 
@@ -171,7 +173,7 @@ func (q *QueriesHandlerQL) SendAddExampleMutation(ctx context.Context, input mod
 
     err := q.client.Run(context.Background(), request, &response)
 	if err != nil {
-        log.Println("Error while adding example sentences:", err)
+        fmt.Println("Error while adding example sentences:", err)
         return false, err
     }
 
