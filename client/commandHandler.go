@@ -4,7 +4,6 @@ import(
 	"strings"
 	"fmt"
 	"context"
-	"regexp"
 	"dictionary-app/server/graph/model"
 )
 
@@ -103,9 +102,6 @@ type ModifyCommandHandler struct{
 func (m *ModifyCommandHandler) HandleCommand(command string) bool{	
 	commandSplitted := strings.Split(command, " ")
 	if(strings.ToLower(commandSplitted[0])=="modify"){
-		if(len(commandSplitted)<3){
-			fmt.Println("Wrong command")
-		}
 		modifyAction := m.modifyFactory.CreateAction(m.handler, command)
 		var success bool
 		if modifyAction!= nil{

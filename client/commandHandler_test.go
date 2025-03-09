@@ -2,14 +2,10 @@ package main
 
 import (
 	"testing"
-	"context"
-	"bytes"
-	"os"
 	"fmt"
 	"github.com/stretchr/testify/assert"
     "github.com/stretchr/testify/mock"
 	"dictionary-app/server/graph/model"
-	"github.com/machinebox/graphql"
 )
 
 // --------------------------HELPER FUNCTION-----------------------------------
@@ -24,73 +20,6 @@ func equalSlices(a, b []string) bool {
 		}
 	}
 	return true
-}
-
-// --------------------------MOCK STRUCTURE------------------------------------
-
-type MockGraphQLClient struct {
-	mock.Mock
-}
-
-func (m *MockGraphQLClient) Run(ctx context.Context, req *graphql.Request, res interface{}) error {
-	args := m.Called(ctx, req, res)
-	return args.Error(0)
-}
-
-type MockQueriesHandler struct {
-	client *MockGraphQLClient
-	mock.Mock
-}
-
-func (m *MockQueriesHandler) SendCreateMutation(ctx context.Context, input model.FullRecordInput) (bool, error) {
-	args := m.Called(ctx, input)
-	return args.Bool(0), args.Error(1)
-}
-
-func (m *MockQueriesHandler) SendReceiveMutation(ctx context.Context, input string) (string, error) {
-	args := m.Called(ctx, input)
-	return args.String(0), args.Error(1)
-}
-
-func (m *MockQueriesHandler) SendRemoveMutation(ctx context.Context, input string) (bool, error) {
-	args := m.Called(ctx, input)
-	return args.Bool(0), args.Error(1)
-}
-
-func (m *MockQueriesHandler) SendRemoveTranslationMutation(ctx context.Context, word string, input string) (bool, error) {
-	args := m.Called(ctx, word, input)
-	return args.Bool(0), args.Error(1)
-}
-
-func (m *MockQueriesHandler) SendRemoveExampleMutation(ctx context.Context, input model.FullRecordInput) (bool, error){
-	args := m.Called(ctx, input)
-	return args.Bool(0), args.Error(1)
-}
-
-func (m *MockQueriesHandler) SendAddTranslationMutation(ctx context.Context, input model.FullRecordInput) (bool, error) {
-	args := m.Called(ctx, input)
-	return args.Bool(0), args.Error(1)
-}
-
-func (m *MockQueriesHandler) SendAddExampleMutation(ctx context.Context, input model.FullRecordInput) (bool, error) {
-	args := m.Called(ctx, input)
-	return args.Bool(0), args.Error(1)
-}
-
-func captureStdout(f func()) string {
-	originalStdout := os.Stdout
-	readPipe, writePipe, _ := os.Pipe()
-	defer readPipe.Close()
-
-	os.Stdout = writePipe
-	defer func() { os.Stdout = originalStdout }()
-
-	f()
-
-	writePipe.Close() 
-	var buf bytes.Buffer
-	_, _ = buf.ReadFrom(readPipe)
-	return buf.String()
 }
 
 // --------------------------CREATE COMMAND-------------------------------------
@@ -384,7 +313,6 @@ func (m *MockModifyAction) Execute() bool{
 	return args.Bool(0)
 }
 
-// TODO make it better and check every outcome
 func TestHandleCommandModify(t *testing.T) {
 	tests := []struct {
 		name string
@@ -459,6 +387,7 @@ func TestHandleCommandModify(t *testing.T) {
 			expectedResult: true,
 		},
 
+
 	}
 
 	for _, tt := range tests {
@@ -485,3 +414,90 @@ func TestHandleCommandModify(t *testing.T) {
 		})
 	}
 }
+
+func TestHandleCommandModify_OtherCommand(t *testing.T){
+	mockClient := new(MockGraphQLClient)
+    mockQueriesHandler := &MockQueriesHandler{client: mockClient}
+
+    handler := &ModifyCommandHandler{handler: mockQueriesHandler}
+
+    command := "create something"
+
+    success := handler.HandleCommand(command)
+
+    assert.False(t, success) 
+}
+
+// --------------------------REMOVE COMMAND------------------------------------
+
+
+func TestHandleCommandRemove(t *testing.T){
+	tests := []struct {
+		name string
+		command string
+		mockResponse bool
+		mockError error
+		expectedOutput string
+		expectedResult bool
+	}{
+		{
+			name: "Success - Word Removed",
+			command: "remove slowo",
+			mockResponse: true,
+			mockError: nil,
+			expectedOutput: "Word and related data deleted successfully\n",
+			expectedResult: true,
+		},
+		{
+			name: "Failure - Word doesn't exist in the dictionary",
+			command: "remove slowo",
+			mockResponse: false,
+			mockError: nil,
+			expectedOutput: "The word dosen't exist in the dictionary\n",
+			expectedResult: true, 
+		},
+		{
+			name: "Failure - Mutation Error",
+			command: "remove slowo",
+			mockResponse: false,
+			mockError: fmt.Errorf("Mutation Failed"),
+			expectedOutput: "An error occured while removing word from the dictionary\n",
+			expectedResult: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := new(MockGraphQLClient)
+			mockQueriesHandler := &MockQueriesHandler{client: mockClient}
+
+			mockQueriesHandler.On("SendRemoveMutation", mock.Anything, mock.Anything).Return(tt.mockResponse, tt.mockError)
+
+			handler := &RemoveCommandHandler{handler: mockQueriesHandler}
+
+			output := captureStdout(func() {
+				result := handler.HandleCommand(tt.command)
+				assert.Equal(t, tt.expectedResult, result)
+			})
+
+			assert.Equal(t, tt.expectedOutput, output)
+
+			mockQueriesHandler.AssertExpectations(t)
+		})
+	}
+}
+
+func TestHandleCommandRemoveSendModifyMutation_OtherCommand(t *testing.T){
+	mockClient := new(MockGraphQLClient)
+    mockQueriesHandler := &MockQueriesHandler{client: mockClient}
+
+    handler := &RemoveCommandHandler{handler: mockQueriesHandler}
+
+    command := "create something"
+
+    success := handler.HandleCommand(command)
+
+    mockQueriesHandler.AssertNotCalled(t, "SendRemoveMutation")
+    assert.False(t, success) 
+}
+
