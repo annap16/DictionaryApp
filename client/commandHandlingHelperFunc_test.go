@@ -2,6 +2,7 @@ package main
 
 import(
 	"testing"
+	"github.com/stretchr/testify/assert"
 
 )
 
@@ -72,9 +73,156 @@ func TestCheckCreateSyntax(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := CheckCreateSyntax(tt.command)
-			if got != tt.want {
-				t.Errorf("CheckCreateSyntax(%q) = %v, want %v", tt.command, got, tt.want)
-			}
+			assert.Equal(t,tt.want, got)
+		})
+	}
+}
+
+func TestCheckAddExampleSyntax(t *testing.T){
+	tests := []struct {
+		name string
+		command string
+		want bool
+	}{
+		{
+			name : "Success - One Example",
+			command: "modify add example word translation [Example one]",
+			want: true,
+		},
+		{
+			name: "Success - Multiple Examples",
+			command: "modify add example word translation [Example one] [Example two] [Example3]",
+			want: true,
+		},
+		{
+			name: "Success - Ignoring Capital Letters",
+			command: "MODIfy ADd example word translation [Example one]",
+			want: true,
+		},
+		{
+			name: "Failure - No example",
+			command: "modify add example word translation",
+			want: false,
+		},
+		{
+			name: "Failure - Modify Not Specified",
+			command: "add example word translation [Example one]",
+			want: false,
+		},
+		{
+			name: "Failure - Example Not Specified",
+			command: "modify translation word translation [Example one]",
+			want: false,
+		},
+		{
+			name: "Failure - Missing Word In Command",
+			command: "modify example translation [Example one]",
+			want: false,
+		},
+		{
+			name: "Failure - Missing Translation In Command",
+			command: "modify example word [Example one]",
+			want: false,
+		},
+		{
+			name: "Failure - Wrong Brackets",
+			command: "modify add example word translation [whf[fwuef]sfhqwiu dfhweu ]][]",
+			want: false,
+		},
+		{
+			name: "Failure - Empty Brackets",
+			command: "modify add example word translation []",
+			want: false,
+		},
+		{
+			name: "Failure - Correct And Wrong Brackets Combined",
+			command: "modify add example word translation [Okey okey][fweufhy[fwygfuw]]",
+			want: false,
+		},
+		{
+			name: "Failure - Correct And Empty Brackets Combined",
+			command: "modify add example word translation [Here] []",
+			want: false,
+		},
+
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := CheckAddExampleSyntax(tt.command)
+			assert.Equal(t,tt.want, got)
+		})
+	}
+}
+
+func TestCheckAddTranslationSyntax(t *testing.T){
+	tests := []struct {
+		name string
+		command string
+		want bool
+	}{
+		{
+			name: "Success - Translation Without Examples",
+			command: "modify add translation word newTranslation",
+			want: true,
+		},
+		{
+			name: "Success - Translation With One Example",
+			command: "modify add translation word newTrans [Example one]",
+			want: true,
+		},
+		{
+			name: "Success - Translation With Many Examples",
+			command: "modify add translation word newTrans [Example one] [Example two] [Example3]",
+			want: true,
+		},
+		{
+			name: "Success - Ignoring Capital Letters",
+			command: "MODify ADd TRANSlation word newTrans [Example one]",
+			want: true,
+		},
+		{
+			name: "Failure - Missing Modify In Command",
+			command: "add translation word newTrans [Example one]",
+			want: false,
+		},
+		{
+			name: "Failure - Missing Add In Command",
+			command: "modify translation word newTrans [Example one]",
+			want: false,
+		},
+		{
+			name: "Failure - Missing Translation In Command",
+			command: "modify add word newTrans [Example one]",
+			want: false,
+		},
+		{
+			name: "Failure - Wrong Brackets",
+			command: "modify add translation word newTrans [huwff[weiufh]]]",
+			want: false,
+		},
+		{
+			name: "Failure - Empty Brackets",
+			command: "modify add translation word newTrans []",
+			want: false,
+		},
+		{
+			name: "Failure - Correct And Wrong Brackets Combined",
+			command: "modify add translation word newTrans [cwyfgu[ew]]][ [Correct]",
+			want: false,
+		},
+		{
+			name: "Failure - Correct And Empty Brackets Combined",
+			command: "modify add translation word newTrans [Correct] []",
+			want: false,
+		},
+
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := CheckAddTranslationSyntax(tt.command)
+			assert.Equal(t,tt.want, got)
 		})
 	}
 }

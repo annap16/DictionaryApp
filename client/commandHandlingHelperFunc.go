@@ -13,15 +13,14 @@ func CheckCreateSyntax(command string) bool{
 }
 
 func CheckAddExampleSyntax(command string) bool{
-	pattern := `(?i)^modify\s+add\s+example\s+(\S+)\s+(\S+)(\s+\[.*?\])+`
-
+	pattern := `(?i)^modify\s+add\s+example\s+([^\[\]\s]+)\s+([^\[\]\s]+)(\s+\[[^\[\]]+\])+$`
 	re := regexp.MustCompile(pattern)
 
 	return re.MatchString(command)
 }
 
 func CheckAddTranslationSyntax(command string) bool{
-	pattern := `(?i)^modify\s+add\s+translation\s+(\S+)\s+(\S+)(\s+\[.*?\])*$`
+	pattern := `(?i)^modify\s+add\s+translation\s+([^\[\]\s]+)\s+([^\[\]\s]+)(\s+\[[^\[\]]+\])*?$`
 	re := regexp.MustCompile(pattern)
 
 	return re.MatchString(command)
