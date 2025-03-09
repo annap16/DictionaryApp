@@ -3,7 +3,6 @@ package main
 import(
 	"fmt"
 	"context"
-	"log"
 	"dictionary-app/server/graph/model"
 )
 
@@ -41,9 +40,8 @@ func (m *ModifyAddCommand) Execute() bool {
         fmt.Println("Invalid modify add command")
         return false
     }
-
     if err != nil {
-        log.Println("Error:", err)
+        fmt.Println("Error:", err)
         return false
     }
 
@@ -78,7 +76,7 @@ func (m *ModifyDeleteCommand) Execute() bool {
     }
 
     if err != nil {
-        log.Println("Error:", err)
+        fmt.Println("Error:", err)
         return false
     }
 	
