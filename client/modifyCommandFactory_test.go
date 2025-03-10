@@ -2,6 +2,7 @@ package main
 
 import(
 	"testing"
+    "errors"
 	"github.com/stretchr/testify/assert"
 
 )
@@ -13,6 +14,7 @@ func TestCreateAction(t *testing.T) {
         name string
         command string
         expectedAction ModifyAction
+        expectedError error
     }{
         {
             name: "Success - Create Add Command",
@@ -24,6 +26,7 @@ func TestCreateAction(t *testing.T) {
                 translation: "translation",
                 examples: nil,
             },
+            expectedError: nil,
         },
         {
             name: "Success - Create Delete Command",
@@ -35,11 +38,13 @@ func TestCreateAction(t *testing.T) {
                 translation: "translation",
                 examples: nil,
             },
+            expectedError: nil,
         },
 		{
             name: "Failure - Wrong Key word",
             command: "modify create translation word translation",
             expectedAction: nil,
+            expectedError: errors.New("Niepoprawna składnia dla polecenia modyfikacji słowa"),
         },
 		
     }
@@ -48,10 +53,10 @@ func TestCreateAction(t *testing.T) {
         t.Run(tt.name, func(t *testing.T) {
             factory := &ModifyCommandFactory{}
 
-			var action ModifyAction
-			action, _ = factory.CreateAction(mockHandler, tt.command)            
+			action, err := factory.CreateAction(mockHandler, tt.command)            
 
             assert.Equal(t, tt.expectedAction, action)
+            assert.Equal(t, tt.expectedError, err)
         })
     }
 }

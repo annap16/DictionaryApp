@@ -16,6 +16,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 		name string
 		input ModifyAddCommand
 		expectedResult bool
+		expectedError error
 		mockBehavior func()
 
 	}{
@@ -29,6 +30,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 				examples: []string{"example1"},
 			},
 			expectedResult: true,
+			expectedError: nil,
 			mockBehavior: func() {
 				mockHandler.On("SendAddTranslationMutation", mock.Anything, model.FullRecordInput{
 					Word: "word1",
@@ -47,6 +49,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 				examples: []string{"example2"},
 			},
 			expectedResult: true,
+			expectedError: nil,
 			mockBehavior: func() {
 				mockHandler.On("SendAddExampleMutation", mock.Anything, model.FullRecordInput{
 					Word: "word2",
@@ -65,6 +68,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 				examples: []string{"example3"},
 			},
 			expectedResult: false,
+			expectedError: nil,
 			mockBehavior: func() {
 			},
 		},
@@ -78,6 +82,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 				examples: []string{"example4"},
 			},
 			expectedResult: false,
+			expectedError: errors.New("Add Error"),
 			mockBehavior: func() {
 				mockHandler.On("SendAddTranslationMutation", mock.Anything, model.FullRecordInput{
 					Word: "word4",
@@ -96,6 +101,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 				examples: []string{"example5"},
 			},
 			expectedResult: false,
+			expectedError: errors.New("Add Error"),
 			mockBehavior: func() {
 				mockHandler.On("SendAddExampleMutation", mock.Anything, model.FullRecordInput{
 					Word: "word5",
@@ -114,6 +120,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 				examples: []string{"example6"},
 			},
 			expectedResult: false,
+			expectedError: nil,
 			mockBehavior: func() {
 				mockHandler.On("SendAddTranslationMutation", mock.Anything, model.FullRecordInput{
 					Word: "word6",
@@ -132,6 +139,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 				examples: []string{"example7"},
 			},
 			expectedResult: false,
+			expectedError: nil,
 			mockBehavior: func() {
 				mockHandler.On("SendAddExampleMutation", mock.Anything, model.FullRecordInput{
 					Word: "word7",
@@ -147,11 +155,10 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockBehavior()
 
-			var result bool
-			result, _ = tt.input.Execute()
-			
+			result, err := tt.input.Execute()
 
 			assert.Equal(t, tt.expectedResult, result)
+			assert.Equal(t, tt.expectedError, err)
 			mockHandler.AssertExpectations(t)
 		})
 	}

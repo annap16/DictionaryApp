@@ -212,7 +212,6 @@ func TestSendRemoveTranslationMutation(t *testing.T) {
 		mockBehavior func(mockClient *MockGraphQLClient)
 		expectedResult bool
 		expectedError error
-		expectedOutput string
 	}{
 		{
 			name: "Success - DeleteTranslation Returns True",
@@ -224,7 +223,6 @@ func TestSendRemoveTranslationMutation(t *testing.T) {
 			},
 			expectedResult: true,
 			expectedError: nil,
-			expectedOutput: "",
 		},
 		{
 			name: "Failure - Error From GraphQL Client",
@@ -233,7 +231,6 @@ func TestSendRemoveTranslationMutation(t *testing.T) {
 			},
 			expectedResult: false,
 			expectedError: errors.New("graphQL Error"),
-			expectedOutput: "Error while deleting translation: graphQL Error\n",
 		},
 	}
 
@@ -246,15 +243,10 @@ func TestSendRemoveTranslationMutation(t *testing.T) {
 				client: mockClient,
 			}
 
-			var result bool
-			var err error
-			output := captureStdout(func() {
-				result, err = queriesHandler.SendRemoveTranslationMutation(context.Background(), word, translation)
-			})
+			result, err := queriesHandler.SendRemoveTranslationMutation(context.Background(), word, translation)			
 
 			assert.Equal(t, tt.expectedResult, result)
 			assert.Equal(t, tt.expectedError, err)
-			assert.Equal(t, tt.expectedOutput, output)
 
 			mockClient.AssertExpectations(t)
 		})
@@ -273,7 +265,6 @@ func TestSendRemoveExampleMutation(t *testing.T) {
 		mockBehavior func(mockClient *MockGraphQLClient)
 		expectedResult bool
 		expectedError error
-		expectedOutput string
 	}{
 		{
 			name: "Success - DeleteExample Returns True",
@@ -285,7 +276,6 @@ func TestSendRemoveExampleMutation(t *testing.T) {
 			},
 			expectedResult: true,
 			expectedError: nil,
-			expectedOutput: "",
 		},
 		{
 			name: "Failure - Error From GraphQL Client",
@@ -294,7 +284,6 @@ func TestSendRemoveExampleMutation(t *testing.T) {
 			},
 			expectedResult: false,
 			expectedError: errors.New("graphQL Error"),
-			expectedOutput: "Error while deleting example: graphQL Error\n",
 		},
 	}
 
@@ -307,15 +296,10 @@ func TestSendRemoveExampleMutation(t *testing.T) {
 				client: mockClient,
 			}
 
-			var result bool
-			var err error
-			output := captureStdout(func() {
-				result, err = queriesHandler.SendRemoveExampleMutation(context.Background(), input)
-			})
+			result, err := queriesHandler.SendRemoveExampleMutation(context.Background(), input)
 
 			assert.Equal(t, tt.expectedResult, result)
 			assert.Equal(t, tt.expectedError, err)
-			assert.Equal(t, tt.expectedOutput, output)
 
 			mockClient.AssertExpectations(t)
 		})

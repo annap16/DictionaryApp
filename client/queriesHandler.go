@@ -3,7 +3,6 @@ package main
 import(
 	"context"
 	"strings"
-	"fmt"
 	"github.com/machinebox/graphql"
 	"dictionary-app/server/graph/model"
 )
@@ -109,7 +108,6 @@ func(q *QueriesHandlerQL) SendRemoveTranslationMutation(ctx context.Context, wor
 	var response RemoveTranslationResponse
 
     if err := q.client.Run(context.Background(), request, &response); err != nil {
-        fmt.Println("Error while deleting translation:", err)
         return false, err
     }
 
@@ -128,8 +126,7 @@ func(q *QueriesHandlerQL) SendRemoveExampleMutation(ctx context.Context, input m
 	var response RemoveExampleResponse
 
 	if err := q.client.Run(context.Background(), request, &response); err != nil {
-		fmt.Println("Error while deleting example:", err)
-	return false, err
+		return false, err
 	}	
 	
 	return response.DeleteExample, nil

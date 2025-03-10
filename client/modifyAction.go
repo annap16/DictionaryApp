@@ -18,8 +18,6 @@ type ModifyAddCommand struct {
     examples []string
 }
 
-// TODO better error handling and returning err not only bool
-
 func (m *ModifyAddCommand) Execute() (bool, error) {
     var success bool
     var err error

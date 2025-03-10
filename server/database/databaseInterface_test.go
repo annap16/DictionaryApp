@@ -530,7 +530,7 @@ func TestDeleteExample(t *testing.T){
 					Return(nil)
 			},			
 			expectedResult: false,
-			expectedError: errors.New("Example error"),
+			expectedError: errors.New("Nie można było usunąć przykładu ze słownika. Anulowano całą operację"),
 			expectedOutput: "",
 		},
 		{
@@ -558,7 +558,7 @@ func TestDeleteExample(t *testing.T){
 					Return(nil)
 			},			
 			expectedResult: false,
-			expectedError: errors.New("Example error"),
+			expectedError: errors.New("Nie można było usunąć przykładu ze słownika. Anulowano całą operację"),
 			expectedOutput: "",
 		},
 		{
@@ -778,7 +778,7 @@ func TestAddTranslation(t *testing.T){
 					Return(errors.New("duplicate key value violates unique constraint"))
 			},
 			expectedResult: false,
-			expectedError: nil,
+			expectedError: errors.New("Nie można dodać tłumaczenia – narusza ono unikalność rekordów"),
 			expectedOutput: "",
 		},
 		{
@@ -805,8 +805,8 @@ func TestAddTranslation(t *testing.T){
 					Return(errors.New("violates foreign key constraint"))
 			},
 			expectedResult: false,
-			expectedError: errors.New("Word does not exist"),
-			expectedOutput: "Error while searching for word existance in a DB: violates foreign key constraint\n",
+			expectedError: errors.New("Wystąpił błąd podczas dodawania tłumaczenia"),
+			expectedOutput: "",
 		},
 		{
 			name: "Failure - Random Database Error With Translation",
@@ -833,7 +833,7 @@ func TestAddTranslation(t *testing.T){
 			},
 			expectedResult: false,
 			expectedError: errors.New("Translation Error"),
-			expectedOutput: "Error while adding translation: Translation Error\n",
+			expectedOutput: "",
 		},
 		{
 			name: "Failure - Word Not Found",
@@ -915,6 +915,7 @@ func TestAddTranslation(t *testing.T){
 
 			assert.Equal(t, tt.expectedOutput, output)
 
+			
 			if tt.expectedError != nil {
 				assert.Error(t, err)
 				assert.Equal(t, tt.expectedError.Error(), err.Error())
@@ -1009,7 +1010,7 @@ func TestAddExample(t *testing.T){
 					Return(nil)
 			},
 			expectedResult: false,
-			expectedError:  nil,
+			expectedError:  errors.New("Nie można dodać przykładu - narusza ono unikalność rekordów"),
 			expectedOutput: "",
 		},
 		{
@@ -1044,8 +1045,8 @@ func TestAddExample(t *testing.T){
 					Return(nil)
 			},
 			expectedResult: false,
-			expectedError:  errors.New("Translation does not exist"),
-			expectedOutput: "Error while searching for translation existance in a DB: violates foreign key constraint\n",
+			expectedError:  errors.New("Wystąpił błąd podczas dodawania przykładu"),
+			expectedOutput: "",
 		},
 		{
 			name: "Failure - Random Error Database Example",
@@ -1080,7 +1081,7 @@ func TestAddExample(t *testing.T){
 			},
 			expectedResult: false,
 			expectedError:  errors.New("Example error"),
-			expectedOutput: "Error while adding example sentence: Example error\n",
+			expectedOutput: "",
 		},
 		{
 			name: "Failure - Translation Not Found",
@@ -1164,7 +1165,7 @@ func TestAddExample(t *testing.T){
 			expectedOutput: "",
 		},
 		{
-			name: "Failure - Word Not Found",
+			name: "Failure - Word Not Found Error",
 			input: model.FullRecordInput{
 				Word: "ksiazka",
 				Translation: "book",

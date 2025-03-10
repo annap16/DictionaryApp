@@ -80,6 +80,12 @@ func TestParseModifyCommand(t *testing.T) {
 			expectedError: errors.New("Niepoprawna składnia dla polecenia usuwania"),
 			expectedModel: nil,
 		},
+		{
+			name: "Failure - Command To Short For Processing",
+			command: "modify add",
+			expectedError: errors.New("Wprowadzono niepoprawne polecenie"),
+			expectedModel: nil,
+		},
 	}
 
 	for _, tt := range tests {
