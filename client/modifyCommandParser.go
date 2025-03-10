@@ -25,23 +25,23 @@ func ParseModifyCommand(command string) (*ModifyCommandParams, error) {
     }
 
     switch params.Action {
-    case "add":
-        if params.TargetType == "translation" && CheckAddTranslationSyntax(command) {
+    case "dodaj":
+        if params.TargetType == "tłumaczenie" && CheckAddTranslationSyntax(command) {
             params.Word = parts[3]
             params.Translation = parts[4]
             params.Examples = ParseQuery(command)
-        } else if params.TargetType == "example" && CheckAddExampleSyntax(command) {
+        } else if params.TargetType == "przykład" && CheckAddExampleSyntax(command) {
             params.Word = parts[3]
 			params.Translation = parts[4]
             params.Examples = ParseQuery(command)
         } else {
             return nil, errors.New("Niepoprawna składnia dla polecenia dodawania")
         }
-    case "delete":
-        if params.TargetType == "translation" && len(parts) == 5 {
+    case "usuń":
+        if params.TargetType == "tłumaczenie" && len(parts) == 5 {
             params.Word = parts[3]
 			params.Translation = parts[4]
-        } else if params.TargetType == "example" && len(parts) > 5 {
+        } else if params.TargetType == "przykład" && len(parts) > 5 {
             params.Word = parts[3]
 			params.Translation = parts[4]
             params.Examples = ParseQuery(command)

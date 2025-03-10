@@ -71,7 +71,7 @@ func (q *QueriesHandlerQL) ParseReceiveResponse(response ReceiveResponse) string
 	for _, translation := range response.GetWordTranslation.Translations {
 		result += "Tłumaczenie: " + translation.Translation + "\n"
 		for _, sentence := range translation.ExampleSentences {
-			result += "Przykład: " + sentence.Sentence + "\n"
+			result += "\tPrzykład: " + sentence.Sentence + "\n"
 		}
 	}
 	result = strings.TrimSuffix(result, "\n")

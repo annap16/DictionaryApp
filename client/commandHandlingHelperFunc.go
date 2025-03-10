@@ -6,21 +6,21 @@ import(
 )
 
 func CheckCreateSyntax(command string) bool{
-	pattern := `(?i)^create\s+([^\[\]\s]+)\s+([^\[\]\s]+)(\s+\[[^\[\]]+\])*?$`
+	pattern := `(?i)^dodaj\s+([^\[\]\s]+)\s+([^\[\]\s]+)(\s+\[[^\[\]]+\])*?$`
 	re := regexp.MustCompile(pattern)
 
 	return re.MatchString(command)
 }
 
 func CheckAddExampleSyntax(command string) bool{
-	pattern := `(?i)^modify\s+add\s+example\s+([^\[\]\s]+)\s+([^\[\]\s]+)(\s+\[[^\[\]]+\])+$`
+	pattern := `(?i)^modyfikuj\s+dodaj\s+przykład\s+([^\[\]\s]+)\s+([^\[\]\s]+)(\s+\[[^\[\]]+\])+$`
 	re := regexp.MustCompile(pattern)
 
 	return re.MatchString(command)
 }
 
 func CheckAddTranslationSyntax(command string) bool{
-	pattern := `(?i)^modify\s+add\s+translation\s+([^\[\]\s]+)\s+([^\[\]\s]+)(\s+\[[^\[\]]+\])*?$`
+	pattern := `(?i)^modyfikuj\s+dodaj\s+tłumaczenie\s+([^\[\]\s]+)\s+([^\[\]\s]+)(\s+\[[^\[\]]+\])*?$`
 	re := regexp.MustCompile(pattern)
 
 	return re.MatchString(command)

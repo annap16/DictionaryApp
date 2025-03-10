@@ -29,9 +29,9 @@ func (m *ModifyAddCommand) Execute() (bool, error) {
 	}
 
     switch m.targetType {
-    case "translation":
+    case "tłumaczenie":
         success, err = m.handler.SendAddTranslationMutation(context.Background(), input)
-    case "example":
+    case "przykład":
         success, err = m.handler.SendAddExampleMutation(context.Background(), input)
     default:
         return false, nil
@@ -56,9 +56,9 @@ func (m *ModifyDeleteCommand) Execute() (bool, error) {
     var err error
 
     switch m.targetType {
-    case "translation":
+    case "tłumaczenie":
         success, err = m.handler.SendRemoveTranslationMutation(context.Background(), m.word, m.translation)
-    case "example":
+    case "przykład":
         input := model.FullRecordInput{
             Word:        m.word,
             Translation: m.translation,

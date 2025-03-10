@@ -18,7 +18,7 @@ func (m *ModifyCommandFactory) CreateAction(handler QueriesHandler, command stri
     }
 
     switch params.Action {
-    case "add":
+    case "dodaj":
         return &ModifyAddCommand{
             handler: handler,
             targetType: params.TargetType,
@@ -26,7 +26,7 @@ func (m *ModifyCommandFactory) CreateAction(handler QueriesHandler, command stri
             translation: params.Translation,
             examples: params.Examples,
         }, nil
-    case "delete":
+    case "usuń":
         return &ModifyDeleteCommand{
             handler: handler,
             targetType: params.TargetType,

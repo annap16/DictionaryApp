@@ -7,7 +7,6 @@ import(
 
 )
 
-// TODO: maybe think of a better name
 type GraphQLClient interface {
 	Run(ctx context.Context, req *graphql.Request, res interface{}) error
 }

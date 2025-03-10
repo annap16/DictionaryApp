@@ -8,7 +8,6 @@ import(
 )
 
 func WaitForUserInput(handler QueriesHandler) {
-	// Initializing variables and responsibility chain
 	reader := bufio.NewReader(os.Stdin)
 	exit := false
 
@@ -21,28 +20,27 @@ func WaitForUserInput(handler QueriesHandler) {
 	reciveHandler.SetNext(modifyHandler)
 	modifyHandler.SetNext(removeHandler)
 
-	// Input handling
 	for !exit {
-		fmt.Println("Enter command:")
+		green := "\033[32m"
+		reset := "\033[0m"
+
+		fmt.Println(green + "Wprowadź polecenie:" + reset)
 		input, err := reader.ReadString('\n')
 
 		if err != nil {
-			fmt.Println("Error while reading input data", err)
+			fmt.Println("Wystąpił błąd podczas wczytywania danych", err)
 			return
 		}
 
-		// Formatting input string
 		input = strings.TrimRight(input, " \t\r\n")
 
-		// Checking for exit condition
 		if(strings.ToLower(input)=="exit"){
 			exit = true
 			break
 		}
 
-		// Handling command based on its type
 		if !createHandler.HandleCommand(input){
-			fmt.Println("Unexpected Command")
+			fmt.Println("Niepoprawne polecenie")
 		}
 	}	
 	

@@ -24,7 +24,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 			name: "Success - Execute With Translation Type",
 			input: ModifyAddCommand{
 				handler: mockHandler,
-				targetType: "translation",
+				targetType: "tłumaczenie",
 				word: "word1",
 				translation: "translation1",
 				examples: []string{"example1"},
@@ -43,7 +43,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 			name: "Success - Execute With Example Type",
 			input: ModifyAddCommand{
 				handler: mockHandler,
-				targetType: "example",
+				targetType: "przykład",
 				word: "word2",
 				translation: "translation2",
 				examples: []string{"example2"},
@@ -76,7 +76,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 			name: "Failure - Execute With Error From SendAddTranslationMutation",
 			input: ModifyAddCommand{
 				handler: mockHandler,
-				targetType: "translation",
+				targetType: "tłumaczenie",
 				word: "word4",
 				translation: "translation4",
 				examples: []string{"example4"},
@@ -95,7 +95,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 			name: "Failure - Execute With Error From SendAddExampleMutation",
 			input: ModifyAddCommand{
 				handler: mockHandler,
-				targetType: "example",
+				targetType: "przykład",
 				word: "word5",
 				translation: "translation5",
 				examples: []string{"example5"},
@@ -114,7 +114,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 			name: "Failure - Execute With False From SendAddTranslationMutation",
 			input: ModifyAddCommand{
 				handler: mockHandler,
-				targetType: "translation",
+				targetType: "tłumaczenie",
 				word: "word6",
 				translation: "translation6",
 				examples: []string{"example6"},
@@ -133,7 +133,7 @@ func TestModifyAddCommand_Execute(t *testing.T) {
 			name: "Failure - Execute With False From SendAddExampleMutation",
 			input: ModifyAddCommand{
 				handler: mockHandler,
-				targetType: "example",
+				targetType: "przykład",
 				word: "word7",
 				translation: "translation7",
 				examples: []string{"example7"},
@@ -178,7 +178,7 @@ func TestModifyDeleteCommand_Execute(t *testing.T) {
 			name: "Success - Execute With Translation Type",
 			input: ModifyDeleteCommand{
 				handler: mockHandler,
-				targetType: "translation",
+				targetType: "tłumaczenie",
 				word: "word1",
 				translation: "translation1",
 			},
@@ -192,7 +192,7 @@ func TestModifyDeleteCommand_Execute(t *testing.T) {
 			name: "Success - Execute With Example Type",
 			input: ModifyDeleteCommand{
 				handler: mockHandler,
-				targetType: "example",
+				targetType: "przykład",
 				word: "word2",
 				translation: "translation2",
 				examples: []string{"example2"},
@@ -224,7 +224,7 @@ func TestModifyDeleteCommand_Execute(t *testing.T) {
 			name: "Failure - Execute With Error From SendRemoveTranslationMutation",
 			input: ModifyDeleteCommand{
 				handler: mockHandler,
-				targetType: "translation",
+				targetType: "tłumaczenie",
 				word: "word4",
 				translation: "translation4",
 			},
@@ -238,7 +238,7 @@ func TestModifyDeleteCommand_Execute(t *testing.T) {
 			name: "Failure - Execute With Error From SendRemoveExampleMutation",
 			input: ModifyDeleteCommand{
 				handler: mockHandler,
-				targetType: "example",
+				targetType: "przykład",
 				word: "word5",
 				translation: "translation5",
 				examples: []string{"example5"},
@@ -257,7 +257,7 @@ func TestModifyDeleteCommand_Execute(t *testing.T) {
 			name: "Failure - Execute With False From SendRemoveTranslationMutation",
 			input: ModifyDeleteCommand{
 				handler: mockHandler,
-				targetType: "translation",
+				targetType: "tłumaczenie",
 				word: "word6",
 				translation: "translation6",
 			},
@@ -271,7 +271,7 @@ func TestModifyDeleteCommand_Execute(t *testing.T) {
 			name: "Failure - Execute With False From SendRemoveExampleMutation",
 			input: ModifyDeleteCommand{
 				handler: mockHandler,
-				targetType: "example",
+				targetType: "przykład",
 				word: "word7",
 				translation: "translation7",
 				examples: []string{"example7"},

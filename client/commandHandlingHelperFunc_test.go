@@ -15,32 +15,32 @@ func TestCheckCreateSyntax(t *testing.T) {
 	}{
 		{
 			name : "Success - Command Without Examples",
-			command: "create xyz abc",
+			command: "dodaj xyz abc",
 			want: true,
 		},
 		{
 			name: "Success - Command With Capital Letters", 
-			command: "CREATe something else", 
+			command: "DODaj something else", 
 			want: true,
 		},
 		{
 			name: "Success - Command With 2 Examples",
-			command: "create word translation [Sentence one] [Sentence two]", 
+			command: "dodaj word translation [Sentence one] [Sentence two]", 
 			want: true,
 		},
 		{
 			name: "Failure - Too Many Arguments Before Examples",
-			command: "Create word translation something [else]", 
+			command: "Dodaj word translation something [else]", 
 			want: false,
 		},
 		{
 			name: "Failure - Not Enough Arguments Before Examples",
-			command: "create missingTranslation [value1] [value2]", 
+			command: "dodaj missingTranslation [value1] [value2]", 
 			want: false,
 		},
 		{
 			name: "Failure - Empty Create Command With Whitespace Character",
-			command: "create ", 
+			command: "dodaj ", 
 			want: false,
 		},
 		{
@@ -50,22 +50,22 @@ func TestCheckCreateSyntax(t *testing.T) {
 		},
 		{
 			name: "Failure - Wrong Brackets",
-			command: "create word translation [sentence[sentence2]]]", 
+			command: "dodaj word translation [sentence[sentence2]]]", 
 			want: false,
 		},
 		{
 			name: "Failure - Empty Brackets",
-			command: "create word translation []", 
+			command: "dodaj word translation []", 
 			want: false,
 		},
 		{
 			name: "Failure - Correct And Wrong Brackets Combined",
-			command: "create word translation ][sentence]][]", 
+			command: "dodaj word translation ][sentence]][]", 
 			want: false,
 		},
 		{
 			name: "Failure - Correct And Empty Brackets Combined",
-			command: "create word [][ here] translation", 
+			command: "dodaj word [][ here] translation", 
 			want: false,
 		},
 	}
@@ -86,22 +86,22 @@ func TestCheckAddExampleSyntax(t *testing.T){
 	}{
 		{
 			name : "Success - One Example",
-			command: "modify add example word translation [Example one]",
+			command: "modyfikuj dodaj przykład word translation [Example one]",
 			want: true,
 		},
 		{
 			name: "Success - Multiple Examples",
-			command: "modify add example word translation [Example one] [Example two] [Example3]",
+			command: "modyfikuj dodaj przykład word translation [Example one] [Example two] [Example3]",
 			want: true,
 		},
 		{
 			name: "Success - Ignoring Capital Letters",
-			command: "MODIfy ADd example word translation [Example one]",
+			command: "MODYfikuj DODaj przykład word translation [Example one]",
 			want: true,
 		},
 		{
 			name: "Failure - No example",
-			command: "modify add example word translation",
+			command: "modyfikuj dodaj przykład word translation",
 			want: false,
 		},
 		{
@@ -126,22 +126,22 @@ func TestCheckAddExampleSyntax(t *testing.T){
 		},
 		{
 			name: "Failure - Wrong Brackets",
-			command: "modify add example word translation [whf[fwuef]sfhqwiu dfhweu ]][]",
+			command: "modyfikuj dodaj przykład word translation [whf[fwuef]sfhqwiu dfhweu ]][]",
 			want: false,
 		},
 		{
 			name: "Failure - Empty Brackets",
-			command: "modify add example word translation []",
+			command: "modyfikuj dodaj przykład word translation []",
 			want: false,
 		},
 		{
 			name: "Failure - Correct And Wrong Brackets Combined",
-			command: "modify add example word translation [Okey okey][fweufhy[fwygfuw]]",
+			command: "modyfikuj dodaj przykład word translation [Okey okey][fweufhy[fwygfuw]]",
 			want: false,
 		},
 		{
 			name: "Failure - Correct And Empty Brackets Combined",
-			command: "modify add example word translation [Here] []",
+			command: "modyfikuj dodaj przykład word translation [Here] []",
 			want: false,
 		},
 
@@ -163,22 +163,22 @@ func TestCheckAddTranslationSyntax(t *testing.T){
 	}{
 		{
 			name: "Success - Translation Without Examples",
-			command: "modify add translation word newTranslation",
+			command: "modyfikuj dodaj tłumaczenie word newTranslation",
 			want: true,
 		},
 		{
 			name: "Success - Translation With One Example",
-			command: "modify add translation word newTrans [Example one]",
+			command: "modyfikuj dodaj tłumaczenie word newTrans [Example one]",
 			want: true,
 		},
 		{
 			name: "Success - Translation With Many Examples",
-			command: "modify add translation word newTrans [Example one] [Example two] [Example3]",
+			command: "modyfikuj dodaj tłumaczenie word newTrans [Example one] [Example two] [Example3]",
 			want: true,
 		},
 		{
 			name: "Success - Ignoring Capital Letters",
-			command: "MODify ADd TRANSlation word newTrans [Example one]",
+			command: "MODYfikuj DODaj TŁUMaczenie word newTrans [Example one]",
 			want: true,
 		},
 		{
@@ -198,22 +198,22 @@ func TestCheckAddTranslationSyntax(t *testing.T){
 		},
 		{
 			name: "Failure - Wrong Brackets",
-			command: "modify add translation word newTrans [huwff[weiufh]]]",
+			command: "modyfikuj dodaj tłumaczenie word newTrans [huwff[weiufh]]]",
 			want: false,
 		},
 		{
 			name: "Failure - Empty Brackets",
-			command: "modify add translation word newTrans []",
+			command: "modyfikuj dodaj tłumaczenie word newTrans []",
 			want: false,
 		},
 		{
 			name: "Failure - Correct And Wrong Brackets Combined",
-			command: "modify add translation word newTrans [cwyfgu[ew]]][ [Correct]",
+			command: "modyfikuj dodaj tłumaczenie word newTrans [cwyfgu[ew]]][ [Correct]",
 			want: false,
 		},
 		{
 			name: "Failure - Correct And Empty Brackets Combined",
-			command: "modify add translation word newTrans [Correct] []",
+			command: "modyfikuj dodaj tłumaczenie word newTrans [Correct] []",
 			want: false,
 		},
 
@@ -235,22 +235,22 @@ func TestParseQuery(t *testing.T) {
 	}{
 		{
 			name: "Success - Create Query With 2 Examples",
-			query: "create word translation [value1] [value2 value3]", 
+			query: "dodaj word translation [value1] [value2 value3]", 
 			want: []string{"value1", "value2 value3"},
 		},
 		{
 			name: "Success - Create Query Without Any Examples",
-			query: "create word translation", 
+			query: "dodaj word translation", 
 			want: []string{},
 		},
 		{
 			name: "Success - Create Query With 1 Example",
-			query: "create word translation [single]", 
+			query: "dodaj word translation [single]", 
 			want: []string{"single"},
 		},
 		{
 			name: "Success - Create Query 3 Examples",
-			query: "create word translation [one] [two] [three]", 
+			query: "dodaj word translation [one] [two] [three]", 
 			want: []string{"one", "two", "three"},
 		},
 	}

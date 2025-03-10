@@ -16,11 +16,11 @@ func TestParseModifyCommand(t *testing.T) {
 	}{
 		{
 			name:    "Success - Add Translation",
-			command: "modify add translation word translation [example1] [example2]",
+			command: "modyfikuj dodaj tłumaczenie word translation [example1] [example2]",
 			expectedError: nil,
 			expectedModel: &ModifyCommandParams{
-				Action:     "add",
-				TargetType: "translation",
+				Action:     "dodaj",
+				TargetType: "tłumaczenie",
 				Word:       "word",
 				Translation: "translation",
 				Examples:   []string{"example1", "example2"},
@@ -28,11 +28,11 @@ func TestParseModifyCommand(t *testing.T) {
 		},
 		{
 			name:    "Success - Add Example",
-			command: "modify add example word translation [example1] [example2]",
+			command: "modyfikuj dodaj przykład word translation [example1] [example2]",
 			expectedError: nil,
 			expectedModel: &ModifyCommandParams{
-				Action:     "add",
-				TargetType: "example",
+				Action:     "dodaj",
+				TargetType: "przykład",
 				Word:       "word",
 				Translation: "translation",
 				Examples:   []string{"example1", "example2"},
@@ -40,11 +40,11 @@ func TestParseModifyCommand(t *testing.T) {
 		},
 		{
 			name:    "Success - Delete Example",
-			command: "modify delete example word translation [example1]",
+			command: "modyfikuj usuń przykład word translation [example1]",
 			expectedError: nil,
 			expectedModel: &ModifyCommandParams{
-				Action:     "delete",
-				TargetType: "example",
+				Action:     "usuń",
+				TargetType: "przykład",
 				Word:       "word",
 				Translation: "translation",
 				Examples:   []string{"example1"},
@@ -52,11 +52,11 @@ func TestParseModifyCommand(t *testing.T) {
 		},
 		{
 			name:    "Success - Delete Translation",
-			command: "modify delete translation word translation",
+			command: "modyfikuj usuń tłumaczenie word translation",
 			expectedError: nil,
 			expectedModel: &ModifyCommandParams{
-				Action:     "delete",
-				TargetType: "translation",
+				Action:     "usuń",
+				TargetType: "tłumaczenie",
 				Word:       "word",
 				Translation: "translation",
 				Examples:  nil,
@@ -70,13 +70,13 @@ func TestParseModifyCommand(t *testing.T) {
 		},
 		{
 			name:    "Failure - Add - Wrong Command",
-			command: "modify add translation word translation [][Wrong]]",
+			command: "modyfikuj dodaj tłumaczenie word translation [][Wrong]]",
 			expectedError: errors.New("Niepoprawna składnia dla polecenia dodawania"),
 			expectedModel: nil,
 		},
 		{
 			name:    "Failure - Delete - Wrong Command",
-			command: "modify delete translation word translation [][Wrong]]",
+			command: "modyfikuj usuń tłumaczenie word translation [][Wrong]]",
 			expectedError: errors.New("Niepoprawna składnia dla polecenia usuwania"),
 			expectedModel: nil,
 		},

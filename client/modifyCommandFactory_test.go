@@ -18,10 +18,10 @@ func TestCreateAction(t *testing.T) {
     }{
         {
             name: "Success - Create Add Command",
-            command: "modify add translation word translation",
+            command: "modyfikuj dodaj tłumaczenie word translation",
             expectedAction: &ModifyAddCommand{
                 handler: mockHandler,
-                targetType: "translation",
+                targetType: "tłumaczenie",
                 word: "word",
                 translation: "translation",
                 examples: nil,
@@ -30,10 +30,10 @@ func TestCreateAction(t *testing.T) {
         },
         {
             name: "Success - Create Delete Command",
-            command: "modify delete translation word translation",
+            command: "modyfikuj usuń tłumaczenie word translation",
             expectedAction: &ModifyDeleteCommand{
                 handler: mockHandler,
-                targetType: "translation",
+                targetType: "tłumaczenie",
                 word: "word",
                 translation: "translation",
                 examples: nil,
@@ -42,7 +42,7 @@ func TestCreateAction(t *testing.T) {
         },
 		{
             name: "Failure - Wrong Key word",
-            command: "modify create translation word translation",
+            command: "modyfikuj create translation word translation",
             expectedAction: nil,
             expectedError: errors.New("Niepoprawna składnia dla polecenia modyfikacji słowa"),
         },

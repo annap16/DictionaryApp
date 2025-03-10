@@ -361,7 +361,7 @@ func TestDeleteTranslation(t *testing.T){
 				mockRepo.On("DeleteTranslation", uint(1), "book", mockTx).Return(false, nil)
 			},
 			expectedResult: false,
-			expectedError: nil,
+			expectedError: errors.New("Nie znaleziono tłumaczenia"),
 			expectedOutput: "",
 		},
 		{

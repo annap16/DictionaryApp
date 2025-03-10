@@ -21,7 +21,7 @@ type CreateCommandHandler struct{
 
 func (c *CreateCommandHandler) HandleCommand(command string) bool{
 	commandSplitted := strings.Split(command, " ")
-	if(strings.ToLower(commandSplitted[0])=="create"){
+	if(strings.ToLower(commandSplitted[0])=="dodaj"){
 		if !CheckCreateSyntax(command){
 			fmt.Println("Niepoprawne polecenie")
 			return true
@@ -66,7 +66,7 @@ type ReceiveCommandHandler struct{
 
 func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
 	commandSplitted := strings.Split(command, " ")
-	if(strings.ToLower(commandSplitted[0])=="receive"){
+	if(strings.ToLower(commandSplitted[0])=="sprawdź"){
 		if(len(commandSplitted)!=2){
 			fmt.Println("Niepoprawne polecenie")
 			return true
@@ -100,13 +100,13 @@ type ModifyCommandHandler struct{
 
 func (m *ModifyCommandHandler) HandleCommand(command string) bool{	
 	commandSplitted := strings.Split(command, " ")
-	if(strings.ToLower(commandSplitted[0])=="modify"){
+	if(strings.ToLower(commandSplitted[0])=="modyfikuj"){
 		var success bool
 		modifyAction, err := m.modifyFactory.CreateAction(m.handler, command)
 
 		if modifyAction!= nil{
 			success, err = modifyAction.Execute()
-		}else{
+		}else if err!=nil{
 			fmt.Println(err)
 			return true
 		}
@@ -132,7 +132,6 @@ func (m *ModifyCommandHandler) SetNext(handler CommandHandler) {
 	m.next = handler
 }
 
-
 type RemoveCommandHandler struct{
 	next CommandHandler
 	handler QueriesHandler
@@ -140,7 +139,7 @@ type RemoveCommandHandler struct{
 
 func (r *RemoveCommandHandler) HandleCommand(command string) bool{
 	commandSplitted := strings.Split(command, " ")
-	if(strings.ToLower(commandSplitted[0])=="remove"){
+	if(strings.ToLower(commandSplitted[0])=="usuń"){
 		if(len(commandSplitted)!=2){
 			fmt.Println("Niepoprawne polecenie")
 			return true

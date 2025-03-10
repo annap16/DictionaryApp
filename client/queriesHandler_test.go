@@ -7,8 +7,6 @@ import(
 	"github.com/stretchr/testify/assert"
 	"dictionary-app/server/graph/model"
 	"github.com/stretchr/testify/mock"
-
-
 )
 
 
@@ -116,7 +114,7 @@ func TestSendReceiveMutation(t *testing.T) {
 					}
 				}).Return(nil)
 			},
-			expectedResult: "Słowo: word1\nTłumaczenie: translation1\nPrzykład: example sentence 1\nPrzykład: example sentence 2",
+			expectedResult: "Słowo: word1\nTłumaczenie: translation1\n\tPrzykład: example sentence 1\n\tPrzykład: example sentence 2",
 			expectedError:  nil,
 		},
 		{
@@ -450,7 +448,7 @@ func TestParseReceiveResponse(t *testing.T) {
 		},
 	}
 
-	expectedOutput := "Słowo: word1\nTłumaczenie: translation1\nPrzykład: example sentence 1\nPrzykład: example sentence 2"
+	expectedOutput := "Słowo: word1\nTłumaczenie: translation1\n\tPrzykład: example sentence 1\n\tPrzykład: example sentence 2"
 
 	q := &QueriesHandlerQL{}
 

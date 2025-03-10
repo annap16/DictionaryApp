@@ -114,7 +114,12 @@ func (dbI *DBInterface) DeleteTranslation(word string, translation string) (bool
 			return false, nil
 		}
 
-		return  dbI.repo.DeleteTranslation(wordID, translation, tx)
+		success, err := dbI.repo.DeleteTranslation(wordID, translation, tx)
+		if !success && err==nil{
+			return success, errors.New("Nie znaleziono tłumaczenia")
+		}
+		
+		return success, err
 	})
 }
 
