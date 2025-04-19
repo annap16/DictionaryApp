@@ -54,7 +54,7 @@ func (dbI *DBInterface) ReceiveWordTranslation(input string) (*model.Word, error
 			return false, err
 		}
 		if result.ID == 0 {
-			err = errors.New("Record not found")
+			err := errors.New("Record not found")
 			return false, err
 		}
 		return true, nil
