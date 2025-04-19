@@ -35,7 +35,7 @@ func (dbI *DBInterface) AddWord(input model.FullRecordInput) (bool, error) {
 		err := dbI.repo.CreateWord(&word, tx)
 		if err != nil {
 			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-				return false, nil
+				return dbI.AddTranslation(input)
 			}
 			fmt.Println("Error while adding a word to a DB", err)
 			return false, err

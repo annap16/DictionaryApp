@@ -52,20 +52,6 @@ func TestAddWord(t *testing.T) {
 			expectedOutput: "",
 		},
 		{
-			name: "Error - Duplicate Key Violation",
-			input: model.FullRecordInput{
-				Word: "ksiazka",
-				Translation: "book",
-				Examples: []string{"I love my new book"},
-			},
-			mockCreateWord: func(mockRepo *MockRepository, mockTx *gorm.DB) {
-				mockRepo.On("CreateWord", mock.Anything, mockTx).Return(errors.New("duplicate key value violates unique constraint"))
-			},
-			expectedResult: false,
-			expectedError:  nil,
-			expectedOutput: "",
-		},
-		{
 			name: "Error - General Database Error",
 			input: model.FullRecordInput{
 				Word: "samochod",

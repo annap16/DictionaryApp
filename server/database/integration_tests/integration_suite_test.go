@@ -8,6 +8,9 @@ import (
 	"log"
 	"os"
 
+    "io"
+    "gorm.io/gorm/logger"
+
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/suite"
 	tc "github.com/testcontainers/testcontainers-go"
@@ -53,7 +56,18 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	port, _ := container.MappedPort(ctx, "5432")
 
 	dsn := fmt.Sprintf("host=%s port=%s user=user password=password dbname=testdb sslmode=disable TimeZone=UTC", host, port.Port())
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+
+	gormLogger := logger.New(
+		log.New(io.Discard, "", log.LstdFlags),
+		logger.Config{
+			LogLevel: logger.Silent,
+		},
+	)
+	
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: gormLogger,
+	})
+
 	s.Require().NoError(err)
 
 	err = db.AutoMigrate(&database.Word{}, &database.Translation{}, &database.ExampleSentence{})
