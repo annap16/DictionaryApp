@@ -84,7 +84,6 @@ func (dbI *DBInterface) GetWordID(tx *gorm.DB, word string) (uint, error) {
 	var existingWord Word
 
 	err := dbI.repo.GetWord(word, &existingWord, tx)
-
 	if err != nil{
 		fmt.Println("Error while searching for word existance in a DB:", err)
 		return 0, err
