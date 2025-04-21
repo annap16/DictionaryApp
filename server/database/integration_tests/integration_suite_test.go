@@ -88,3 +88,16 @@ func (s *IntegrationTestSuite) TearDownSuite() {
 func TestIntegrationTestSuite(t *testing.T) {
 	suite.Run(t, new(IntegrationTestSuite))
 }
+
+func (s *IntegrationTestSuite) SetupTest() {
+	dbWrapper, ok := s.DB.DB.(*database.GormDatabase)
+	s.Require().True(ok, "DBInterface does not wrap GormDatabase")
+
+	conn := dbWrapper.Connection
+
+	err := conn.Exec(`
+		TRUNCATE TABLE example_sentences, translations, words RESTART IDENTITY CASCADE;
+	`).Error
+	s.Require().NoError(err)
+}
+
