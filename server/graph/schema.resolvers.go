@@ -6,43 +6,52 @@ package graph
 
 import (
 	"context"
+	"strings"
 
 	model1 "dictionary-app/server/graph/model"
 )
 
 // CreateTranslation is the resolver for the createTranslation field.
 func (r *mutationResolver) CreateTranslation(ctx context.Context, input model1.FullRecordInput) (bool, error) {
+	input.Word = strings.ToLower(input.Word)
+	input.Translation = strings.ToLower(input.Translation)
 	return r.DBInterface.AddWord(input)
 }
 
 // AddTranslation is the resolver for the addTranslation field.
 func (r *mutationResolver) AddTranslation(ctx context.Context, input model1.FullRecordInput) (bool, error) {
+	input.Word = strings.ToLower(input.Word)
+	input.Translation = strings.ToLower(input.Translation)
 	return r.DBInterface.AddTranslation(input)
 }
 
 // AddExample is the resolver for the addExample field.
 func (r *mutationResolver) AddExample(ctx context.Context, input model1.FullRecordInput) (bool, error) {
+	input.Word = strings.ToLower(input.Word)
+	input.Translation = strings.ToLower(input.Translation)
 	return r.DBInterface.AddExample(input)
 }
 
 // DeleteWord is the resolver for the deleteWord field.
 func (r *mutationResolver) DeleteWord(ctx context.Context, word string) (bool, error) {
-	return r.DBInterface.DeleteWord(word)
+	return r.DBInterface.DeleteWord(strings.ToLower(word))
 }
 
 // DeleteTranslation is the resolver for the deleteTranslation field.
 func (r *mutationResolver) DeleteTranslation(ctx context.Context, word string, translation string) (bool, error) {
-	return r.DBInterface.DeleteTranslation(word, translation)
+	return r.DBInterface.DeleteTranslation(strings.ToLower(word), strings.ToLower(translation))
 }
 
 // DeleteExample is the resolver for the deleteExample field.
 func (r *mutationResolver) DeleteExample(ctx context.Context, input model1.FullRecordInput) (bool, error) {
+	input.Word = strings.ToLower(input.Word)
+	input.Translation = strings.ToLower(input.Translation)
 	return r.DBInterface.DeleteExample(input)
 }
 
 // GetWordTranslation is the resolver for the getWordTranslation field.
 func (r *queryResolver) GetWordTranslation(ctx context.Context, word string) (*model1.Word, error) {
-	return r.DBInterface.ReceiveWordTranslation(word)
+	return r.DBInterface.ReceiveWordTranslation(strings.ToLower(word))
 }
 
 // Mutation returns MutationResolver implementation.
