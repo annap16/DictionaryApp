@@ -31,7 +31,6 @@ func NewGormDatabase() (*GormDatabase, error) {
 	fmt.Println("Current Working Directory:", dir)
 	if err := godotenv.Load("../.env"); err != nil {
 		log.Fatal(err)
-		log.Fatal("Error loading .env file")
 		return nil, nil
 	}
 
