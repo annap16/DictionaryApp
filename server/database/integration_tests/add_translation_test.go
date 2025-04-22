@@ -36,12 +36,8 @@ func (s *IntegrationTestSuite) TestAddTranslation() {
     s.Equal("word", word.Word)
     s.Len(word.Translations, 2)
     
-    translations := []string{
-        word.Translations[0].Translation,
-        word.Translations[1].Translation,
-    }
-    s.Contains(translations, "translation")
-    s.Contains(translations, "translation2")
+    s.Equal(word.Translations[0].Translation, "translation")
+    s.Equal(word.Translations[1].Translation, "translation2")
 }
 
 // Adding a translation to a non-existent word
@@ -113,13 +109,9 @@ func (s *IntegrationTestSuite) TestAddMultipleTranslationsSequentially() {
 	s.Equal(word, wordRecord.Word)
 	s.Len(wordRecord.Translations, 3) 
 
-	var translations []string
-	for _, t := range wordRecord.Translations {
-		translations = append(translations, t.Translation)
-	}
-
-	s.Contains(translations, "translation2")
-	s.Contains(translations, "translation3")
+    s.Equal("translation1", wordRecord.Translations[0].Translation)
+	s.Equal("translation2", wordRecord.Translations[1].Translation)
+	s.Equal("translation3", wordRecord.Translations[2].Translation)
 }
 
 // Adding the same translation twice sequentially

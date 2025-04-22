@@ -86,12 +86,12 @@ func (s *IntegrationTestSuite) TestAddDuplicateWord() {
     s.Equal("duplicateWord", word.Word)
     s.Len(word.Translations, 2)
     
-    translations := []string{
-        word.Translations[0].Translation,
-        word.Translations[1].Translation,
-    }
-    s.Contains(translations, "firstTranslation")
-    s.Contains(translations, "secondTranslation")
+    // translations := []string{
+    //     word.Translations[0].Translation,
+    //     word.Translations[1].Translation,
+    // }
+    s.Equal("firstTranslation", word.Translations[0].Translation)
+    s.Equal("secondTranslation", word.Translations[1].Translation)
 }
 
 // --------------------------- PARALLEL TESTS ---------------------------
