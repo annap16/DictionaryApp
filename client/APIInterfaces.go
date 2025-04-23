@@ -1,10 +1,9 @@
 package main
 
-import(
+import (
 	"context"
 	"dictionary-app/server/graph/model"
 	"github.com/machinebox/graphql"
-
 )
 
 type GraphQLClient interface {
@@ -20,5 +19,3 @@ type QueriesHandler interface {
 	SendAddTranslationMutation(ctx context.Context, input model.FullRecordInput) (bool, error)
 	SendAddExampleMutation(ctx context.Context, input model.FullRecordInput) (bool, error)
 }
-
-

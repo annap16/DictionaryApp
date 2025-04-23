@@ -2,10 +2,10 @@ package integration_tests
 
 import (
 	"dictionary-app/server/graph/model"
+	"fmt"
 	"sync"
 	"sync/atomic"
 	"time"
-	"fmt"
 )
 
 // --------------------------- SEQUENTIAL TESTS ---------------------------
@@ -13,18 +13,18 @@ import (
 // Adding a new example to an existing word
 func (s *IntegrationTestSuite) TestAddExample() {
 	input := model.FullRecordInput{
-		Word: "word",
+		Word:        "word",
 		Translation: "translation",
-		Examples: []string{"Example1"},
+		Examples:    []string{"Example1"},
 	}
 	ok, err := s.DB.AddWord(input)
 	s.Require().NoError(err)
 	s.Require().True(ok)
 
 	exampleInput := model.FullRecordInput{
-		Word: "word",
+		Word:        "word",
 		Translation: "translation",
-		Examples: []string{"Example2"},
+		Examples:    []string{"Example2"},
 	}
 	ok, err = s.DB.AddExample(exampleInput)
 	s.Require().NoError(err)
@@ -43,31 +43,31 @@ func (s *IntegrationTestSuite) TestAddExample() {
 // Adding an example to a non existent word
 func (s *IntegrationTestSuite) TestAddExampleNonExistentWord() {
 	input := model.FullRecordInput{
-		Word: "word",
+		Word:        "word",
 		Translation: "translation",
-		Examples: []string{"Example"},
+		Examples:    []string{"Example"},
 	}
 	ok, err := s.DB.AddExample(input)
 	s.Require().Error(err)
-	s.EqualError(err,  "Nie dodano przykładu - nie znaleziono związanego z nim słowa")
+	s.EqualError(err, "Nie dodano przykładu - nie znaleziono związanego z nim słowa")
 	s.False(ok)
 }
 
 // Adding an example to a non existent translation
 func (s *IntegrationTestSuite) TestAddExampleNonExistentTranslation() {
 	input := model.FullRecordInput{
-		Word: "word",
+		Word:        "word",
 		Translation: "translation",
-		Examples: []string{"Example1"},
+		Examples:    []string{"Example1"},
 	}
 	ok, err := s.DB.AddWord(input)
 	s.Require().NoError(err)
 	s.Require().True(ok)
 
 	input2 := model.FullRecordInput{
-		Word: "word",
+		Word:        "word",
 		Translation: "translation2",
-		Examples: []string{"Example"},
+		Examples:    []string{"Example"},
 	}
 	ok, err = s.DB.AddExample(input2)
 	s.Require().Error(err)
@@ -78,9 +78,9 @@ func (s *IntegrationTestSuite) TestAddExampleNonExistentTranslation() {
 // Adding a duplicate example
 func (s *IntegrationTestSuite) TestAddDuplicateExample() {
 	input := model.FullRecordInput{
-		Word: "word",
+		Word:        "word",
 		Translation: "translation",
-		Examples: []string{"Example"},
+		Examples:    []string{"Example"},
 	}
 	ok, err := s.DB.AddWord(input)
 	s.Require().NoError(err)
@@ -103,26 +103,26 @@ func (s *IntegrationTestSuite) TestAddMultipleExamplesSequentially() {
 	translation := "translation"
 
 	ok, err := s.DB.AddWord(model.FullRecordInput{
-		Word: word,
+		Word:        word,
 		Translation: translation,
-		Examples: []string{"Example1"},
+		Examples:    []string{"Example1"},
 	})
 	s.Require().NoError(err)
 	s.Require().True(ok)
 
 	example1 := model.FullRecordInput{
-		Word: word,
+		Word:        word,
 		Translation: translation,
-		Examples: []string{"Example2"},
+		Examples:    []string{"Example2"},
 	}
 	ok, err = s.DB.AddExample(example1)
 	s.Require().NoError(err)
 	s.True(ok)
 
 	example2 := model.FullRecordInput{
-		Word: word,
+		Word:        word,
 		Translation: translation,
-		Examples: []string{"Example3"},
+		Examples:    []string{"Example3"},
 	}
 	ok, err = s.DB.AddExample(example2)
 	s.Require().NoError(err)
@@ -156,9 +156,9 @@ func (s *IntegrationTestSuite) addSameExampleConcurrently(word, translation stri
 			<-startBarrier
 
 			input := model.FullRecordInput{
-				Word: word,
+				Word:        word,
 				Translation: translation,
-				Examples: []string{example},
+				Examples:    []string{example},
 			}
 			ok, err := s.DB.AddExample(input)
 			if err != nil {
@@ -198,9 +198,9 @@ func (s *IntegrationTestSuite) TestAddSameExampleConcurrentlyRepeatedly() {
 		testWord := fmt.Sprintf("%s_%d", baseWord, i)
 
 		ok, err := s.DB.AddWord(model.FullRecordInput{
-			Word: testWord,
+			Word:        testWord,
 			Translation: translation,
-			Examples: []string{example},
+			Examples:    []string{example},
 		})
 		s.Require().NoError(err)
 		s.Require().True(ok)
@@ -228,9 +228,9 @@ func (s *IntegrationTestSuite) addDifferentExamplesConcurrently(word, translatio
 			<-startBarrier
 
 			input := model.FullRecordInput{
-				Word: word,
+				Word:        word,
 				Translation: translation,
-				Examples: []string{example},
+				Examples:    []string{example},
 			}
 			ok, err := s.DB.AddExample(input)
 			if ok && err == nil {
@@ -273,9 +273,9 @@ func (s *IntegrationTestSuite) TestAddDifferentExamplesConcurrentlyRepeatedly() 
 		testWord := fmt.Sprintf("%s_diff_%d", baseWord, i)
 
 		ok, err := s.DB.AddWord(model.FullRecordInput{
-			Word: testWord,
+			Word:        testWord,
 			Translation: translation,
-			Examples: []string{"base"},
+			Examples:    []string{"base"},
 		})
 		s.Require().NoError(err)
 		s.Require().True(ok)
@@ -285,4 +285,3 @@ func (s *IntegrationTestSuite) TestAddDifferentExamplesConcurrentlyRepeatedly() 
 		})
 	}
 }
-

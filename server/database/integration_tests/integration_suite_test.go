@@ -1,15 +1,14 @@
-
 package integration_tests
 
 import (
 	"context"
 	"fmt"
-	"testing"
 	"log"
 	"os"
+	"testing"
 
-    "io"
-    "gorm.io/gorm/logger"
+	"gorm.io/gorm/logger"
+	"io"
 
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/suite"
@@ -38,8 +37,8 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		ExposedPorts: []string{"5432/tcp"},
 		Env: map[string]string{
 			"POSTGRES_PASSWORD": os.Getenv("POSTGRES_PASSWORD"),
-			"POSTGRES_USER": os.Getenv("POSTGRES_USER"),
-			"POSTGRES_DB": os.Getenv("POSTGRES_DB"),
+			"POSTGRES_USER":     os.Getenv("POSTGRES_USER"),
+			"POSTGRES_DB":       os.Getenv("POSTGRES_DB"),
 		},
 		WaitingFor: wait.ForListeningPort("5432/tcp"),
 	}
@@ -63,7 +62,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 			LogLevel: logger.Silent,
 		},
 	)
-	
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: gormLogger,
 	})
@@ -100,4 +99,3 @@ func (s *IntegrationTestSuite) SetupTest() {
 	`).Error
 	s.Require().NoError(err)
 }
-

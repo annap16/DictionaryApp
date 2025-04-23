@@ -1,10 +1,11 @@
-package database 
+package database
 
 import (
+	"database/sql"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
-	"database/sql"
 )
+
 type MockRepository struct {
 	mock.Mock
 }
@@ -15,7 +16,7 @@ func (m *MockRepository) TransactionWrapper(DB Database, fn func(tx *gorm.DB) (b
 		if errFn, ok := args.Get(1).(func(mock.Arguments) error); ok {
 			return returnFn(args), errFn(args)
 		}
-		}
+	}
 	return args.Bool(0), args.Error(1)
 }
 
@@ -59,12 +60,11 @@ func (m *MockRepository) GetTranslation(wordID uint, translation string, result 
 	return args.Error(0)
 }
 
-
 type MockDatabase struct {
 	mock.Mock
 }
 
-func (m *MockDatabase)Begin(opts ...*sql.TxOptions) *gorm.DB {
+func (m *MockDatabase) Begin(opts ...*sql.TxOptions) *gorm.DB {
 	args := m.Called(opts)
 	return args.Get(0).(*gorm.DB)
 }

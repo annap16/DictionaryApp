@@ -14,9 +14,9 @@ func (s *IntegrationTestSuite) TestDeleteTranslation() {
 	translation := "translation"
 
 	input := model.FullRecordInput{
-		Word: word,
+		Word:        word,
 		Translation: translation,
-		Examples: []string{"example1"},
+		Examples:    []string{"example1"},
 	}
 
 	ok, err := s.DB.AddWord(input)
@@ -40,7 +40,7 @@ func (s *IntegrationTestSuite) TestDeleteNonExistingTranslation() {
 
 	success, err := s.DB.DeleteTranslation(word, translation)
 	s.Require().Error(err)
-	s.EqualError(err, "Nie usunięto tłumaczenia - nie znaleziono związanego z nim słowa")	
+	s.EqualError(err, "Nie usunięto tłumaczenia - nie znaleziono związanego z nim słowa")
 	s.Require().False(success)
 }
 
@@ -57,9 +57,9 @@ func (s *IntegrationTestSuite) TestDeleteDifferentTranslationsInParallel() {
 		translation := "translation1"
 
 		input := model.FullRecordInput{
-			Word: word,
+			Word:        word,
 			Translation: translation,
-			Examples: []string{"example1"},
+			Examples:    []string{"example1"},
 		}
 		ok, err := s.DB.AddWord(input)
 		s.Require().NoError(err)
@@ -76,9 +76,9 @@ func (s *IntegrationTestSuite) TestDeleteDifferentTranslationsInParallel() {
 		translation := "translation2"
 
 		input := model.FullRecordInput{
-			Word: word,
+			Word:        word,
 			Translation: translation,
-			Examples: []string{"example2"},
+			Examples:    []string{"example2"},
 		}
 		ok, err := s.DB.AddWord(input)
 		s.Require().NoError(err)
@@ -103,9 +103,9 @@ func (s *IntegrationTestSuite) TestDeleteSameTranslationConcurrently() {
 	translation := "concurrenttranslation"
 
 	input := model.FullRecordInput{
-		Word: word,
+		Word:        word,
 		Translation: translation,
-		Examples: []string{"example"},
+		Examples:    []string{"example"},
 	}
 
 	ok, err := s.DB.AddWord(input)
@@ -121,9 +121,9 @@ func (s *IntegrationTestSuite) TestDeleteSameTranslationConcurrently() {
 			<-startBarrier
 			success, err := s.DB.DeleteTranslation(word, translation)
 
-			if success==true && err==nil {
+			if success == true && err == nil {
 				atomic.AddInt32(&successCount, 1)
-			} else if success==false && err!=nil{
+			} else if success == false && err != nil {
 				atomic.AddInt32(&errorCount, 1)
 			}
 		}()
@@ -140,4 +140,3 @@ func (s *IntegrationTestSuite) TestDeleteSameTranslationConcurrently() {
 	s.Require().NotNil(received)
 	s.Require().Len(received.Translations, 0)
 }
-

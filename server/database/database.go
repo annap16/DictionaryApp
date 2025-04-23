@@ -1,17 +1,18 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
-	"log"
-	"os"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"database/sql"
+	"log"
+	"os"
 )
+
 type Database interface {
-	Begin(opts ...*sql.TxOptions) *gorm.DB         
-    AutoMigrate(dst ...interface{}) error
+	Begin(opts ...*sql.TxOptions) *gorm.DB
+	AutoMigrate(dst ...interface{}) error
 }
 
 type GormDatabase struct {
@@ -19,7 +20,7 @@ type GormDatabase struct {
 }
 
 func (g *GormDatabase) Begin(opts ...*sql.TxOptions) *gorm.DB {
-	return g.Connection.Begin() 
+	return g.Connection.Begin()
 }
 
 func (g *GormDatabase) AutoMigrate(dst ...interface{}) error {
@@ -58,4 +59,3 @@ func (d *GormDatabase) migrate() {
 	}
 	fmt.Println("GormDatabase migration completed.")
 }
-

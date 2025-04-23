@@ -1,9 +1,9 @@
 package main
 
-import(
+import (
+	"bufio"
 	"fmt"
 	"os"
-	"bufio"
 	"strings"
 )
 
@@ -34,14 +34,14 @@ func WaitForUserInput(handler QueriesHandler) {
 
 		input = strings.TrimRight(input, " \t\r\n")
 
-		if(strings.ToLower(input)=="exit"){
+		if strings.ToLower(input) == "exit" {
 			exit = true
 			break
 		}
 
-		if !createHandler.HandleCommand(input){
+		if !createHandler.HandleCommand(input) {
 			fmt.Println("Niepoprawne polecenie")
 		}
-	}	
-	
+	}
+
 }

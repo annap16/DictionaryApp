@@ -1,11 +1,11 @@
 package main
 
 import (
-	"testing"
+	"dictionary-app/server/graph/model"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-    "github.com/stretchr/testify/mock"
-	"dictionary-app/server/graph/model"
+	"github.com/stretchr/testify/mock"
+	"testing"
 )
 
 // --------------------------HELPER FUNCTION-----------------------------------
@@ -26,34 +26,34 @@ func equalSlices(a, b []string) bool {
 
 func TestHandleCommandCreate(t *testing.T) {
 	tests := []struct {
-		name string
-		command string
-		mockResponse bool
-		mockError error
+		name           string
+		command        string
+		mockResponse   bool
+		mockError      error
 		expectedOutput string
 		expectedResult bool
 	}{
 		{
-			name: "Success - Word Created",
-			command: "dodaj word translation [example]",
-			mockResponse: true,
-			mockError: nil,
+			name:           "Success - Word Created",
+			command:        "dodaj word translation [example]",
+			mockResponse:   true,
+			mockError:      nil,
 			expectedOutput: "Słowo zostało dodane do słownika\n",
 			expectedResult: true,
 		},
 		{
-			name: "Failure - Word Already Exists",
-			command: "dodaj word translation [example]",
-			mockResponse: false,
-			mockError: nil,
+			name:           "Failure - Word Already Exists",
+			command:        "dodaj word translation [example]",
+			mockResponse:   false,
+			mockError:      nil,
 			expectedOutput: "Słowo zostało dodane do słownika\n",
-			expectedResult: true, 
+			expectedResult: true,
 		},
 		{
-			name: "Failure - Mutation Error",
-			command: "dodaj word translation [example]",
-			mockResponse: false,
-			mockError: fmt.Errorf("mutation failed"),
+			name:           "Failure - Mutation Error",
+			command:        "dodaj word translation [example]",
+			mockResponse:   false,
+			mockError:      fmt.Errorf("mutation failed"),
 			expectedOutput: "Błąd:  mutation failed\n",
 			expectedResult: true,
 		},
@@ -81,56 +81,56 @@ func TestHandleCommandCreate(t *testing.T) {
 }
 
 func TestHandleCommandCreate_OtherCommand(t *testing.T) {
-    mockClient := new(MockGraphQLClient)
-    mockQueriesHandler := &MockQueriesHandler{client: mockClient}
+	mockClient := new(MockGraphQLClient)
+	mockQueriesHandler := &MockQueriesHandler{client: mockClient}
 
-    handler := &CreateCommandHandler{handler: mockQueriesHandler}
+	handler := &CreateCommandHandler{handler: mockQueriesHandler}
 
-    command := "stwórz something"
+	command := "stwórz something"
 
-    success := handler.HandleCommand(command)
+	success := handler.HandleCommand(command)
 
-    mockQueriesHandler.AssertNotCalled(t, "SendCreateMutation")
-    assert.False(t, success) 
+	mockQueriesHandler.AssertNotCalled(t, "SendCreateMutation")
+	assert.False(t, success)
 }
 
 func TestHandleCommandCreate_CorrectInput(t *testing.T) {
 	tests := []struct {
-		name string
-		command string
-		expectedInput model.FullRecordInput
+		name           string
+		command        string
+		expectedInput  model.FullRecordInput
 		expectedOutput string
 		expectedResult bool
 	}{
 		{
-			name: "Success - Input Check With One Example",
+			name:    "Success - Input Check With One Example",
 			command: "dodaj ksiazka book [I love my new book]",
 			expectedInput: model.FullRecordInput{
-				Word: "ksiazka",
+				Word:        "ksiazka",
 				Translation: "book",
-				Examples: []string{"I love my new book"},
-			},
-			expectedOutput:"Słowo zostało dodane do słownika\n",
-			expectedResult: true,
-		},
-		{
-			name: "Success - Input Check With Two Examples",
-			command: "dodaj samochod car [A fast car] [My car is blue]",
-			expectedInput: model.FullRecordInput{
-				Word: "samochod",
-				Translation: "car",
-				Examples: []string{"A fast car", "My car is blue"},
+				Examples:    []string{"I love my new book"},
 			},
 			expectedOutput: "Słowo zostało dodane do słownika\n",
 			expectedResult: true,
 		},
 		{
-			name: "Success - Input Check Without Any Examples",
+			name:    "Success - Input Check With Two Examples",
+			command: "dodaj samochod car [A fast car] [My car is blue]",
+			expectedInput: model.FullRecordInput{
+				Word:        "samochod",
+				Translation: "car",
+				Examples:    []string{"A fast car", "My car is blue"},
+			},
+			expectedOutput: "Słowo zostało dodane do słownika\n",
+			expectedResult: true,
+		},
+		{
+			name:    "Success - Input Check Without Any Examples",
 			command: "dodaj kot cat",
 			expectedInput: model.FullRecordInput{
-				Word: "kot",
+				Word:        "kot",
 				Translation: "cat",
-				Examples: []string{},
+				Examples:    []string{},
 			},
 			expectedOutput: "Słowo zostało dodane do słownika\n",
 			expectedResult: true,
@@ -141,7 +141,7 @@ func TestHandleCommandCreate_CorrectInput(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockClient := new(MockGraphQLClient)
 			mockQueriesHandler := &MockQueriesHandler{client: mockClient}
-			
+
 			mockQueriesHandler.On("SendCreateMutation", mock.Anything, mock.MatchedBy(func(input model.FullRecordInput) bool {
 				return input.Word == tt.expectedInput.Word &&
 					input.Translation == tt.expectedInput.Translation &&
@@ -150,7 +150,6 @@ func TestHandleCommandCreate_CorrectInput(t *testing.T) {
 			})).Return(true, nil)
 
 			handler := &CreateCommandHandler{handler: mockQueriesHandler}
-
 
 			output := captureStdout(func() {
 				result := handler.HandleCommand(tt.command)
@@ -166,36 +165,36 @@ func TestHandleCommandCreate_CorrectInput(t *testing.T) {
 
 // --------------------------RECEIVE COMMAND------------------------------------
 
-func TestHandleCommandReceive(t *testing.T){
+func TestHandleCommandReceive(t *testing.T) {
 	tests := []struct {
-		name string
-		command string
-		mockResponse string
-		mockError error
+		name           string
+		command        string
+		mockResponse   string
+		mockError      error
 		expectedOutput string
 		expectedResult bool
 	}{
 		{
-			name: "Success - Word Received",
-			command: "sprawdź word",
-			mockResponse: "result",
-			mockError: nil,
+			name:           "Success - Word Received",
+			command:        "sprawdź word",
+			mockResponse:   "result",
+			mockError:      nil,
 			expectedOutput: "result\n",
 			expectedResult: true,
 		},
 		{
-			name: "Failure - Word Not Found",
-			command: "sprawdź word",
-			mockResponse: "",
-			mockError: nil,
+			name:           "Failure - Word Not Found",
+			command:        "sprawdź word",
+			mockResponse:   "",
+			mockError:      nil,
 			expectedOutput: "",
 			expectedResult: true,
 		},
 		{
-			name: "Error - Mutation Error",
-			command: "sprawdź ksiazka",
-			mockResponse: "",
-			mockError: fmt.Errorf("mutation failed"),
+			name:           "Error - Mutation Error",
+			command:        "sprawdź ksiazka",
+			mockResponse:   "",
+			mockError:      fmt.Errorf("mutation failed"),
 			expectedOutput: "Błąd:  mutation failed\n",
 			expectedResult: true,
 		},
@@ -220,49 +219,49 @@ func TestHandleCommandReceive(t *testing.T){
 			mockQueriesHandler.AssertExpectations(t)
 		})
 	}
-	
+
 }
 
 func TestHandleCommandReceive_OtherCommand(t *testing.T) {
-    mockClient := new(MockGraphQLClient)
-    mockQueriesHandler := &MockQueriesHandler{client: mockClient}
+	mockClient := new(MockGraphQLClient)
+	mockQueriesHandler := &MockQueriesHandler{client: mockClient}
 
-    handler := &ReceiveCommandHandler{handler: mockQueriesHandler}
+	handler := &ReceiveCommandHandler{handler: mockQueriesHandler}
 
-    command := "create something"
+	command := "create something"
 
-    success := handler.HandleCommand(command)
+	success := handler.HandleCommand(command)
 
-    mockQueriesHandler.AssertNotCalled(t, "SendReceiveMutation")
-    assert.False(t, success) 
+	mockQueriesHandler.AssertNotCalled(t, "SendReceiveMutation")
+	assert.False(t, success)
 }
 
 func TestHandleCommandReceive_CorrectInput(t *testing.T) {
 	tests := []struct {
-		name string
-		command string
-		expectedInput string
+		name           string
+		command        string
+		expectedInput  string
 		expectedOutput string
 		expectedResult bool
 	}{
 		{
-			name: "Success - Word Received (ksiazka)",
-			command: "sprawdź ksiazka",
-			expectedInput: "ksiazka",
+			name:           "Success - Word Received (ksiazka)",
+			command:        "sprawdź ksiazka",
+			expectedInput:  "ksiazka",
 			expectedOutput: "result\n",
 			expectedResult: true,
 		},
 		{
-			name: "Success - Word Received (samochod)",
-			command: "sprawdź samochod",
-			expectedInput: "samochod",
+			name:           "Success - Word Received (samochod)",
+			command:        "sprawdź samochod",
+			expectedInput:  "samochod",
 			expectedOutput: "result\n",
 			expectedResult: true,
 		},
 		{
-			name: "Success - Word Received (kot)",
-			command: "sprawdź kot",
-			expectedInput: "kot",
+			name:           "Success - Word Received (kot)",
+			command:        "sprawdź kot",
+			expectedInput:  "kot",
 			expectedOutput: "result\n",
 			expectedResult: true,
 		},
@@ -272,9 +271,10 @@ func TestHandleCommandReceive_CorrectInput(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockClient := new(MockGraphQLClient)
 			mockQueriesHandler := &MockQueriesHandler{client: mockClient}
-			
+
 			mockQueriesHandler.On("SendReceiveMutation", mock.Anything, mock.MatchedBy(func(input string) bool {
-				return input == tt.expectedInput})).Return("result", nil)
+				return input == tt.expectedInput
+			})).Return("result", nil)
 
 			handler := &ReceiveCommandHandler{handler: mockQueriesHandler}
 
@@ -292,7 +292,7 @@ func TestHandleCommandReceive_CorrectInput(t *testing.T) {
 
 // --------------------------MODIFY COMMAND------------------------------------
 
-type MockModifyFactory struct{
+type MockModifyFactory struct {
 	mock.Mock
 }
 
@@ -301,70 +301,68 @@ func (m *MockModifyFactory) CreateAction(handler QueriesHandler, command string)
 	return args.Get(0).(ModifyAction), args.Error(1)
 }
 
-type MockModifyAction struct{
+type MockModifyAction struct {
 	mock.Mock
 }
 
-func (m *MockModifyAction) Execute() (bool, error){
+func (m *MockModifyAction) Execute() (bool, error) {
 	args := m.Called()
 	return args.Bool(0), args.Error(1)
 }
 
 func TestHandleCommandModify(t *testing.T) {
 	tests := []struct {
-		name string
-		command string
+		name            string
+		command         string
 		factoryResponse ModifyAction
-		execResponse bool
-		expectedOutput string
-		expectedResult bool
+		execResponse    bool
+		expectedOutput  string
+		expectedResult  bool
 	}{
 		{
-			name: "Success - Example Added",
-			command: "modyfikuj dodaj przykład word translation [example]",
+			name:            "Success - Example Added",
+			command:         "modyfikuj dodaj przykład word translation [example]",
 			factoryResponse: new(MockModifyAction),
-			execResponse: true,
-			expectedOutput: "Słowo zostało zmodyfikowane poprawnie\n",
-			expectedResult: true,
+			execResponse:    true,
+			expectedOutput:  "Słowo zostało zmodyfikowane poprawnie\n",
+			expectedResult:  true,
 		},
 		{
-			name: "Success - Translation Added",
-			command: "modyfikuj dodaj tłumaczenie word translation",
+			name:            "Success - Translation Added",
+			command:         "modyfikuj dodaj tłumaczenie word translation",
 			factoryResponse: new(MockModifyAction),
-			execResponse: true,
-			expectedOutput: "Słowo zostało zmodyfikowane poprawnie\n",
-			expectedResult: true,
+			execResponse:    true,
+			expectedOutput:  "Słowo zostało zmodyfikowane poprawnie\n",
+			expectedResult:  true,
 		},
 		{
-			name: "Success - Example Deleted",
-			command: "modyfikuj usuń przykład word translation [example]",
+			name:            "Success - Example Deleted",
+			command:         "modyfikuj usuń przykład word translation [example]",
 			factoryResponse: new(MockModifyAction),
-			execResponse: true,
-			expectedOutput: "Słowo zostało zmodyfikowane poprawnie\n",
-			expectedResult: true,
+			execResponse:    true,
+			expectedOutput:  "Słowo zostało zmodyfikowane poprawnie\n",
+			expectedResult:  true,
 		},
 		{
-			name: "Success - Translation Deleted",
-			command: "modyfikuj usuń tłumaczenie word translation",
+			name:            "Success - Translation Deleted",
+			command:         "modyfikuj usuń tłumaczenie word translation",
 			factoryResponse: new(MockModifyAction),
-			execResponse: true,
-			expectedOutput: "Słowo zostało zmodyfikowane poprawnie\n",
-			expectedResult: true,
+			execResponse:    true,
+			expectedOutput:  "Słowo zostało zmodyfikowane poprawnie\n",
+			expectedResult:  true,
 		},
-
-
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockFactory := new(MockModifyFactory)
-			mockModifyAction := tt.factoryResponse.(*MockModifyAction) 
+			mockModifyAction := tt.factoryResponse.(*MockModifyAction)
 
 			mockFactory.On("CreateAction", mock.Anything, mock.Anything).Return(mockModifyAction, nil)
 			mockModifyAction.On("Execute").Return(tt.execResponse, nil)
 
 			handler := &ModifyCommandHandler{
-				modifyFactory: mockFactory, 
+				modifyFactory: mockFactory,
 			}
 
 			output := captureStdout(func() {
@@ -380,52 +378,51 @@ func TestHandleCommandModify(t *testing.T) {
 	}
 }
 
-func TestHandleCommandModify_OtherCommand(t *testing.T){
+func TestHandleCommandModify_OtherCommand(t *testing.T) {
 	mockClient := new(MockGraphQLClient)
-    mockQueriesHandler := &MockQueriesHandler{client: mockClient}
+	mockQueriesHandler := &MockQueriesHandler{client: mockClient}
 
-    handler := &ModifyCommandHandler{handler: mockQueriesHandler}
+	handler := &ModifyCommandHandler{handler: mockQueriesHandler}
 
-    command := "create something"
+	command := "create something"
 
-    success := handler.HandleCommand(command)
+	success := handler.HandleCommand(command)
 
-    assert.False(t, success) 
+	assert.False(t, success)
 }
 
 // --------------------------REMOVE COMMAND------------------------------------
 
-
-func TestHandleCommandRemove(t *testing.T){
+func TestHandleCommandRemove(t *testing.T) {
 	tests := []struct {
-		name string
-		command string
-		mockResponse bool
-		mockError error
+		name           string
+		command        string
+		mockResponse   bool
+		mockError      error
 		expectedOutput string
 		expectedResult bool
 	}{
 		{
-			name: "Success - Word Removed",
-			command: "usuń slowo",
-			mockResponse: true,
-			mockError: nil,
+			name:           "Success - Word Removed",
+			command:        "usuń slowo",
+			mockResponse:   true,
+			mockError:      nil,
 			expectedOutput: "Podane słowo i powiązane z nim dane zostały usunięte\n",
 			expectedResult: true,
 		},
 		{
-			name: "Failure - Word doesn't exist in the dictionary",
-			command: "usuń slowo",
-			mockResponse: false,
-			mockError: nil,
+			name:           "Failure - Word doesn't exist in the dictionary",
+			command:        "usuń slowo",
+			mockResponse:   false,
+			mockError:      nil,
 			expectedOutput: "",
-			expectedResult: true, 
+			expectedResult: true,
 		},
 		{
-			name: "Failure - Mutation Error",
-			command: "usuń slowo",
-			mockResponse: false,
-			mockError: fmt.Errorf("Mutation Failed"),
+			name:           "Failure - Mutation Error",
+			command:        "usuń slowo",
+			mockResponse:   false,
+			mockError:      fmt.Errorf("Mutation Failed"),
 			expectedOutput: "Błąd:  Mutation Failed\n",
 			expectedResult: true,
 		},
@@ -452,17 +449,16 @@ func TestHandleCommandRemove(t *testing.T){
 	}
 }
 
-func TestHandleCommandRemoveSendModifyMutation_OtherCommand(t *testing.T){
+func TestHandleCommandRemoveSendModifyMutation_OtherCommand(t *testing.T) {
 	mockClient := new(MockGraphQLClient)
-    mockQueriesHandler := &MockQueriesHandler{client: mockClient}
+	mockQueriesHandler := &MockQueriesHandler{client: mockClient}
 
-    handler := &RemoveCommandHandler{handler: mockQueriesHandler}
+	handler := &RemoveCommandHandler{handler: mockQueriesHandler}
 
-    command := "create something"
+	command := "create something"
 
-    success := handler.HandleCommand(command)
+	success := handler.HandleCommand(command)
 
-    mockQueriesHandler.AssertNotCalled(t, "SendRemoveMutation")
-    assert.False(t, success) 
+	mockQueriesHandler.AssertNotCalled(t, "SendRemoveMutation")
+	assert.False(t, success)
 }
-

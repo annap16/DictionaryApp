@@ -3,15 +3,14 @@ package integration_tests
 import (
 	"dictionary-app/server/graph/model"
 	"sync"
-
 )
 
 // Receiving single word from database
 func (s *IntegrationTestSuite) TestReceiveWordTranslation_Success() {
 	input := model.FullRecordInput{
-		Word: "existingword",
+		Word:        "existingword",
 		Translation: "existingtranslation",
-		Examples: []string{"Example 1", "Example 2"},
+		Examples:    []string{"Example 1", "Example 2"},
 	}
 
 	ok, err := s.DB.AddWord(input)
@@ -36,9 +35,9 @@ func (s *IntegrationTestSuite) TestReceiveWordTranslation_NotFound() {
 // Receiving word after deleting it from database
 func (s *IntegrationTestSuite) TestReceiveWordTranslation_AfterDeletion() {
 	input := model.FullRecordInput{
-		Word: "tobedeleted",
+		Word:        "tobedeleted",
 		Translation: "temptranslation",
-		Examples: []string{"temp example"},
+		Examples:    []string{"temp example"},
 	}
 
 	ok, err := s.DB.AddWord(input)
@@ -56,9 +55,9 @@ func (s *IntegrationTestSuite) TestReceiveWordTranslation_AfterDeletion() {
 // Receiving the same word many times sequentially
 func (s *IntegrationTestSuite) TestReceiveWordTranslation_RepeatedCalls() {
 	input := model.FullRecordInput{
-		Word: "repeatword",
+		Word:        "repeatword",
 		Translation: "repeattranslation",
-		Examples: []string{"example1"},
+		Examples:    []string{"example1"},
 	}
 
 	ok, err := s.DB.AddWord(input)
@@ -76,9 +75,9 @@ func (s *IntegrationTestSuite) TestReceiveWordTranslation_RepeatedCalls() {
 // Receving the same word many times in parallel
 func (s *IntegrationTestSuite) TestReceiveWordTranslation_ConcurrentReads() {
 	input := model.FullRecordInput{
-		Word: "concurrentreadword",
+		Word:        "concurrentreadword",
 		Translation: "readtranslation",
-		Examples: []string{"Example A", "Example B"},
+		Examples:    []string{"Example A", "Example B"},
 	}
 
 	ok, err := s.DB.AddWord(input)
