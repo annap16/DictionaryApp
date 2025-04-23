@@ -14,7 +14,7 @@ All commands in the client are written in Polish, as this is a Polish-to-English
 
 ## Setup and Usage Instructions
 The application runs using Docker for both the client and server. Follow these steps to set it up:
-1. Download the project and create a `.env` file in the main project directory using provided `env.example` file with example account.
+1. Download the project and create a `.env` file in the main project directory using provided `env_example.txt` file with example account. You can rename or copy this file to your `.env` file: [env_example.txt](https://github.com/user-attachments/files/19872509/env_example.txt)
 2. Start Docker by running: <pre> ```sudo docker-compose up --build ``` </pre>
 3.  In a separate terminal, start the client by executing:<pre> ```sudo docker-compose exec client /bin/sh ``` </pre> Then, once inside, run:  <pre> ```/dictionary-client ``` </pre>
 4.  After successfully launching the client, you can interact with the application using example commands and leave the application at any time using `exit` command.
@@ -27,7 +27,8 @@ Commands such as `dodaj`, `usuń`, and `modyfikuj` are **not case-sensitive** in
 - **Add a new word with a translation and examples:** <pre>```dodaj {word_in_polish} {word_in_english} [Example one] ... [Example n]``` </pre>  The list of examples can be empty.
 - **Retrieve translations of an existing word:*** <pre>```sprawdź {word_in_polish}``` </pre>
 - **Modify an existing translation by adding new example sentences:** <pre> ```modyfikuj dodaj przykład {word_in_polish} {word_in_english} [New example one] [New example two] ... [New example n] ```</pre> At least one example must be provided.
-- **Add a new translation for an existing word (examples are optional):** <pre>```modyfikuj dodaj tłumaczenie {word_in_polish} {word_in_english} [Example one] [Example two] ... [Example n]```</pre> The list of examples can be empty.
+- **Add a new translation 
+for an existing word (examples are optional):** <pre>```modyfikuj dodaj tłumaczenie {word_in_polish} {word_in_english} [Example one] [Example two] ... [Example n]```</pre> The list of examples can be empty.
 - **Remove specific example sentences from a translation:** <pre>```modyfikuj usuń przykład {word_in_polish} {word_in_english} [Example one] [Example two] ... [Example n] ```</pre> At least one example must be specified.
 - **Delete a specific translation of a word:** <pre>```modyfikuj usuń tłumaczenie {word_in_polish} {translation_to_delete} ```</pre>
 - **Delete an entire word and all its translations:** <pre>```usuń {word_in_polish}```</pre>
