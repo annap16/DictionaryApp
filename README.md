@@ -46,7 +46,6 @@ CREATE TABLE Word (
 );
 
 CREATE TABLE Translation (
-
   ID INTEGER PRIMARY KEY,
   Translation TEXT NOT NULL,
   WordID INTEGER NOT NULL,
@@ -57,8 +56,6 @@ CREATE TABLE Translation (
 CREATE TABLE ExampleSentence (
   ID INTEGER PRIMARY KEY,
   Sentence TEXT NOT NULL,
-
-
   TranslationID INTEGER NOT NULL,
   UNIQUE (Sentence, TranslationID),
   FOREIGN KEY (TranslationID) REFERENCES Translation(ID)
