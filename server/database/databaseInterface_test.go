@@ -8,7 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
-	"errors"
+	"errors"	
+	customerrors "dictionary-app/server/errors"
 )
 
 func captureStdout(f func()) string {
@@ -344,10 +345,10 @@ func TestDeleteTranslation(t *testing.T){
 				}).Return(nil)
 			},
 			mockDeleteTranslation: func(mockRepo *MockRepository, mockTx *gorm.DB) {
-				mockRepo.On("DeleteTranslation", uint(1), "book", mockTx).Return(false, nil)
+				mockRepo.On("DeleteTranslation", uint(1), "book", mockTx).Return(false, customerrors.NewNotFoundError("Nie usunięto podanego tłumaczenia - tłumaczenia nie znaleziono"))
 			},
 			expectedResult: false,
-			expectedError: errors.New("Nie znaleziono tłumaczenia"),
+			expectedError: customerrors.NewNotFoundError("Nie usunięto podanego tłumaczenia - tłumaczenia nie znaleziono"),
 			expectedOutput: "",
 		},
 		{
@@ -380,7 +381,7 @@ func TestDeleteTranslation(t *testing.T){
 			mockDeleteTranslation: func(mockRepo *MockRepository, mockTx *gorm.DB) {
 			},
 			expectedResult: false,
-			expectedError: nil,
+			expectedError: customerrors.NewNotFoundError("Nie usunięto tłumaczenia - nie znaleziono związanego z nim słowa"),
 			expectedOutput: "",
 		},
 		{
@@ -572,7 +573,7 @@ func TestDeleteExample(t *testing.T){
 					Return(nil)
 			},			
 			expectedResult: false,
-			expectedError: nil,
+			expectedError: customerrors.NewNotFoundError("Nie usunięto przykładu - nie znaleziono związanego z nim tłumaczenia"),
 			expectedOutput: "",
 		},
 		{
@@ -622,7 +623,7 @@ func TestDeleteExample(t *testing.T){
 			mockGetTranslation: func(mockRepo *MockRepository, mockTx *gorm.DB) {
 			},			
 			expectedResult: false,
-			expectedError: nil,
+			expectedError:  customerrors.NewNotFoundError("Nie usunięto przykładu - nie znaleziono związanego z nim słowa"),
 			expectedOutput: "",
 		},
 		{
@@ -761,7 +762,7 @@ func TestAddTranslation(t *testing.T){
 						translation := args.Get(0).(*Translation)
 						translation.ID = 0
 					}).
-					Return(errors.New("duplicate key value violates unique constraint"))
+					Return(customerrors.NewDuplicateKeyError("Nie można dodać przykładu – narusza on unikalność rekordów"))
 			},
 			expectedResult: false,
 			expectedError: errors.New("Nie można dodać tłumaczenia – narusza ono unikalność rekordów"),
@@ -788,7 +789,7 @@ func TestAddTranslation(t *testing.T){
 						translation := args.Get(0).(*Translation)
 						translation.ID = 0
 					}).
-					Return(errors.New("violates foreign key constraint"))
+					Return(customerrors.NewForeignKeyError("Nie można dodać przykładu – powiązane tłumaczenie nie istnieje"))
 			},
 			expectedResult: false,
 			expectedError: errors.New("Wystąpił błąd podczas dodawania tłumaczenia"),
@@ -839,7 +840,7 @@ func TestAddTranslation(t *testing.T){
 			mockCreateTranslation: func(mockRepo *MockRepository, mockTx *gorm.DB) {
 			},
 			expectedResult: false,
-			expectedError: nil,
+			expectedError: customerrors.NewNotFoundError("Nie dodano tłumaczenia - nie znaleziono związanego z nim słowa"),
 			expectedOutput: "",
 		},
 		{
@@ -977,7 +978,7 @@ func TestAddExample(t *testing.T){
 						example := args.Get(0).(*ExampleSentence)
 						example.ID = 0 
 					}).
-					Return(errors.New("duplicate key value violates unique constraint"))
+					Return(customerrors.NewDuplicateKeyError("Nie można dodać przykładu – narusza on unikalność rekordów"))
 			},
 			mockGetWord: func(mockRepo *MockRepository, mockTx *gorm.DB) {
 				mockRepo.On("GetWord", "ksiazka", mock.Anything, mockTx).
@@ -1012,7 +1013,7 @@ func TestAddExample(t *testing.T){
 						example := args.Get(0).(*ExampleSentence)
 						example.ID = 0 
 					}).
-					Return(errors.New("violates foreign key constraint"))
+					Return(customerrors.NewForeignKeyError("Nie można dodać przykładu – powiązane tłumaczenie nie istnieje"))
 			},
 			mockGetWord: func(mockRepo *MockRepository, mockTx *gorm.DB) {
 				mockRepo.On("GetWord", "ksiazka", mock.Anything, mockTx).
@@ -1095,7 +1096,7 @@ func TestAddExample(t *testing.T){
 					Return(nil)
 			},
 			expectedResult: false,
-			expectedError:  nil,
+			expectedError:  customerrors.NewNotFoundError("Nie dodano tłumaczenia - nie znaleziono związanego z nim tłumaczenia"),
 			expectedOutput: "",
 		},
 		{
@@ -1147,7 +1148,7 @@ func TestAddExample(t *testing.T){
 			mockGetTranslation: func(mockRepo *MockRepository, mockTx *gorm.DB) {
 			},
 			expectedResult: false,
-			expectedError: nil,
+			expectedError: customerrors.NewNotFoundError("Nie dodano przykładu - nie znaleziono związanego z nim słowa"),
 			expectedOutput: "",
 		},
 		{
