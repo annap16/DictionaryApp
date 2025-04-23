@@ -1,15 +1,15 @@
 package database
 
 import (
-	"fmt"
-	"errors"
-	"dictionary-app/server/graph/model"
 	customerrors "dictionary-app/server/errors"
+	"dictionary-app/server/graph/model"
+	"errors"
+	"fmt"
 	"gorm.io/gorm"
 )
 
 type DBInterface struct {
-	DB Database
+	DB   Database
 	repo Repository
 }
 
@@ -17,26 +17,24 @@ func NewDBInterface(db Database, repo Repository) *DBInterface {
 	return &DBInterface{DB: db, repo: repo}
 }
 
-
-
-func (dbI *DBInterface) AddWord(input model.FullRecordInput) (bool, error) {	
+func (dbI *DBInterface) AddWord(input model.FullRecordInput) (bool, error) {
 	exampleSentences := createExampleSentences(input.Examples)
 
-	translation := Translation{ 
-		Translation: input.Translation,
-		ExampleSentences: exampleSentences, 
+	translation := Translation{
+		Translation:      input.Translation,
+		ExampleSentences: exampleSentences,
 	}
 
-	word := Word{ 
-		Word: input.Word,
-		Translations: []Translation{translation}, 
+	word := Word{
+		Word:         input.Word,
+		Translations: []Translation{translation},
 	}
 
-	return dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
+	return dbI.repo.TransactionWrapper(dbI.DB, func(tx *gorm.DB) (bool, error) {
 		err := dbI.repo.CreateWord(&word, tx)
 		var conflictErr *customerrors.DuplicateKeyError
-		if err!=nil{
-			if errors.As(err, &conflictErr) {	
+		if err != nil {
+			if errors.As(err, &conflictErr) {
 				return dbI.AddTranslation(input)
 			}
 			fmt.Println("Error while adding a word to a DB", err)
@@ -50,7 +48,7 @@ func (dbI *DBInterface) AddWord(input model.FullRecordInput) (bool, error) {
 func (dbI *DBInterface) ReceiveWordTranslation(input string) (*model.Word, error) {
 	var result Word
 
-	success, err := dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
+	success, err := dbI.repo.TransactionWrapper(dbI.DB, func(tx *gorm.DB) (bool, error) {
 		err := dbI.repo.GetWord(input, &result, tx)
 		if err != nil {
 			fmt.Println("Error while loading word from a DB:", err)
@@ -62,22 +60,21 @@ func (dbI *DBInterface) ReceiveWordTranslation(input string) (*model.Word, error
 		return true, nil
 	})
 
-	if !success{
+	if !success {
 		return nil, err
 	}
-						
+
 	modelResult := &model.Word{
-		ID:   fmt.Sprintf("%d", result.ID),
-		Word: result.Word,
-		Translations: convertTranslations(result.Translations), 
+		ID:           fmt.Sprintf("%d", result.ID),
+		Word:         result.Word,
+		Translations: convertTranslations(result.Translations),
 	}
 
 	return modelResult, nil
 }
 
-
 func (dbI *DBInterface) DeleteWord(input string) (bool, error) {
-	return dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
+	return dbI.repo.TransactionWrapper(dbI.DB, func(tx *gorm.DB) (bool, error) {
 		return dbI.repo.DeleteWord(input, tx)
 	})
 }
@@ -86,7 +83,7 @@ func (dbI *DBInterface) GetWordID(tx *gorm.DB, word string) (uint, error) {
 	var existingWord Word
 
 	err := dbI.repo.GetWord(word, &existingWord, tx)
-	if err != nil{
+	if err != nil {
 		fmt.Println("Error while searching for word existance in a DB:", err)
 		return 0, err
 	}
@@ -98,20 +95,19 @@ func (dbI *DBInterface) GetTranslationID(tx *gorm.DB, wordID uint, translation s
 	var existingTranslation Translation
 
 	err := dbI.repo.GetTranslation(wordID, translation, &existingTranslation, tx)
-	if err != nil{
+	if err != nil {
 		fmt.Println("Error while searching for translation existance in a DB:", err)
 		return 0, err
 	}
 	return uint(existingTranslation.ID), nil
 }
 
-
 func (dbI *DBInterface) DeleteTranslation(word string, translation string) (bool, error) {
-	return dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
+	return dbI.repo.TransactionWrapper(dbI.DB, func(tx *gorm.DB) (bool, error) {
 		wordID, err := dbI.GetWordID(tx, word)
-		if err!=nil{
+		if err != nil {
 			return false, err
-		} else if wordID==0{
+		} else if wordID == 0 {
 			return false, customerrors.NewNotFoundError("Nie usunięto tłumaczenia - nie znaleziono związanego z nim słowa")
 		}
 
@@ -119,25 +115,25 @@ func (dbI *DBInterface) DeleteTranslation(word string, translation string) (bool
 	})
 }
 
-func (dbI *DBInterface) DeleteExample(input model.FullRecordInput)(bool, error){
-	return dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
+func (dbI *DBInterface) DeleteExample(input model.FullRecordInput) (bool, error) {
+	return dbI.repo.TransactionWrapper(dbI.DB, func(tx *gorm.DB) (bool, error) {
 		wordID, err := dbI.GetWordID(tx, input.Word)
-		if err!=nil{
+		if err != nil {
 			return false, err
-		} else if wordID==0{
+		} else if wordID == 0 {
 			return false, customerrors.NewNotFoundError("Nie usunięto przykładu - nie znaleziono związanego z nim słowa")
 		}
 
 		translationID, err := dbI.GetTranslationID(tx, wordID, input.Translation)
-		if err != nil{
+		if err != nil {
 			return false, err
-		}else if translationID==0{
-			return false,  customerrors.NewNotFoundError("Nie usunięto przykładu - nie znaleziono związanego z nim tłumaczenia")
+		} else if translationID == 0 {
+			return false, customerrors.NewNotFoundError("Nie usunięto przykładu - nie znaleziono związanego z nim tłumaczenia")
 		}
-		
+
 		for _, example := range input.Examples {
 			success, err := dbI.repo.DeleteExample(translationID, example, tx)
-			if !success || err!=nil{
+			if !success || err != nil {
 				return success, errors.New("Nie można było usunąć przykładu ze słownika. Anulowano całą operację")
 			}
 		}
@@ -148,66 +144,66 @@ func (dbI *DBInterface) DeleteExample(input model.FullRecordInput)(bool, error){
 }
 
 func (dbI *DBInterface) AddTranslation(input model.FullRecordInput) (bool, error) {
-	return dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
+	return dbI.repo.TransactionWrapper(dbI.DB, func(tx *gorm.DB) (bool, error) {
 		wordID, err := dbI.GetWordID(tx, input.Word)
-		if err!=nil{
+		if err != nil {
 			return false, err
-		} else if wordID==0{
-			return false,  customerrors.NewNotFoundError("Nie dodano tłumaczenia - nie znaleziono związanego z nim słowa")
+		} else if wordID == 0 {
+			return false, customerrors.NewNotFoundError("Nie dodano tłumaczenia - nie znaleziono związanego z nim słowa")
 		}
 
 		exampleSentences := createExampleSentences(input.Examples)
 
 		newTranslation := Translation{
-			Translation: input.Translation,
-			WordID: wordID,
+			Translation:      input.Translation,
+			WordID:           wordID,
 			ExampleSentences: exampleSentences,
 		}
 
 		err = dbI.repo.CreateTranslation(&newTranslation, tx)
-		
+
 		var duplicateErr *customerrors.DuplicateKeyError
 		var foreignKeyErr *customerrors.ForeignKeyError
-		if err!=nil{
-			if errors.As(err, &duplicateErr) {	
+		if err != nil {
+			if errors.As(err, &duplicateErr) {
 				return false, errors.New("Nie można dodać tłumaczenia – narusza ono unikalność rekordów")
-			}else if errors.As(err, &foreignKeyErr){
+			} else if errors.As(err, &foreignKeyErr) {
 				return false, errors.New("Wystąpił błąd podczas dodawania tłumaczenia")
 			}
 			return false, err
 		}
 		return true, nil
-		})
+	})
 }
 
 func (dbI *DBInterface) AddExample(input model.FullRecordInput) (bool, error) {
-	return dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
+	return dbI.repo.TransactionWrapper(dbI.DB, func(tx *gorm.DB) (bool, error) {
 		wordID, err := dbI.GetWordID(tx, input.Word)
-		if err!=nil{
+		if err != nil {
 			return false, err
-		} else if wordID==0{
+		} else if wordID == 0 {
 			return false, customerrors.NewNotFoundError("Nie dodano przykładu - nie znaleziono związanego z nim słowa")
 		}
 
 		translationID, err := dbI.GetTranslationID(tx, wordID, input.Translation)
-		if err != nil{
+		if err != nil {
 			return false, err
-		}else if translationID==0{
+		} else if translationID == 0 {
 			return false, customerrors.NewNotFoundError("Nie dodano tłumaczenia - nie znaleziono związanego z nim tłumaczenia")
 		}
 
 		exampleSentences := createExampleSentences(input.Examples)
-		
+
 		for _, example := range exampleSentences {
 			example.TranslationID = translationID
-			err:= dbI.repo.CreateExample(&example, tx)
+			err := dbI.repo.CreateExample(&example, tx)
 
 			var duplicateErr *customerrors.DuplicateKeyError
 			var foreignKeyErr *customerrors.ForeignKeyError
-			if err!=nil{
-				if errors.As(err, &duplicateErr) {	
+			if err != nil {
+				if errors.As(err, &duplicateErr) {
 					return false, errors.New("Nie można dodać przykładu - narusza ono unikalność rekordów")
-				}else if errors.As(err, &foreignKeyErr){
+				} else if errors.As(err, &foreignKeyErr) {
 					return false, errors.New("Wystąpił błąd podczas dodawania przykładu")
 				}
 				return false, err
@@ -232,8 +228,8 @@ func convertTranslations(translations []Translation) []*model.Translation {
 	var modelTranslations []*model.Translation
 	for _, t := range translations {
 		modelTranslations = append(modelTranslations, &model.Translation{
-			ID:              fmt.Sprintf("%d", t.ID),
-			Translation:     t.Translation,
+			ID:               fmt.Sprintf("%d", t.ID),
+			Translation:      t.Translation,
 			ExampleSentences: convertExampleSentences(t.ExampleSentences),
 		})
 	}
@@ -250,8 +246,3 @@ func convertExampleSentences(sentences []ExampleSentence) []*model.ExampleSenten
 	}
 	return modelSentences
 }
-
-
-
-
-

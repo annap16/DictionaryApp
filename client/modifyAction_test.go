@@ -1,154 +1,151 @@
 package main
 
 import (
-	"testing"
+	"dictionary-app/server/graph/model"
 	"errors"
 	"github.com/stretchr/testify/assert"
-    "github.com/stretchr/testify/mock"
-	"dictionary-app/server/graph/model"
+	"github.com/stretchr/testify/mock"
+	"testing"
 )
-
 
 func TestModifyAddCommand_Execute(t *testing.T) {
 	mockHandler := new(MockQueriesHandler)
 
 	tests := []struct {
-		name string
-		input ModifyAddCommand
+		name           string
+		input          ModifyAddCommand
 		expectedResult bool
-		expectedError error
-		mockBehavior func()
-
+		expectedError  error
+		mockBehavior   func()
 	}{
 		{
 			name: "Success - Execute With Translation Type",
 			input: ModifyAddCommand{
-				handler: mockHandler,
-				targetType: "tłumaczenie",
-				word: "word1",
+				handler:     mockHandler,
+				targetType:  "tłumaczenie",
+				word:        "word1",
 				translation: "translation1",
-				examples: []string{"example1"},
+				examples:    []string{"example1"},
 			},
 			expectedResult: true,
-			expectedError: nil,
+			expectedError:  nil,
 			mockBehavior: func() {
 				mockHandler.On("SendAddTranslationMutation", mock.Anything, model.FullRecordInput{
-					Word: "word1",
+					Word:        "word1",
 					Translation: "translation1",
-					Examples: []string{"example1"},
+					Examples:    []string{"example1"},
 				}).Return(true, nil)
 			},
 		},
 		{
 			name: "Success - Execute With Example Type",
 			input: ModifyAddCommand{
-				handler: mockHandler,
-				targetType: "przykład",
-				word: "word2",
+				handler:     mockHandler,
+				targetType:  "przykład",
+				word:        "word2",
 				translation: "translation2",
-				examples: []string{"example2"},
+				examples:    []string{"example2"},
 			},
 			expectedResult: true,
-			expectedError: nil,
+			expectedError:  nil,
 			mockBehavior: func() {
 				mockHandler.On("SendAddExampleMutation", mock.Anything, model.FullRecordInput{
-					Word: "word2",
+					Word:        "word2",
 					Translation: "translation2",
-					Examples: []string{"example2"},
+					Examples:    []string{"example2"},
 				}).Return(true, nil)
 			},
 		},
 		{
 			name: "Failure - Execute With Invalid TargetType",
 			input: ModifyAddCommand{
-				handler: mockHandler,
-				targetType: "invalid",
-				word: "word3",
+				handler:     mockHandler,
+				targetType:  "invalid",
+				word:        "word3",
 				translation: "translation3",
-				examples: []string{"example3"},
+				examples:    []string{"example3"},
 			},
 			expectedResult: false,
-			expectedError: nil,
+			expectedError:  nil,
 			mockBehavior: func() {
 			},
 		},
 		{
 			name: "Failure - Execute With Error From SendAddTranslationMutation",
 			input: ModifyAddCommand{
-				handler: mockHandler,
-				targetType: "tłumaczenie",
-				word: "word4",
+				handler:     mockHandler,
+				targetType:  "tłumaczenie",
+				word:        "word4",
 				translation: "translation4",
-				examples: []string{"example4"},
+				examples:    []string{"example4"},
 			},
 			expectedResult: false,
-			expectedError: errors.New("Add Error"),
+			expectedError:  errors.New("Add Error"),
 			mockBehavior: func() {
 				mockHandler.On("SendAddTranslationMutation", mock.Anything, model.FullRecordInput{
-					Word: "word4",
+					Word:        "word4",
 					Translation: "translation4",
-					Examples: []string{"example4"},
-				}).Return(false, errors.New("Add Error")) 
+					Examples:    []string{"example4"},
+				}).Return(false, errors.New("Add Error"))
 			},
 		},
 		{
 			name: "Failure - Execute With Error From SendAddExampleMutation",
 			input: ModifyAddCommand{
-				handler: mockHandler,
-				targetType: "przykład",
-				word: "word5",
+				handler:     mockHandler,
+				targetType:  "przykład",
+				word:        "word5",
 				translation: "translation5",
-				examples: []string{"example5"},
+				examples:    []string{"example5"},
 			},
 			expectedResult: false,
-			expectedError: errors.New("Add Error"),
+			expectedError:  errors.New("Add Error"),
 			mockBehavior: func() {
 				mockHandler.On("SendAddExampleMutation", mock.Anything, model.FullRecordInput{
-					Word: "word5",
+					Word:        "word5",
 					Translation: "translation5",
-					Examples: []string{"example5"},
+					Examples:    []string{"example5"},
 				}).Return(false, errors.New("Add Error"))
 			},
 		},
 		{
 			name: "Failure - Execute With False From SendAddTranslationMutation",
 			input: ModifyAddCommand{
-				handler: mockHandler,
-				targetType: "tłumaczenie",
-				word: "word6",
+				handler:     mockHandler,
+				targetType:  "tłumaczenie",
+				word:        "word6",
 				translation: "translation6",
-				examples: []string{"example6"},
+				examples:    []string{"example6"},
 			},
 			expectedResult: false,
-			expectedError: nil,
+			expectedError:  nil,
 			mockBehavior: func() {
 				mockHandler.On("SendAddTranslationMutation", mock.Anything, model.FullRecordInput{
-					Word: "word6",
+					Word:        "word6",
 					Translation: "translation6",
-					Examples: []string{"example6"},
-				}).Return(false, nil) 
+					Examples:    []string{"example6"},
+				}).Return(false, nil)
 			},
 		},
 		{
 			name: "Failure - Execute With False From SendAddExampleMutation",
 			input: ModifyAddCommand{
-				handler: mockHandler,
-				targetType: "przykład",
-				word: "word7",
+				handler:     mockHandler,
+				targetType:  "przykład",
+				word:        "word7",
 				translation: "translation7",
-				examples: []string{"example7"},
+				examples:    []string{"example7"},
 			},
 			expectedResult: false,
-			expectedError: nil,
+			expectedError:  nil,
 			mockBehavior: func() {
 				mockHandler.On("SendAddExampleMutation", mock.Anything, model.FullRecordInput{
-					Word: "word7",
+					Word:        "word7",
 					Translation: "translation7",
-					Examples: []string{"example7"},
+					Examples:    []string{"example7"},
 				}).Return(false, nil)
 			},
 		},
-		
 	}
 
 	for _, tt := range tests {
@@ -168,18 +165,18 @@ func TestModifyDeleteCommand_Execute(t *testing.T) {
 	mockHandler := new(MockQueriesHandler)
 
 	tests := []struct {
-		name string
-		input ModifyDeleteCommand
+		name           string
+		input          ModifyDeleteCommand
 		expectedResult bool
-		expectedError error
-		mockBehavior func()
+		expectedError  error
+		mockBehavior   func()
 	}{
 		{
 			name: "Success - Execute With Translation Type",
 			input: ModifyDeleteCommand{
-				handler: mockHandler,
-				targetType: "tłumaczenie",
-				word: "word1",
+				handler:     mockHandler,
+				targetType:  "tłumaczenie",
+				word:        "word1",
 				translation: "translation1",
 			},
 			expectedResult: true,
@@ -191,41 +188,41 @@ func TestModifyDeleteCommand_Execute(t *testing.T) {
 		{
 			name: "Success - Execute With Example Type",
 			input: ModifyDeleteCommand{
-				handler: mockHandler,
-				targetType: "przykład",
-				word: "word2",
+				handler:     mockHandler,
+				targetType:  "przykład",
+				word:        "word2",
 				translation: "translation2",
-				examples: []string{"example2"},
+				examples:    []string{"example2"},
 			},
 			expectedResult: true,
 			expectedError:  nil,
 			mockBehavior: func() {
 				mockHandler.On("SendRemoveExampleMutation", mock.Anything, model.FullRecordInput{
-					Word: "word2",
+					Word:        "word2",
 					Translation: "translation2",
-					Examples: []string{"example2"},
+					Examples:    []string{"example2"},
 				}).Return(true, nil)
 			},
 		},
 		{
 			name: "Failure - Execute With Invalid TargetType",
 			input: ModifyDeleteCommand{
-				handler: mockHandler,
-				targetType: "invalid",
-				word: "word3",
+				handler:     mockHandler,
+				targetType:  "invalid",
+				word:        "word3",
 				translation: "translation3",
-				examples: []string{"example3"},
+				examples:    []string{"example3"},
 			},
 			expectedResult: false,
 			expectedError:  nil,
-			mockBehavior: func() {},
+			mockBehavior:   func() {},
 		},
 		{
 			name: "Failure - Execute With Error From SendRemoveTranslationMutation",
 			input: ModifyDeleteCommand{
-				handler: mockHandler,
-				targetType: "tłumaczenie",
-				word: "word4",
+				handler:     mockHandler,
+				targetType:  "tłumaczenie",
+				word:        "word4",
 				translation: "translation4",
 			},
 			expectedResult: false,
@@ -237,52 +234,52 @@ func TestModifyDeleteCommand_Execute(t *testing.T) {
 		{
 			name: "Failure - Execute With Error From SendRemoveExampleMutation",
 			input: ModifyDeleteCommand{
-				handler: mockHandler,
-				targetType: "przykład",
-				word: "word5",
+				handler:     mockHandler,
+				targetType:  "przykład",
+				word:        "word5",
 				translation: "translation5",
-				examples: []string{"example5"},
+				examples:    []string{"example5"},
 			},
 			expectedResult: false,
 			expectedError:  errors.New("Remove Error"),
 			mockBehavior: func() {
 				mockHandler.On("SendRemoveExampleMutation", mock.Anything, model.FullRecordInput{
-					Word: "word5",
+					Word:        "word5",
 					Translation: "translation5",
-					Examples: []string{"example5"},
+					Examples:    []string{"example5"},
 				}).Return(false, errors.New("Remove Error"))
 			},
 		},
 		{
 			name: "Failure - Execute With False From SendRemoveTranslationMutation",
 			input: ModifyDeleteCommand{
-				handler: mockHandler,
-				targetType: "tłumaczenie",
-				word: "word6",
+				handler:     mockHandler,
+				targetType:  "tłumaczenie",
+				word:        "word6",
 				translation: "translation6",
 			},
 			expectedResult: false,
 			expectedError:  nil,
 			mockBehavior: func() {
-				mockHandler.On("SendRemoveTranslationMutation", mock.Anything, "word6", "translation6").Return(false, nil) 
+				mockHandler.On("SendRemoveTranslationMutation", mock.Anything, "word6", "translation6").Return(false, nil)
 			},
 		},
 		{
 			name: "Failure - Execute With False From SendRemoveExampleMutation",
 			input: ModifyDeleteCommand{
-				handler: mockHandler,
-				targetType: "przykład",
-				word: "word7",
+				handler:     mockHandler,
+				targetType:  "przykład",
+				word:        "word7",
 				translation: "translation7",
-				examples: []string{"example7"},
+				examples:    []string{"example7"},
 			},
 			expectedResult: false,
 			expectedError:  nil,
 			mockBehavior: func() {
 				mockHandler.On("SendRemoveExampleMutation", mock.Anything, model.FullRecordInput{
-					Word: "word7",
+					Word:        "word7",
 					Translation: "translation7",
-					Examples: []string{"example7"},
+					Examples:    []string{"example7"},
 				}).Return(false, nil)
 			},
 		},
@@ -293,7 +290,7 @@ func TestModifyDeleteCommand_Execute(t *testing.T) {
 			tt.mockBehavior()
 
 			result, err := tt.input.Execute()
-		
+
 			assert.Equal(t, tt.expectedResult, result)
 			assert.Equal(t, tt.expectedError, err)
 			mockHandler.AssertExpectations(t)

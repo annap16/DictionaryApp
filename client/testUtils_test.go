@@ -1,14 +1,12 @@
-package main 
+package main
 
 import (
+	"bytes"
 	"context"
+	"dictionary-app/server/graph/model"
 	"github.com/machinebox/graphql"
 	"github.com/stretchr/testify/mock"
-	"bytes"
 	"os"
-	"dictionary-app/server/graph/model"
-
-
 )
 
 type MockGraphQLClient struct {
@@ -45,7 +43,7 @@ func (m *MockQueriesHandler) SendRemoveTranslationMutation(ctx context.Context, 
 	return args.Bool(0), args.Error(1)
 }
 
-func (m *MockQueriesHandler) SendRemoveExampleMutation(ctx context.Context, input model.FullRecordInput) (bool, error){
+func (m *MockQueriesHandler) SendRemoveExampleMutation(ctx context.Context, input model.FullRecordInput) (bool, error) {
 	args := m.Called(ctx, input)
 	return args.Bool(0), args.Error(1)
 }
@@ -70,7 +68,7 @@ func captureStdout(f func()) string {
 
 	f()
 
-	writePipe.Close() 
+	writePipe.Close()
 	var buf bytes.Buffer
 	_, _ = buf.ReadFrom(readPipe)
 	return buf.String()

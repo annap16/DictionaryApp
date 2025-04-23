@@ -30,7 +30,7 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
-	
+
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
 		Resolvers: &graph.Resolver{DBInterface: dbInterface},
 	}))

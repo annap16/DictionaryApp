@@ -1,27 +1,26 @@
 package main
 
-import(
-"testing"
-	"errors"
+import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"dictionary-app/server/graph/model"
+	"errors"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"testing"
 )
-
 
 func TestSendCreateMutation(t *testing.T) {
 	input := model.FullRecordInput{
-		Word: "word1",
+		Word:        "word1",
 		Translation: "translation1",
-		Examples: []string{"example1"},
+		Examples:    []string{"example1"},
 	}
 
 	tests := []struct {
-		name string
-		mockBehavior func(mockClient *MockGraphQLClient)
+		name           string
+		mockBehavior   func(mockClient *MockGraphQLClient)
 		expectedResult bool
-		expectedError error
+		expectedError  error
 	}{
 		{
 			name: "Success - CreateTranslation Returns True",
@@ -32,7 +31,7 @@ func TestSendCreateMutation(t *testing.T) {
 				}).Return(nil)
 			},
 			expectedResult: true,
-			expectedError: nil,
+			expectedError:  nil,
 		},
 		{
 			name: "Failure - Error From GraphQL Client",
@@ -67,10 +66,10 @@ func TestSendReceiveMutation(t *testing.T) {
 	input := "word1"
 
 	tests := []struct {
-		name string
-		mockBehavior func(mockClient *MockGraphQLClient)
+		name           string
+		mockBehavior   func(mockClient *MockGraphQLClient)
 		expectedResult string
-		expectedError error
+		expectedError  error
 	}{
 		{
 			name: "Success - Word Found",
@@ -79,23 +78,23 @@ func TestSendReceiveMutation(t *testing.T) {
 					response := args.Get(2).(*ReceiveResponse)
 					*response = ReceiveResponse{
 						GetWordTranslation: struct {
-							ID string `json:"id"`
-							Word string `json:"word"`
+							ID           string `json:"id"`
+							Word         string `json:"word"`
 							Translations []struct {
-								ID  string `json:"id"`
-								Translation string `json:"translation"`
+								ID               string `json:"id"`
+								Translation      string `json:"translation"`
 								ExampleSentences []struct {
-									ID string `json:"id"`
+									ID       string `json:"id"`
 									Sentence string `json:"sentence"`
 								} `json:"exampleSentences"`
 							} `json:"translations"`
 						}{
 							Word: "word1",
 							Translations: []struct {
-								ID  string `json:"id"`
-								Translation string `json:"translation"`
+								ID               string `json:"id"`
+								Translation      string `json:"translation"`
 								ExampleSentences []struct {
-									ID string `json:"id"`
+									ID       string `json:"id"`
 									Sentence string `json:"sentence"`
 								} `json:"exampleSentences"`
 							}{
@@ -157,8 +156,8 @@ func TestSendReceiveMutation(t *testing.T) {
 func TestSendRemoveMutation(t *testing.T) {
 	input := "word1"
 	tests := []struct {
-		name string
-		mockBehavior func(mockClient *MockGraphQLClient)
+		name           string
+		mockBehavior   func(mockClient *MockGraphQLClient)
 		expectedResult bool
 		expectedError  error
 	}{
@@ -171,7 +170,7 @@ func TestSendRemoveMutation(t *testing.T) {
 				}).Return(nil)
 			},
 			expectedResult: true,
-			expectedError: nil,
+			expectedError:  nil,
 		},
 		{
 			name: "Failure - Error From GraphQL Client",
@@ -179,7 +178,7 @@ func TestSendRemoveMutation(t *testing.T) {
 				mockClient.On("Run", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("graphQL Error"))
 			},
 			expectedResult: false,
-			expectedError: errors.New("graphQL Error"),
+			expectedError:  errors.New("graphQL Error"),
 		},
 	}
 
@@ -206,10 +205,10 @@ func TestSendRemoveTranslationMutation(t *testing.T) {
 	word := "word1"
 	translation := "translation1"
 	tests := []struct {
-		name string
-		mockBehavior func(mockClient *MockGraphQLClient)
+		name           string
+		mockBehavior   func(mockClient *MockGraphQLClient)
 		expectedResult bool
-		expectedError error
+		expectedError  error
 	}{
 		{
 			name: "Success - DeleteTranslation Returns True",
@@ -220,7 +219,7 @@ func TestSendRemoveTranslationMutation(t *testing.T) {
 				}).Return(nil)
 			},
 			expectedResult: true,
-			expectedError: nil,
+			expectedError:  nil,
 		},
 		{
 			name: "Failure - Error From GraphQL Client",
@@ -228,7 +227,7 @@ func TestSendRemoveTranslationMutation(t *testing.T) {
 				mockClient.On("Run", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("graphQL Error"))
 			},
 			expectedResult: false,
-			expectedError: errors.New("graphQL Error"),
+			expectedError:  errors.New("graphQL Error"),
 		},
 	}
 
@@ -241,7 +240,7 @@ func TestSendRemoveTranslationMutation(t *testing.T) {
 				client: mockClient,
 			}
 
-			result, err := queriesHandler.SendRemoveTranslationMutation(context.Background(), word, translation)			
+			result, err := queriesHandler.SendRemoveTranslationMutation(context.Background(), word, translation)
 
 			assert.Equal(t, tt.expectedResult, result)
 			assert.Equal(t, tt.expectedError, err)
@@ -253,16 +252,16 @@ func TestSendRemoveTranslationMutation(t *testing.T) {
 
 func TestSendRemoveExampleMutation(t *testing.T) {
 	input := model.FullRecordInput{
-		Word:  "word1",
+		Word:        "word1",
 		Translation: "translation1",
-		Examples: []string{"example1"},
+		Examples:    []string{"example1"},
 	}
 
 	tests := []struct {
-		name string
-		mockBehavior func(mockClient *MockGraphQLClient)
+		name           string
+		mockBehavior   func(mockClient *MockGraphQLClient)
 		expectedResult bool
-		expectedError error
+		expectedError  error
 	}{
 		{
 			name: "Success - DeleteExample Returns True",
@@ -273,7 +272,7 @@ func TestSendRemoveExampleMutation(t *testing.T) {
 				}).Return(nil)
 			},
 			expectedResult: true,
-			expectedError: nil,
+			expectedError:  nil,
 		},
 		{
 			name: "Failure - Error From GraphQL Client",
@@ -281,7 +280,7 @@ func TestSendRemoveExampleMutation(t *testing.T) {
 				mockClient.On("Run", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("graphQL Error"))
 			},
 			expectedResult: false,
-			expectedError: errors.New("graphQL Error"),
+			expectedError:  errors.New("graphQL Error"),
 		},
 	}
 
@@ -306,16 +305,16 @@ func TestSendRemoveExampleMutation(t *testing.T) {
 
 func TestSendAddTranslationMutation(t *testing.T) {
 	input := model.FullRecordInput{
-		Word: "word1",
+		Word:        "word1",
 		Translation: "translation1",
-		Examples: []string{"example1"},
+		Examples:    []string{"example1"},
 	}
 
 	tests := []struct {
-		name string
-		mockBehavior func(mockClient *MockGraphQLClient)
+		name           string
+		mockBehavior   func(mockClient *MockGraphQLClient)
 		expectedResult bool
-		expectedError error
+		expectedError  error
 	}{
 		{
 			name: "Success - AddTranslation Returns True",
@@ -326,7 +325,7 @@ func TestSendAddTranslationMutation(t *testing.T) {
 				}).Return(nil)
 			},
 			expectedResult: true,
-			expectedError: nil,
+			expectedError:  nil,
 		},
 		{
 			name: "Failure - Error From GraphQL Client",
@@ -334,7 +333,7 @@ func TestSendAddTranslationMutation(t *testing.T) {
 				mockClient.On("Run", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("graphQL Error"))
 			},
 			expectedResult: false,
-			expectedError: errors.New("graphQL Error"),
+			expectedError:  errors.New("graphQL Error"),
 		},
 	}
 
@@ -359,16 +358,16 @@ func TestSendAddTranslationMutation(t *testing.T) {
 
 func TestSendAddExampleMutation(t *testing.T) {
 	input := model.FullRecordInput{
-		Word: "word1",
+		Word:        "word1",
 		Translation: "translation1",
-		Examples: []string{"example1"},
+		Examples:    []string{"example1"},
 	}
 
 	tests := []struct {
-		name string
-		mockBehavior func(mockClient *MockGraphQLClient)
+		name           string
+		mockBehavior   func(mockClient *MockGraphQLClient)
 		expectedResult bool
-		expectedError error
+		expectedError  error
 	}{
 		{
 			name: "Success - AddExample Returns True",
@@ -379,7 +378,7 @@ func TestSendAddExampleMutation(t *testing.T) {
 				}).Return(nil)
 			},
 			expectedResult: true,
-			expectedError: nil,
+			expectedError:  nil,
 		},
 		{
 			name: "Failure - Error From GraphQL Client",
@@ -387,7 +386,7 @@ func TestSendAddExampleMutation(t *testing.T) {
 				mockClient.On("Run", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("graphQL Error"))
 			},
 			expectedResult: false,
-			expectedError: errors.New("graphQL Error"),
+			expectedError:  errors.New("graphQL Error"),
 		},
 	}
 
@@ -411,33 +410,33 @@ func TestSendAddExampleMutation(t *testing.T) {
 }
 
 func TestParseReceiveResponse(t *testing.T) {
-	
+
 	mockResponse := ReceiveResponse{
 		GetWordTranslation: struct {
-			ID string `json:"id"`
-			Word string `json:"word"`
+			ID           string `json:"id"`
+			Word         string `json:"word"`
 			Translations []struct {
-				ID string `json:"id"`
-				Translation string `json:"translation"`
+				ID               string `json:"id"`
+				Translation      string `json:"translation"`
 				ExampleSentences []struct {
-					ID string `json:"id"`
+					ID       string `json:"id"`
 					Sentence string `json:"sentence"`
 				} `json:"exampleSentences"`
 			} `json:"translations"`
 		}{
 			Word: "word1",
 			Translations: []struct {
-				ID string `json:"id"`
-				Translation string `json:"translation"`
+				ID               string `json:"id"`
+				Translation      string `json:"translation"`
 				ExampleSentences []struct {
-					ID string `json:"id"`
+					ID       string `json:"id"`
 					Sentence string `json:"sentence"`
 				} `json:"exampleSentences"`
 			}{
 				{
 					Translation: "translation1",
 					ExampleSentences: []struct {
-						ID string `json:"id"`
+						ID       string `json:"id"`
 						Sentence string `json:"sentence"`
 					}{
 						{Sentence: "example sentence 1"},
@@ -456,11 +455,3 @@ func TestParseReceiveResponse(t *testing.T) {
 
 	assert.Equal(t, expectedOutput, result)
 }
-
-
-
-
-
-
-
-

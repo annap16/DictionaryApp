@@ -1,37 +1,36 @@
 package main
 
-import(
-	"strings"
-	"fmt"
+import (
 	"context"
 	"dictionary-app/server/graph/model"
+	"fmt"
+	"strings"
 	//"errors"
 	//customerrors "dictionary-app/server/errors"
-
 )
 
 //Implementing responsibility chain pattern for commands handling
 
-type CommandHandler interface{
+type CommandHandler interface {
 	HandleCommand(command string) bool
 	SetNext(handler CommandHandler)
 }
 
-type CreateCommandHandler struct{
-	next CommandHandler
+type CreateCommandHandler struct {
+	next    CommandHandler
 	handler QueriesHandler
 }
 
-func (c *CreateCommandHandler) HandleCommand(command string) bool{
+func (c *CreateCommandHandler) HandleCommand(command string) bool {
 	commandSplitted := strings.Split(command, " ")
-	if(strings.ToLower(commandSplitted[0])=="dodaj"){
-		if !CheckCreateSyntax(command){
+	if strings.ToLower(commandSplitted[0]) == "dodaj" {
+		if !CheckCreateSyntax(command) {
 			fmt.Println("Niepoprawne polecenie")
 			return true
 		}
 
 		word := strings.ToLower(commandSplitted[1])
-		translation := strings.ToLower(commandSplitted[2]) 
+		translation := strings.ToLower(commandSplitted[2])
 		sentences := ParseQuery(command)
 
 		input := model.FullRecordInput{
@@ -42,20 +41,20 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 
 		ctx := context.Background()
 		_, err := c.handler.SendCreateMutation(ctx, input)
-		if err!=nil{
-			if strings.HasPrefix(err.Error(), "graphql: "){
+		if err != nil {
+			if strings.HasPrefix(err.Error(), "graphql: ") {
 				cleanMsg := strings.TrimPrefix(err.Error(), "graphql: ")
 				fmt.Println("Błąd: ", cleanMsg)
-			}else{
+			} else {
 				fmt.Println("Błąd: ", err.Error())
 			}
-		}else{
+		} else {
 			fmt.Println("Słowo zostało dodane do słownika")
 		}
 
 		return true
 	}
-	if(c.next!=nil){
+	if c.next != nil {
 		return c.next.HandleCommand(command)
 	}
 	return false
@@ -65,34 +64,34 @@ func (c *CreateCommandHandler) SetNext(handler CommandHandler) {
 	c.next = handler
 }
 
-type ReceiveCommandHandler struct{
-	next CommandHandler
+type ReceiveCommandHandler struct {
+	next    CommandHandler
 	handler QueriesHandler
 }
 
-func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
+func (r *ReceiveCommandHandler) HandleCommand(command string) bool {
 	commandSplitted := strings.Split(command, " ")
-	if(strings.ToLower(commandSplitted[0])=="sprawdź"){
-		if(len(commandSplitted)!=2){
+	if strings.ToLower(commandSplitted[0]) == "sprawdź" {
+		if len(commandSplitted) != 2 {
 			fmt.Println("Niepoprawne polecenie")
 			return true
 		}
 		ctx := context.Background()
 		received, err := r.handler.SendReceiveMutation(ctx, strings.ToLower(commandSplitted[1]))
 
-		if err!=nil{
-			if strings.HasPrefix(err.Error(), "graphql: "){
+		if err != nil {
+			if strings.HasPrefix(err.Error(), "graphql: ") {
 				cleanMsg := strings.TrimPrefix(err.Error(), "graphql: ")
 				fmt.Println("Błąd: ", cleanMsg)
-			}else{
+			} else {
 				fmt.Println("Błąd: ", err.Error())
 			}
-		}else if received!=""{
+		} else if received != "" {
 			fmt.Println(received)
 		}
 		return true
 	}
-	if(r.next!=nil){
+	if r.next != nil {
 		return r.next.HandleCommand(command)
 	}
 	return false
@@ -102,76 +101,75 @@ func (r *ReceiveCommandHandler) SetNext(handler CommandHandler) {
 	r.next = handler
 }
 
-type ModifyCommandHandler struct{
-	next CommandHandler
-	handler QueriesHandler
+type ModifyCommandHandler struct {
+	next          CommandHandler
+	handler       QueriesHandler
 	modifyFactory CommandFactory
 }
 
-func (m *ModifyCommandHandler) HandleCommand(command string) bool{	
+func (m *ModifyCommandHandler) HandleCommand(command string) bool {
 	commandSplitted := strings.Split(command, " ")
-	if(strings.ToLower(commandSplitted[0])=="modyfikuj"){
+	if strings.ToLower(commandSplitted[0]) == "modyfikuj" {
 		var success bool
 		modifyAction, err := m.modifyFactory.CreateAction(m.handler, command)
 
-		if modifyAction!= nil{
+		if modifyAction != nil {
 			success, err = modifyAction.Execute()
-		}else if err!=nil{
+		} else if err != nil {
 			fmt.Println(err)
 			return true
 		}
 
-		if success{
+		if success {
 			fmt.Println("Słowo zostało zmodyfikowane poprawnie")
-		}else if err!=nil{
-			if strings.HasPrefix(err.Error(), "graphql: "){
+		} else if err != nil {
+			if strings.HasPrefix(err.Error(), "graphql: ") {
 				cleanMsg := strings.TrimPrefix(err.Error(), "graphql: ")
 				fmt.Println("Błąd: ", cleanMsg)
-			}else{
+			} else {
 				fmt.Println("Błąd: ", err.Error())
 			}
 		}
 		return true
 	}
 
-	if(m.next!=nil){
+	if m.next != nil {
 		return m.next.HandleCommand(command)
 	}
 	return false
 }
 
-
 func (m *ModifyCommandHandler) SetNext(handler CommandHandler) {
 	m.next = handler
 }
 
-type RemoveCommandHandler struct{
-	next CommandHandler
+type RemoveCommandHandler struct {
+	next    CommandHandler
 	handler QueriesHandler
 }
 
-func (r *RemoveCommandHandler) HandleCommand(command string) bool{
+func (r *RemoveCommandHandler) HandleCommand(command string) bool {
 	commandSplitted := strings.Split(command, " ")
-	if(strings.ToLower(commandSplitted[0])=="usuń"){
-		if(len(commandSplitted)!=2){
+	if strings.ToLower(commandSplitted[0]) == "usuń" {
+		if len(commandSplitted) != 2 {
 			fmt.Println("Niepoprawne polecenie")
 			return true
 		}
 		ctx := context.Background()
 		success, err := r.handler.SendRemoveMutation(ctx, commandSplitted[1])
-		if err!=nil{
-			if strings.HasPrefix(err.Error(), "graphql: "){
+		if err != nil {
+			if strings.HasPrefix(err.Error(), "graphql: ") {
 				cleanMsg := strings.TrimPrefix(err.Error(), "graphql: ")
 				fmt.Println("Błąd: ", cleanMsg)
-			}else{
+			} else {
 				fmt.Println("Błąd: ", err.Error())
 			}
-		}else if success{
+		} else if success {
 			fmt.Println("Podane słowo i powiązane z nim dane zostały usunięte")
 		}
 		return true
 	}
-	if(r.next!=nil){
+	if r.next != nil {
 		return r.next.HandleCommand(command)
 	}
 	return false

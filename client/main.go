@@ -1,13 +1,11 @@
 package main
 
-import(
+import (
 	"github.com/machinebox/graphql"
-	)
+)
 
 func main() {
 	client := graphql.NewClient("http://server:8080/query")
-	queriesHandlerQL := &QueriesHandlerQL {client: client} 
+	queriesHandlerQL := &QueriesHandlerQL{client: client}
 	WaitForUserInput(queriesHandlerQL)
 }
-
-

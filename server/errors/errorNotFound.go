@@ -1,13 +1,13 @@
 package customerrors
 
 type NotFoundError struct {
-    Msg string
+	Msg string
 }
 
 func (e *NotFoundError) Error() string {
-    return e.Msg
+	return e.Msg
 }
 
 func NewNotFoundError(msg string) error {
-    return &NotFoundError{Msg: msg}
+	return &NotFoundError{Msg: msg}
 }

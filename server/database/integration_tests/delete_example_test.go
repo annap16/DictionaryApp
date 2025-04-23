@@ -15,9 +15,9 @@ func (s *IntegrationTestSuite) TestDeleteExample() {
 	example := "exampletodelete"
 
 	input := model.FullRecordInput{
-		Word: word,
+		Word:        word,
 		Translation: translation,
-		Examples: []string{example},
+		Examples:    []string{example},
 	}
 
 	ok, err := s.DB.AddWord(input)
@@ -37,14 +37,14 @@ func (s *IntegrationTestSuite) TestDeleteExample() {
 // Deleting an example from a non existing word
 func (s *IntegrationTestSuite) TestDeleteExample_NonExistingWord() {
 	input := model.FullRecordInput{
-		Word: "nonexistentword",
+		Word:        "nonexistentword",
 		Translation: "translation",
-		Examples: []string{"example"},
+		Examples:    []string{"example"},
 	}
 
 	success, err := s.DB.DeleteExample(input)
 	s.Require().Error(err)
-	s.EqualError(err, "Nie usunięto przykładu - nie znaleziono związanego z nim słowa")	
+	s.EqualError(err, "Nie usunięto przykładu - nie znaleziono związanego z nim słowa")
 	s.Require().False(success)
 }
 
@@ -52,18 +52,18 @@ func (s *IntegrationTestSuite) TestDeleteExample_NonExistingWord() {
 func (s *IntegrationTestSuite) TestDeleteExample_NonExistingTranslation() {
 	word := "word"
 	inputWord := model.FullRecordInput{
-		Word: word,
+		Word:        word,
 		Translation: "translation",
-		Examples: []string{"example"},
+		Examples:    []string{"example"},
 	}
 	ok, err := s.DB.AddWord(inputWord)
 	s.Require().NoError(err)
 	s.Require().True(ok)
 
 	input := model.FullRecordInput{
-		Word:  word,
+		Word:        word,
 		Translation: "nonexistingtranslation",
-		Examples: []string{"example"},
+		Examples:    []string{"example"},
 	}
 
 	success, err := s.DB.DeleteExample(input)
@@ -82,9 +82,9 @@ func (s *IntegrationTestSuite) TestDeleteDifferentExamplesInParallel() {
 	go func() {
 		defer wg.Done()
 		input := model.FullRecordInput{
-			Word: "word1",
+			Word:        "word1",
 			Translation: "translation1",
-			Examples: []string{"example1"},
+			Examples:    []string{"example1"},
 		}
 		ok, err := s.DB.AddWord(input)
 		s.Require().NoError(err)
@@ -98,9 +98,9 @@ func (s *IntegrationTestSuite) TestDeleteDifferentExamplesInParallel() {
 	go func() {
 		defer wg.Done()
 		input := model.FullRecordInput{
-			Word: "word2",
+			Word:        "word2",
 			Translation: "translation2",
-			Examples: []string{"example2"},
+			Examples:    []string{"example2"},
 		}
 		ok, err := s.DB.AddWord(input)
 		s.Require().NoError(err)
@@ -126,9 +126,9 @@ func (s *IntegrationTestSuite) TestDeleteSameExampleConcurrently() {
 	example := "example"
 
 	input := model.FullRecordInput{
-		Word: word,
+		Word:        word,
 		Translation: translation,
-		Examples: []string{example},
+		Examples:    []string{example},
 	}
 	ok, err := s.DB.AddWord(input)
 	s.Require().NoError(err)

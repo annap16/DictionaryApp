@@ -11,9 +11,9 @@ import (
 // Deleting an existing word
 func (s *IntegrationTestSuite) TestDeleteWord() {
 	input := model.FullRecordInput{
-		Word: "wordtodelete",
+		Word:        "wordtodelete",
 		Translation: "translationtodelete",
-		Examples: []string{"example1", "example2"},
+		Examples:    []string{"example1", "example2"},
 	}
 	ok, err := s.DB.AddWord(input)
 	s.Require().NoError(err)
@@ -38,12 +38,12 @@ func (s *IntegrationTestSuite) TestDeleteWord() {
 func (s *IntegrationTestSuite) TestDeleteNonExistingWord() {
 	ok, err := s.DB.DeleteWord("nonexistingword")
 	s.Require().Error(err)
-	s.EqualError(err, "Nie usunięto podanego słowa - słowa nie znaleziono")	
-	s.Require().False(ok) 
+	s.EqualError(err, "Nie usunięto podanego słowa - słowa nie znaleziono")
+	s.Require().False(ok)
 
 	_, err = s.DB.ReceiveWordTranslation("nonexistingword")
 	s.Require().Error(err)
-	s.EqualError(err, "Nie znaleziono podanego słowa w słowniku")	
+	s.EqualError(err, "Nie znaleziono podanego słowa w słowniku")
 
 }
 
@@ -57,9 +57,9 @@ func (s *IntegrationTestSuite) TestDeleteWordsInParallel() {
 	go func() {
 		defer wg.Done()
 		input := model.FullRecordInput{
-			Word: "word1todelete",
+			Word:        "word1todelete",
 			Translation: "translation1todelete",
-			Examples: []string{"example1", "example2"},
+			Examples:    []string{"example1", "example2"},
 		}
 		ok, err := s.DB.AddWord(input)
 		s.Require().NoError(err)
@@ -77,9 +77,9 @@ func (s *IntegrationTestSuite) TestDeleteWordsInParallel() {
 	go func() {
 		defer wg.Done()
 		input := model.FullRecordInput{
-			Word: "word2todelete",
+			Word:        "word2todelete",
 			Translation: "translation2todelete",
-			Examples: []string{"example1", "example2"},
+			Examples:    []string{"example1", "example2"},
 		}
 		ok, err := s.DB.AddWord(input)
 		s.Require().NoError(err)
@@ -107,9 +107,9 @@ func (s *IntegrationTestSuite) TestDeleteSameWordConcurrently() {
 	word := "concurrentdeleteword"
 
 	input := model.FullRecordInput{
-		Word: word,
+		Word:        word,
 		Translation: "translationtodelete",
-		Examples: []string{"example1", "example2"},
+		Examples:    []string{"example1", "example2"},
 	}
 	ok, err := s.DB.AddWord(input)
 	s.Require().NoError(err)
@@ -126,7 +126,7 @@ func (s *IntegrationTestSuite) TestDeleteSameWordConcurrently() {
 			if err != nil {
 				s.Require().Error(err)
 				s.EqualError(err, "Nie usunięto podanego słowa - słowa nie znaleziono")
-				atomic.AddInt32(&errorCount, 1)	
+				atomic.AddInt32(&errorCount, 1)
 			} else if success {
 				atomic.AddInt32(&successCount, 1)
 			}
@@ -143,5 +143,3 @@ func (s *IntegrationTestSuite) TestDeleteSameWordConcurrently() {
 	s.Require().Error(err)
 	s.EqualError(err, "Nie znaleziono podanego słowa w słowniku")
 }
-
-
