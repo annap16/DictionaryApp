@@ -2,7 +2,11 @@
 ## Table of Contents
 - [Application Overview](#application-overview)
 - [Setup and Usage Instructions](#setup-and-usage-instructions)
-- [Command Schema in Command-Line Application](command-schema-in-command-line-appliction)
+- [Command Schema in Command-Line Application](#command-schema-in-command-line-appliction)
+  - [Available Commands](#available-commands)
+- [Database Design](#database-design)
+- [GraphQL Queries and Mutation](#graphql-queries-and-mutation)
+- [Example Client Commands](#example-client-commands)
 ## Application Overview
 The application consists of a client and a server. The server is responsible for handling communication with the database, processing translations concurrently, and implementing other features as described in the recruitment assignment. The client is a simple command-line application that parses and interprets user input. It allows users to interact with the application easily by validating input and converting it into GraphQL queries.  
 
