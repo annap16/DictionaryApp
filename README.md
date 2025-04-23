@@ -2,7 +2,7 @@
 ## Table of Contents
 - [Application Overview](#application-overview)
 - [Setup and Usage Instructions](#setup-and-usage-instructions)
-- [Command Schema in Command-Line Application](#command-schema-in-command-line-appliction)
+- [Command Schema in Command-Line Application](#command-schema-in-command-line-application)
   - [Available Commands](#available-commands)
 - [Database Design](#database-design)
 - [GraphQL Queries and Mutation](#graphql-queries-and-mutation)
