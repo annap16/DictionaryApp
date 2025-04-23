@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 	"errors"
-	"strings"
+	//"strings"
 	"dictionary-app/server/graph/model"
 	customerrors "dictionary-app/server/errors"
 	"gorm.io/gorm"
@@ -17,6 +17,7 @@ type DBInterface struct {
 func NewDBInterface(db Database, repo Repository) *DBInterface {
 	return &DBInterface{DB: db, repo: repo}
 }
+
 
 
 func (dbI *DBInterface) AddWord(input model.FullRecordInput) (bool, error) {	
@@ -34,14 +35,15 @@ func (dbI *DBInterface) AddWord(input model.FullRecordInput) (bool, error) {
 
 	return dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
 		err := dbI.repo.CreateWord(&word, tx)
-		if err != nil {
-			// ---------------------------------------------------------------------------------TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+		var conflictErr *customerrors.DuplicateKeyError
+		if err!=nil{
+			if errors.As(err, &conflictErr) {	
 				return dbI.AddTranslation(input)
 			}
 			fmt.Println("Error while adding a word to a DB", err)
 			return false, err
 		}
+
 		return true, nil
 	})
 }
@@ -164,16 +166,29 @@ func (dbI *DBInterface) AddTranslation(input model.FullRecordInput) (bool, error
 		}
 
 		err = dbI.repo.CreateTranslation(&newTranslation, tx)
-		if err != nil {
-			// ---------------------------------------------------------------------------------TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+		
+		var duplicateErr *customerrors.DuplicateKeyError
+		var foreignKeyErr *customerrors.ForeignKeyError
+		if err!=nil{
+			if errors.As(err, &duplicateErr) {	
 				return false, errors.New("Nie można dodać tłumaczenia – narusza ono unikalność rekordów")
-			}
-			if strings.Contains(err.Error(), "violates foreign key constraint") {
+			}else if errors.As(err, &foreignKeyErr){
 				return false, errors.New("Wystąpił błąd podczas dodawania tłumaczenia")
 			}
 			return false, err
 		}
+		//if err != nil {
+
+			
+			// ---------------------------------------------------------------------------------TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+			// if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			// 	return false, errors.New("Nie można dodać tłumaczenia – narusza ono unikalność rekordów")
+			// }
+			// if strings.Contains(err.Error(), "violates foreign key constraint") {
+			// 	return false, errors.New("Wystąpił błąd podczas dodawania tłumaczenia")
+			// }
+			//return false, err
+		//}
 		return true, nil
 		})
 }
@@ -199,16 +214,27 @@ func (dbI *DBInterface) AddExample(input model.FullRecordInput) (bool, error) {
 		for _, example := range exampleSentences {
 			example.TranslationID = translationID
 			err:= dbI.repo.CreateExample(&example, tx)
-			// ---------------------------------------------------------------------------------------	todoooooooooooooooooooooooooooo	
-			if err != nil {
-				if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+
+			var duplicateErr *customerrors.DuplicateKeyError
+			var foreignKeyErr *customerrors.ForeignKeyError
+			if err!=nil{
+				if errors.As(err, &duplicateErr) {	
 					return false, errors.New("Nie można dodać przykładu - narusza ono unikalność rekordów")
-				}
-				if strings.Contains(err.Error(), "violates foreign key constraint") {
+				}else if errors.As(err, &foreignKeyErr){
 					return false, errors.New("Wystąpił błąd podczas dodawania przykładu")
 				}
 				return false, err
 			}
+			// ---------------------------------------------------------------------------------------	todoooooooooooooooooooooooooooo	
+			//if err != nil {
+				// if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+				// 	return false, errors.New("Nie można dodać przykładu - narusza ono unikalność rekordów")
+				// }
+				// if strings.Contains(err.Error(), "violates foreign key constraint") {
+				// 	return false, errors.New("Wystąpił błąd podczas dodawania przykładu")
+				// }
+				// return false, err
+			// }
 		}
 
 		return true, nil

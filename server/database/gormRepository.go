@@ -3,8 +3,11 @@ package database
 
 import (
 	"gorm.io/gorm"
+	"fmt"
 	"log"
 	customerrors "dictionary-app/server/errors"
+	"github.com/jackc/pgx/v5/pgconn"
+	"errors"
 )
 
 type Repository interface {
@@ -18,7 +21,6 @@ type Repository interface {
 	GetWord(word string, result *Word, tx *gorm.DB) error
 	GetTranslation(wordID uint, translation string, result *Translation, tx *gorm.DB) error
 }
-
 
 type GormRepository struct {
 }
@@ -42,15 +44,63 @@ func (r *GormRepository) TransactionWrapper(DB Database, fn func(tx *gorm.DB) (b
 }
 
 func (r *GormRepository)CreateWord(word *Word, tx *gorm.DB) error{
-	return tx.Create(word).Error
+	err := tx.Create(word).Error
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == "23505" {
+				return customerrors.NewDuplicateKeyError("Podane słowo istnieje już w bazie danych")
+			} else {
+				fmt.Println("Postgres error:", pgErr.Message)
+			}
+		} else {
+			fmt.Println("Other error:", err)
+		}
+	}
+	return err
 }
 
 func (r *GormRepository)CreateTranslation(translation *Translation, tx *gorm.DB) error{
-	return tx.Create(translation).Error
+	err := tx.Create(translation).Error
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case "23505":
+				return customerrors.NewDuplicateKeyError("Nie można dodać przykładu – narusza on unikalność rekordów")
+			case "23503":
+				return customerrors.NewForeignKeyError("Nie można dodać przykładu – powiązane tłumaczenie nie istnieje")
+			default:
+				fmt.Println("Postgres error:", pgErr.Message)
+			}
+		} else {
+			fmt.Println("Other error:", err)
+		}
+		return err
+	}
+	return nil
+
 }
 
 func (r *GormRepository)CreateExample(example *ExampleSentence, tx *gorm.DB) error{
-	return tx.Create(example).Error
+	err := tx.Create(example).Error
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case "23505":
+				return customerrors.NewDuplicateKeyError("Nie można dodać przykładu – narusza on unikalność rekordów")
+			case "23503":
+				return customerrors.NewForeignKeyError("Nie można dodać przykładu – powiązane tłumaczenie nie istnieje")
+			default:
+				fmt.Println("Postgres error:", pgErr.Message)
+			}
+		} else {
+			fmt.Println("Other error:", err)
+		}
+		return err
+	}
+	return nil
 }
 
 func (r *GormRepository)DeleteWord(word string, tx *gorm.DB) (bool, error){
