@@ -43,7 +43,8 @@ func (s *IntegrationTestSuite) TestDeleteExample_NonExistingWord() {
 	}
 
 	success, err := s.DB.DeleteExample(input)
-	s.Require().NoError(err)
+	s.Require().Error(err)
+	s.EqualError(err, "Nie usunięto przykładu - nie znaleziono związanego z nim słowa")	
 	s.Require().False(success)
 }
 
@@ -66,7 +67,8 @@ func (s *IntegrationTestSuite) TestDeleteExample_NonExistingTranslation() {
 	}
 
 	success, err := s.DB.DeleteExample(input)
-	s.Require().NoError(err)
+	s.Require().Error(err)
+	s.EqualError(err, "Nie usunięto przykładu - nie znaleziono związanego z nim tłumaczenia")
 	s.Require().False(success)
 }
 

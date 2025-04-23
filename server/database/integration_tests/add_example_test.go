@@ -48,7 +48,8 @@ func (s *IntegrationTestSuite) TestAddExampleNonExistentWord() {
 		Examples: []string{"Example"},
 	}
 	ok, err := s.DB.AddExample(input)
-	s.Require().NoError(err)
+	s.Require().Error(err)
+	s.EqualError(err,  "Nie dodano przykładu - nie znaleziono związanego z nim słowa")
 	s.False(ok)
 }
 
@@ -69,7 +70,8 @@ func (s *IntegrationTestSuite) TestAddExampleNonExistentTranslation() {
 		Examples: []string{"Example"},
 	}
 	ok, err = s.DB.AddExample(input2)
-	s.Require().NoError(err)
+	s.Require().Error(err)
+	s.EqualError(err, "Nie dodano tłumaczenia - nie znaleziono związanego z nim tłumaczenia")
 	s.False(ok)
 }
 

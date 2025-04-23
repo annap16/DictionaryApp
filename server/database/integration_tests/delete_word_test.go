@@ -31,18 +31,20 @@ func (s *IntegrationTestSuite) TestDeleteWord() {
 
 	_, err = s.DB.ReceiveWordTranslation("wordtodelete")
 	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "Record not found")
+	s.EqualError(err, "Nie znaleziono podanego słowa w słowniku")
 }
 
 // Deleting non existing word
 func (s *IntegrationTestSuite) TestDeleteNonExistingWord() {
 	ok, err := s.DB.DeleteWord("nonexistingword")
-	s.Require().NoError(err)
+	s.Require().Error(err)
+	s.EqualError(err, "Nie usunięto podanego słowa - słowa nie znaleziono")	
 	s.Require().False(ok) 
 
 	_, err = s.DB.ReceiveWordTranslation("nonexistingword")
 	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "Record not found")
+	s.EqualError(err, "Nie znaleziono podanego słowa w słowniku")	
+
 }
 
 // --------------------------- PARALLEL TESTS ---------------------------
@@ -69,7 +71,7 @@ func (s *IntegrationTestSuite) TestDeleteWordsInParallel() {
 
 		_, err = s.DB.ReceiveWordTranslation("word1todelete")
 		s.Require().Error(err)
-		s.Require().Contains(err.Error(), "Record not found")
+		s.EqualError(err, "Nie znaleziono podanego słowa w słowniku")
 	}()
 
 	go func() {
@@ -89,7 +91,7 @@ func (s *IntegrationTestSuite) TestDeleteWordsInParallel() {
 
 		_, err = s.DB.ReceiveWordTranslation("word2todelete")
 		s.Require().Error(err)
-		s.Require().Contains(err.Error(), "Record not found")
+		s.EqualError(err, "Nie znaleziono podanego słowa w słowniku")
 	}()
 
 	wg.Wait()
@@ -122,12 +124,12 @@ func (s *IntegrationTestSuite) TestDeleteSameWordConcurrently() {
 			<-startBarrier
 			success, err := s.DB.DeleteWord(word)
 			if err != nil {
-					s.Require().NoError(err)
+				s.Require().Error(err)
+				s.EqualError(err, "Nie usunięto podanego słowa - słowa nie znaleziono")
+				atomic.AddInt32(&errorCount, 1)	
 			} else if success {
 				atomic.AddInt32(&successCount, 1)
-			} else if !success{
-				atomic.AddInt32(&errorCount, 1)	
-			} 
+			}
 		}()
 	}
 
@@ -139,7 +141,7 @@ func (s *IntegrationTestSuite) TestDeleteSameWordConcurrently() {
 
 	_, err = s.DB.ReceiveWordTranslation(word)
 	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "Record not found")
+	s.EqualError(err, "Nie znaleziono podanego słowa w słowniku")
 }
 
 

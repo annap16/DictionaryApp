@@ -48,7 +48,8 @@ func (s *IntegrationTestSuite) TestAddTranslationNonExistentWord() {
         Examples: []string{"Example"},
     }
     ok, err := s.DB.AddTranslation(input)
-    s.Require().NoError(err)
+    s.Require().Error(err)
+    s.EqualError(err, "Nie dodano tłumaczenia - nie znaleziono związanego z nim słowa")
     s.False(ok)
 }
 

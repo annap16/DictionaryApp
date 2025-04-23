@@ -39,7 +39,8 @@ func (s *IntegrationTestSuite) TestDeleteNonExistingTranslation() {
 	translation := "nonexistingtranslation"
 
 	success, err := s.DB.DeleteTranslation(word, translation)
-	s.Require().NoError(err)
+	s.Require().Error(err)
+	s.EqualError(err, "Nie usunięto tłumaczenia - nie znaleziono związanego z nim słowa")	
 	s.Require().False(success)
 }
 

@@ -30,7 +30,7 @@ func (s *IntegrationTestSuite) TestReceiveWordTranslation_Success() {
 func (s *IntegrationTestSuite) TestReceiveWordTranslation_NotFound() {
 	_, err := s.DB.ReceiveWordTranslation("nonexistentword")
 	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "Record not found")
+	s.EqualError(err, "Nie znaleziono podanego słowa w słowniku")
 }
 
 // Receiving word after deleting it from database
@@ -50,7 +50,7 @@ func (s *IntegrationTestSuite) TestReceiveWordTranslation_AfterDeletion() {
 
 	_, err = s.DB.ReceiveWordTranslation("tobedeleted")
 	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "Record not found")
+	s.EqualError(err, "Nie znaleziono podanego słowa w słowniku")
 }
 
 // Receiving the same word many times sequentially
