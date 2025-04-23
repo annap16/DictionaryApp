@@ -1,5 +1,8 @@
 # Dictionary Application
-
+## Table of Contents
+- [Application Overview](#application-overview)
+- [Setup and Usage Instructions](#setup-and-usage-instructions)
+- [Command Schema in Command-Line Application](command-schema-in-command-line-appliction)
 ## Application Overview
 The application consists of a client and a server. The server is responsible for handling communication with the database, processing translations concurrently, and implementing other features as described in the recruitment assignment. The client is a simple command-line application that parses and interprets user input. It allows users to interact with the application easily by validating input and converting it into GraphQL queries.  
 
@@ -27,7 +30,7 @@ Commands such as `dodaj`, `usuń`, and `modyfikuj` are **not case-sensitive** in
 
 ## Database Design
 Below is the entity-relationship diagram (ERD) representing the database tables:
-
+![Database](https://github.com/user-attachments/assets/29584b36-660e-42da-a6ce-2ceb69535a8a)
 The following is the database schema, including indexes omitted in image.
 ```sql
 -- Database Schema
@@ -38,6 +41,7 @@ CREATE TABLE Word (
 );
 
 CREATE TABLE Translation (
+
   ID INTEGER PRIMARY KEY,
   Translation TEXT NOT NULL,
   WordID INTEGER NOT NULL,
@@ -48,13 +52,15 @@ CREATE TABLE Translation (
 CREATE TABLE ExampleSentence (
   ID INTEGER PRIMARY KEY,
   Sentence TEXT NOT NULL,
+
+
   TranslationID INTEGER NOT NULL,
   UNIQUE (Sentence, TranslationID),
   FOREIGN KEY (TranslationID) REFERENCES Translation(ID)
 );
 ```
 ## GraphQL Queries and Mutation
-Examples of GraphQL queries and mutations are provided in the file:
+Examples of GraphQL queries and mutations are provided in the file: [GraphQLexamples.txt](https://github.com/user-attachments/files/19872124/GraphQLexamples.txt)
 
 ## Example Client Commands
 - **Adding a new word:** <pre>```dodaj książka book [I love my new book] [This is a book]```</pre>
@@ -64,3 +70,4 @@ Examples of GraphQL queries and mutations are provided in the file:
 - **Modifying an existing word - removing an example sentence:** <pre>```modyfikuj usuń przykład książka book [New example] [New example nr 2]```</pre>
 - **Modifying an existing word - removing a translation:** <pre>```modyfikuj usuń tłumaczenie książka tome```</pre>
 - **Deleting an existing word:** <pre>```usuń książka```</pre>
+
