@@ -5,6 +5,9 @@ import(
 	"fmt"
 	"context"
 	"dictionary-app/server/graph/model"
+	//"errors"
+	//customerrors "dictionary-app/server/errors"
+
 )
 
 //Implementing responsibility chain pattern for commands handling
@@ -38,11 +41,14 @@ func (c *CreateCommandHandler) HandleCommand(command string) bool{
 		}
 
 		ctx := context.Background()
-		success, err := c.handler.SendCreateMutation(ctx, input)
-		if err != nil {
-			fmt.Println("Wystąpił błąd podczas dodawania do bazy danych:", err)
-		}else if !success{
-			fmt.Println("Podane słowo istnieje już w słowniku")
+		_, err := c.handler.SendCreateMutation(ctx, input)
+		if err!=nil{
+			if strings.HasPrefix(err.Error(), "graphql: "){
+				cleanMsg := strings.TrimPrefix(err.Error(), "graphql: ")
+				fmt.Println("Błąd: ", cleanMsg)
+			}else{
+				fmt.Println("Błąd: ", err.Error())
+			}
 		}else{
 			fmt.Println("Słowo zostało dodane do słownika")
 		}
@@ -73,12 +79,16 @@ func (r *ReceiveCommandHandler) HandleCommand(command string) bool{
 		}
 		ctx := context.Background()
 		received, err := r.handler.SendReceiveMutation(ctx, strings.ToLower(commandSplitted[1]))
+
 		if err!=nil{
-			fmt.Println("Wystąpił błąd podczas wyszukiwania w słowniku:", err)
+			if strings.HasPrefix(err.Error(), "graphql: "){
+				cleanMsg := strings.TrimPrefix(err.Error(), "graphql: ")
+				fmt.Println("Błąd: ", cleanMsg)
+			}else{
+				fmt.Println("Błąd: ", err.Error())
+			}
 		}else if received!=""{
 			fmt.Println(received)
-		}else{
-			fmt.Println("Podane słowo nie istnieje w słowniku")
 		}
 		return true
 	}
@@ -113,10 +123,13 @@ func (m *ModifyCommandHandler) HandleCommand(command string) bool{
 
 		if success{
 			fmt.Println("Słowo zostało zmodyfikowane poprawnie")
-		}else if err==nil{
-			fmt.Println("Wprowadzono niepoprawne polecenie")
-		}else{
-			fmt.Println(err)
+		}else if err!=nil{
+			if strings.HasPrefix(err.Error(), "graphql: "){
+				cleanMsg := strings.TrimPrefix(err.Error(), "graphql: ")
+				fmt.Println("Błąd: ", cleanMsg)
+			}else{
+				fmt.Println("Błąd: ", err.Error())
+			}
 		}
 		return true
 	}
@@ -147,11 +160,14 @@ func (r *RemoveCommandHandler) HandleCommand(command string) bool{
 		ctx := context.Background()
 		success, err := r.handler.SendRemoveMutation(ctx, commandSplitted[1])
 		if err!=nil{
-			fmt.Println("Wystąpił błąd podczas usuwania słowa ze słownika:", err)
+			if strings.HasPrefix(err.Error(), "graphql: "){
+				cleanMsg := strings.TrimPrefix(err.Error(), "graphql: ")
+				fmt.Println("Błąd: ", cleanMsg)
+			}else{
+				fmt.Println("Błąd: ", err.Error())
+			}
 		}else if success{
 			fmt.Println("Podane słowo i powiązane z nim dane zostały usunięte")
-		}else{
-			fmt.Println("Podane słowo nie istnieje w słowniku")
 		}
 		return true
 	}

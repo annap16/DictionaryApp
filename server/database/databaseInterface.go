@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 	"dictionary-app/server/graph/model"
+	customerrors "dictionary-app/server/errors"
 	"gorm.io/gorm"
 )
 
@@ -22,18 +23,19 @@ func (dbI *DBInterface) AddWord(input model.FullRecordInput) (bool, error) {
 	exampleSentences := createExampleSentences(input.Examples)
 
 	translation := Translation{ 
-		Translation:      input.Translation,
+		Translation: input.Translation,
 		ExampleSentences: exampleSentences, 
 	}
 
 	word := Word{ 
-		Word:         input.Word,
+		Word: input.Word,
 		Translations: []Translation{translation}, 
 	}
 
 	return dbI.repo.TransactionWrapper(dbI.DB,func(tx *gorm.DB) (bool, error){
 		err := dbI.repo.CreateWord(&word, tx)
 		if err != nil {
+			// ---------------------------------------------------------------------------------TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 				return dbI.AddTranslation(input)
 			}
@@ -54,8 +56,7 @@ func (dbI *DBInterface) ReceiveWordTranslation(input string) (*model.Word, error
 			return false, err
 		}
 		if result.ID == 0 {
-			err := errors.New("Record not found")
-			return false, err
+			return false, customerrors.NewNotFoundError("Nie znaleziono podanego słowa w słowniku")
 		}
 		return true, nil
 	})
@@ -110,15 +111,10 @@ func (dbI *DBInterface) DeleteTranslation(word string, translation string) (bool
 		if err!=nil{
 			return false, err
 		} else if wordID==0{
-			return false, nil
+			return false, customerrors.NewNotFoundError("Nie usunięto tłumaczenia - nie znaleziono związanego z nim słowa")
 		}
 
-		success, err := dbI.repo.DeleteTranslation(wordID, translation, tx)
-		if !success && err==nil{
-			return success, errors.New("Nie znaleziono tłumaczenia")
-		}
-		
-		return success, err
+		return dbI.repo.DeleteTranslation(wordID, translation, tx)
 	})
 }
 
@@ -128,14 +124,14 @@ func (dbI *DBInterface) DeleteExample(input model.FullRecordInput)(bool, error){
 		if err!=nil{
 			return false, err
 		} else if wordID==0{
-			return false, nil
+			return false, customerrors.NewNotFoundError("Nie usunięto przykładu - nie znaleziono związanego z nim słowa")
 		}
 
 		translationID, err := dbI.GetTranslationID(tx, wordID, input.Translation)
 		if err != nil{
 			return false, err
 		}else if translationID==0{
-			return false, nil
+			return false,  customerrors.NewNotFoundError("Nie usunięto przykładu - nie znaleziono związanego z nim tłumaczenia")
 		}
 		
 		for _, example := range input.Examples {
@@ -156,19 +152,20 @@ func (dbI *DBInterface) AddTranslation(input model.FullRecordInput) (bool, error
 		if err!=nil{
 			return false, err
 		} else if wordID==0{
-			return false, nil
+			return false,  customerrors.NewNotFoundError("Nie dodano tłumaczenia - nie znaleziono związanego z nim słowa")
 		}
 
 		exampleSentences := createExampleSentences(input.Examples)
 
 		newTranslation := Translation{
-			Translation:      input.Translation,
-			WordID:           wordID,
+			Translation: input.Translation,
+			WordID: wordID,
 			ExampleSentences: exampleSentences,
 		}
 
 		err = dbI.repo.CreateTranslation(&newTranslation, tx)
 		if err != nil {
+			// ---------------------------------------------------------------------------------TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 				return false, errors.New("Nie można dodać tłumaczenia – narusza ono unikalność rekordów")
 			}
@@ -187,14 +184,14 @@ func (dbI *DBInterface) AddExample(input model.FullRecordInput) (bool, error) {
 		if err!=nil{
 			return false, err
 		} else if wordID==0{
-			return false, nil
+			return false, customerrors.NewNotFoundError("Nie dodano przykładu - nie znaleziono związanego z nim słowa")
 		}
 
 		translationID, err := dbI.GetTranslationID(tx, wordID, input.Translation)
 		if err != nil{
 			return false, err
 		}else if translationID==0{
-			return false, nil
+			return false, customerrors.NewNotFoundError("Nie dodano tłumaczenia - nie znaleziono związanego z nim tłumaczenia")
 		}
 
 		exampleSentences := createExampleSentences(input.Examples)
@@ -202,6 +199,7 @@ func (dbI *DBInterface) AddExample(input model.FullRecordInput) (bool, error) {
 		for _, example := range exampleSentences {
 			example.TranslationID = translationID
 			err:= dbI.repo.CreateExample(&example, tx)
+			// ---------------------------------------------------------------------------------------	todoooooooooooooooooooooooooooo	
 			if err != nil {
 				if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 					return false, errors.New("Nie można dodać przykładu - narusza ono unikalność rekordów")

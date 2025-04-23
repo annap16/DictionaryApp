@@ -4,6 +4,7 @@ package database
 import (
 	"gorm.io/gorm"
 	"log"
+	customerrors "dictionary-app/server/errors"
 )
 
 type Repository interface {
@@ -59,7 +60,7 @@ func (r *GormRepository)DeleteWord(word string, tx *gorm.DB) (bool, error){
 		return false, result.Error
 	}
 	if result.RowsAffected == 0 {
-		return false, nil
+		return false, customerrors.NewNotFoundError("Nie usunięto podanego słowa - słowa nie znaleziono")
 	}
 	return true, nil
 }
@@ -71,7 +72,7 @@ func (r *GormRepository)DeleteTranslation(wordID uint, translation string, tx *g
 		return false, result.Error
 	}
 	if result.RowsAffected == 0 {
-		return false, nil
+		return false, customerrors.NewNotFoundError("Nie usunięto podanego tłumaczenia - tłumaczenia nie znaleziono")
 	}
 	return true, nil
 }
@@ -83,7 +84,7 @@ func (r *GormRepository)DeleteExample(translationID uint, sentence string, tx *g
 		return false, result.Error
 	}
 	if result.RowsAffected == 0 {
-		return false, nil
+		return false,  customerrors.NewNotFoundError("Nie usunięto podanego przykładu - przykładu nie znaleziono")
 	}
 	return true, nil
 }

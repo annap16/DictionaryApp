@@ -55,10 +55,7 @@ func (q *QueriesHandlerQL) SendCreateMutation(ctx context.Context, input model.F
 	err := q.client.Run(context.Background(), request, &response)
 
 	if err != nil {
-		if strings.Contains(err.Error(), "Record not found") {
-			return "", nil
-		}
-		return "", err
+		return  "", err
 	}
 
 	return q.ParseReceiveResponse(response), nil
