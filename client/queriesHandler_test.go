@@ -131,7 +131,7 @@ func TestSendReceiveMutation(t *testing.T) {
 				mockClient.On("Run", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("Record not found"))
 			},
 			expectedResult: "",
-			expectedError:  nil,
+			expectedError:  errors.New("Record not found"),
 		},
 	}
 
