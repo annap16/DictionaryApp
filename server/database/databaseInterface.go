@@ -3,7 +3,6 @@ package database
 import (
 	"fmt"
 	"errors"
-	//"strings"
 	"dictionary-app/server/graph/model"
 	customerrors "dictionary-app/server/errors"
 	"gorm.io/gorm"
@@ -177,18 +176,6 @@ func (dbI *DBInterface) AddTranslation(input model.FullRecordInput) (bool, error
 			}
 			return false, err
 		}
-		//if err != nil {
-
-			
-			// ---------------------------------------------------------------------------------TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-			// if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			// 	return false, errors.New("Nie można dodać tłumaczenia – narusza ono unikalność rekordów")
-			// }
-			// if strings.Contains(err.Error(), "violates foreign key constraint") {
-			// 	return false, errors.New("Wystąpił błąd podczas dodawania tłumaczenia")
-			// }
-			//return false, err
-		//}
 		return true, nil
 		})
 }
@@ -225,16 +212,6 @@ func (dbI *DBInterface) AddExample(input model.FullRecordInput) (bool, error) {
 				}
 				return false, err
 			}
-			// ---------------------------------------------------------------------------------------	todoooooooooooooooooooooooooooo	
-			//if err != nil {
-				// if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-				// 	return false, errors.New("Nie można dodać przykładu - narusza ono unikalność rekordów")
-				// }
-				// if strings.Contains(err.Error(), "violates foreign key constraint") {
-				// 	return false, errors.New("Wystąpił błąd podczas dodawania przykładu")
-				// }
-				// return false, err
-			// }
 		}
 
 		return true, nil
